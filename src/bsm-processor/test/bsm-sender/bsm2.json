@@ -1,0 +1,19 @@
+{
+    "BasicVehicle": {
+        "heading_Degree": 272.06,
+        "position": {
+            "elevation_Meter": 742.2648,
+            "latitude_DecimalDegree":  32.236062,
+            "longitude_DecimalDegree": -110.951071
+        },
+        "secMark_Second": 720,
+        "size": {
+            "length_cm": 1220.968,
+            "width_cm": 324.094
+        },
+        "speed_MeterPerSecond": 16.49,
+        "temporaryID": 650,
+        "type": "Truck"
+    },
+    "MsgType": "BSM"
+}
