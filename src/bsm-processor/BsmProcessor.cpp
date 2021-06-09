@@ -169,7 +169,8 @@ void BsmProcessor::getVehicleInformationFromMAP(BasicVehicle basicVehicle)
 		else if (unsigned(vehicleTracking_t_1.intsectionTrackingState.vehicleIntersectionStatus) == static_cast<int>(MsgEnum::mapLocType::insideIntersectionBox))
 			locationOnMap = "insideIntersectionBox";
 
-		logFile << fixed << showpoint << setprecision(6) << timeStamp << "," << vehicleId << "," << vehicleType << "," << vehicleDistanceFromStopBar << "," << vehicleSpeed << "," << vehicleHeading << "," << vehicleLaneId << "," << vehicleApproachId << "," << vehicleSignalGroup << endl;
+		logFile << fixed << showpoint << setprecision(4) << timeStamp << ",";
+		logFile << fixed << showpoint << setprecision(2) << vehicleId << "," << vehicleType << "," << vehicleDistanceFromStopBar << "," << vehicleSpeed << "," << vehicleHeading << "," << locationOnMap << "," << vehicleLaneId << "," << vehicleApproachId << "," << vehicleSignalGroup << endl;
 
 	}
 }

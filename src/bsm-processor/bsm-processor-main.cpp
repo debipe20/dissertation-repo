@@ -39,17 +39,16 @@ int main()
     BasicVehicle basicVehicle;
 
     //Socket Communication
-    UdpSocket bsmProcessorSocket(static_cast<short unsigned int>(jsonObject["PortNumber"]["TrajectoryAware"].asInt()));
+    UdpSocket bsmProcessorSocket(static_cast<short unsigned int>(jsonObject["PortNumber"]["MessageDistributor"].asInt()));
 
     char receiveBuffer[40960];
-    int msgType{};
+
     while (true)
     {
         bsmProcessorSocket.receiveData(receiveBuffer, sizeof(receiveBuffer));
         string receivedJsonString(receiveBuffer);
-        cout << "Received Message is " << receivedJsonString << endl;
-        msgType = bsmProcessor.getMessageType(receivedJsonString);
-        if (msgType == MsgEnum::DSRCmsgID_bsm)
+
+        if (bsmProcessor.getMessageType(receivedJsonString) == MsgEnum::DSRCmsgID_bsm)
         {
             basicVehicle.json2BasicVehicle(receivedJsonString);
             bsmProcessor.getVehicleInformationFromMAP(basicVehicle);
