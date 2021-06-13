@@ -26,9 +26,11 @@
 #include <string>
 #include <fstream>
 #include <chrono>
+#include "DataPointStructure.h"
 #include "BasicVehicle.h"
 #include <json/json.h>
 #include "locAware.h"
+#include "msgEnum.h"
 
 using std::vector;
 using std::string;
@@ -41,6 +43,9 @@ using std::fixed;
 using std::setprecision;
 using std::showpoint;
 
+#define FeetToMeterConversion 0.3048
+#define StandardQueueLengthPerVehicle 25.0
+
 class VehiclePredictionDataProcessor
 {
 private:
@@ -51,6 +56,7 @@ private:
     ofstream logFile;
 
     LocAware *plocAwareLib;
+    vector<DataPointStructure>DataPointList;
 
 public:
     VehiclePredictionDataProcessor(string configFilename);
@@ -58,5 +64,7 @@ public:
     void getVehicleInformationFromMAP(BasicVehicle basicVehicle);
     int getMessageType(string jsonString);
     string readIntersectionMapConfig(string configFilename);
+    void createDataPointStructure();
+    void getNoOfCells();
 
 };

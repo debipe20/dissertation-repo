@@ -1,0 +1,13 @@
+{
+    "IntersectionName" : "speedway-mountain",
+    "ApproachId": 1,
+    "ApproachSpeedLimit": 35.0,
+    "NoOfThroughLanes":3,
+    "ThroughLanesLength": 50,
+    "NoOfLeftTurnPocket":2,
+    "LeftTurnPocketLength": 25,
+    "ThoughLanesSignalGroup": 2,
+    "LeftTurnPocketsSignalGroup": 5,
+    "ThroughLanesId": [1,2,3],
+    "LeftTurnPocketsId": [3,4]
+}

@@ -40,6 +40,8 @@ VehiclePredictionDataProcessor::VehiclePredictionDataProcessor(string configFile
 
 	LocAware *tempPlocAwareLib = new LocAware(fmap, singleFrame);
 	plocAwareLib = tempPlocAwareLib;
+
+	createDataPointStructure();
 }
 
 
@@ -174,6 +176,71 @@ void VehiclePredictionDataProcessor::getVehicleInformationFromMAP(BasicVehicle b
 
 	}
 }
+
+void VehiclePredictionDataProcessor::createDataPointStructure()
+{
+	Json::Value jsonObject;
+	Json::CharReaderBuilder builder;
+	Json::CharReader *reader = builder.newCharReader();
+	string errors{};
+	ifstream jsonconfigfile("mmitss-intersection-information-config.json");
+	string configJsonString((std::istreambuf_iterator<char>(jsonconfigfile)), std::istreambuf_iterator<char>());
+
+	bool parsingSuccessful = reader->parse(configJsonString.c_str(), configJsonString.c_str() + configJsonString.size(), &jsonObject, &errors);
+	delete reader;
+	DataPointStructure dataPointStructure;
+	dataPointStructure.reset();
+	double cellLength = StandardQueueLengthPerVehicle * FeetToMeterConversion;
+	double cellStartPoint{};
+	
+	if (parsingSuccessful)
+	{
+		int approachId = jsonObject["ApproachId"].asInt();
+		int noOfThroughLanes = jsonObject["NoOfThroughLanes"].asInt();
+		int throughLanesLength = jsonObject["ThroughLanesLength"].asInt();
+		int noOfLeftTurnPockets = jsonObject["NoOfLeftTurnPocket"].asInt();
+		int leftTurnPocketsLength = jsonObject["LeftTurnPocketLength"].asInt();
+		int noOfCellsPerThroughLane = static_cast<int>(throughLanesLength / cellLength);
+        int noOfCellsPerLeftTurnPocket = static_cast<int>(leftTurnPocketsLength / cellLength);
+
+		for (int i = 0; i < noOfLeftTurnPockets; i++)
+		{
+			for (int j = 0; j < noOfCellsPerLeftTurnPocket; j++)
+			{
+				dataPointStructure.signalGroup = jsonObject["LeftTurnPocketsSignalGroup"].asInt();
+				dataPointStructure.laneId = jsonObject["LeftTurnPocketsId"][i].asInt();
+				dataPointStructure.approachId = approachId;
+				dataPointStructure.locationOnMap = static_cast<int>(MsgEnum::mapLocType::onInbound);
+				dataPointStructure.cellStartPonit = cellStartPoint;
+				dataPointStructure.cellEndPont = cellStartPoint + cellLength;
+				dataPointStructure.cellStatus = false;
+				
+				DataPointList.push_back(dataPointStructure);
+				cellStartPoint = cellStartPoint + cellLength;
+			}
+		}
+
+		for (int i = 0; i < noOfThroughLanes; i++)
+		{
+			cellStartPoint = 0.0;
+			
+			for (int j = 0; j < noOfCellsPerThroughLane; j++)
+			{
+				dataPointStructure.signalGroup = jsonObject["ThoughLanesSignalGroup"].asInt();
+				dataPointStructure.laneId = jsonObject["ThroughLanesId"][i].asInt();
+				dataPointStructure.approachId = approachId;
+				dataPointStructure.locationOnMap = static_cast<int>(MsgEnum::mapLocType::onInbound);
+				dataPointStructure.cellStartPonit = cellStartPoint;
+				dataPointStructure.cellEndPont = cellStartPoint + cellLength;
+				dataPointStructure.cellStatus = false;
+				
+				DataPointList.push_back(dataPointStructure);
+				cellStartPoint = cellStartPoint + cellLength;
+			}
+		}		
+	}
+}
+
 
 VehiclePredictionDataProcessor::~VehiclePredictionDataProcessor()
 {
