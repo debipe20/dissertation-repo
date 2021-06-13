@@ -100,7 +100,7 @@ string BsmProcessor::readIntersectionMapConfig(string configFilename)
 			   << " " << intersectionName << " " << mapPayload << std::endl;
 	outputfile.close();
 
-	logFile.open("data.csv");
+	logFile.open("test-data.csv");
 	logFile << "TimeStamp" << "," << "VehicleId" << "," << "VehicleType" << "," << "DistanceToStopBar" << "," << "Speed" << "," << "Heading" << "," << "LocationOnMap" << "," << "LaneId" << "," << "ApproachId" << "," << "SignalGroup" << endl;  
 
 	return fmap;
