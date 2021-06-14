@@ -14,9 +14,10 @@ struct DataPointStructure
     double speed{};
     double heading{};
     double distanceToStopBar{};
+    double stoppedDelay{};
     double cellStartPonit{};
     double cellEndPont{};
-    double timeStamp{};
+    // double timeStamp{};
     bool cellStatus{};
     
     void reset()
@@ -33,7 +34,7 @@ struct DataPointStructure
         distanceToStopBar = 0.0;
         cellStartPonit = 0.0;
         cellEndPont = 0.0;
-        timeStamp = 0.0;
+        // timeStamp = 0.0;
         cellStatus = false;
     }
 };

@@ -1,0 +1,30 @@
+{
+    "MsgType": "VehicleStatusList",
+    "NoOfVehicle": 2,
+    "VehcileStatusList": [
+        {
+            "distanceFromStopBar": 16.0,
+            "heading_Degree": 269.44999999999999,
+            "inBoundApproachId": 1,
+            "inBoundLaneId": 3,
+            "locationOnMap": 2,
+            "signalGroup": 6,
+            "speed_MeterPerSecond": 17.731000000000002,
+            "stoppedDelay": 0.0,
+            "vehicleId": 602,
+            "vehicleType": 6
+        },
+        {
+            "distanceFromStopBar": 12.0,
+            "heading_Degree": 272.06,
+            "inBoundApproachId": 1,
+            "inBoundLaneId": 2,
+            "locationOnMap": 2,
+            "signalGroup": 6,
+            "speed_MeterPerSecond": 56.489999999999998,
+            "stoppedDelay": 0.0,
+            "vehicleId": 650,
+            "vehicleType": 9
+        }
+    ]
+}
