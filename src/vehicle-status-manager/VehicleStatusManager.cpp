@@ -131,7 +131,8 @@ void VehicleStatusManager::getVehicleInformationFromMAP(BasicVehicle basicVehicl
 		vehicleId = basicVehicle.getTemporaryID();
 
 		vector<VehicleStatus>::iterator findVehicleIdInVehicleStatusList = std::find_if(std::begin(VehcileStatusList), std::end(VehcileStatusList),
-																					  [&](VehicleStatus const &p) { return p.vehicleId == vehicleId; });
+																						[&](VehicleStatus const &p)
+																						{ return p.vehicleId == vehicleId; });
 
 		findVehicleIdInVehicleStatusList->vehicleDistanceFromStopBar = vehicleDistanceFromStopBar;
 		findVehicleIdInVehicleStatusList->vehicleLaneId = vehicleLaneId;
@@ -164,17 +165,20 @@ void VehicleStatusManager::manageVehicleStatusList(BasicVehicle basicVehicle)
 	int vehicleType{};
 	VehicleStatus vehicleStatus;
 	vehicleStatus.reset();
-	
+
 	if (addVehicleIDInVehicleStatusList(basicVehicle))
 	{
 		if (basicVehicle.getType() == "Transit")
 			vehicleType = Transit;
-		
+
 		else if (basicVehicle.getType() == "Truck")
 			vehicleType = Truck;
 
 		else if (basicVehicle.getType() == "EmergencyVehicle")
 			vehicleType = EmergencyVehicle;
+
+		else if (basicVehicle.getType() == "Car")
+			vehicleType = PassengerVehicle;
 
 		vehicleStatus.vehicleId = basicVehicle.getTemporaryID();
 		vehicleStatus.vehicleType = vehicleType;
@@ -190,7 +194,8 @@ void VehicleStatusManager::manageVehicleStatusList(BasicVehicle basicVehicle)
 		vehicleId = basicVehicle.getTemporaryID();
 
 		vector<VehicleStatus>::iterator findVehicleIdInVehicleStatusList = std::find_if(std::begin(VehcileStatusList), std::end(VehcileStatusList),
-																					  [&](VehicleStatus const &p) { return p.vehicleId == vehicleId; });
+																						[&](VehicleStatus const &p)
+																						{ return p.vehicleId == vehicleId; });
 
 		findVehicleIdInVehicleStatusList->vehicleSpeed_MeterPerSecond = basicVehicle.getSpeed_MeterPerSecond();
 		findVehicleIdInVehicleStatusList->vehicleHeading_Degree = basicVehicle.getHeading_Degree();
@@ -210,7 +215,8 @@ bool VehicleStatusManager::addVehicleIDInVehicleStatusList(BasicVehicle basicVeh
 	int vehicleId = basicVehicle.getTemporaryID();
 
 	vector<VehicleStatus>::iterator findVehicleIdInVehicleStatusList = std::find_if(std::begin(VehcileStatusList), std::end(VehcileStatusList),
-																				  [&](VehicleStatus const &p) { return p.vehicleId == vehicleId; });
+																					[&](VehicleStatus const &p)
+																					{ return p.vehicleId == vehicleId; });
 
 	if (VehcileStatusList.empty())
 		addVehicleID = true;
@@ -231,7 +237,8 @@ bool VehicleStatusManager::updateVehicleIDInVehicleStatusList(BasicVehicle basic
 	int veheicleID = basicVehicle.getTemporaryID();
 
 	vector<VehicleStatus>::iterator findVehicleIdInVehicleStatusList = std::find_if(std::begin(VehcileStatusList), std::end(VehcileStatusList),
-																				  [&](VehicleStatus const &p) { return p.vehicleId == veheicleID; });
+																					[&](VehicleStatus const &p)
+																					{ return p.vehicleId == veheicleID; });
 
 	if (VehcileStatusList.empty())
 		updateVehicleID = false;
@@ -263,7 +270,8 @@ void VehicleStatusManager::deleteTimedOutVehicleIdFromVehicleStatusList()
 				vehicleId = VehcileStatusList[i].vehicleId;
 
 				vector<VehicleStatus>::iterator findVehicleIDInVehicleStatusList = std::find_if(std::begin(VehcileStatusList), std::end(VehcileStatusList),
-																							  [&](VehicleStatus const &p) { return p.vehicleId == vehicleId; });
+																								[&](VehicleStatus const &p)
+																								{ return p.vehicleId == vehicleId; });
 
 				VehcileStatusList.erase(findVehicleIDInVehicleStatusList);
 				i--;
@@ -279,7 +287,9 @@ string VehicleStatusManager::getVehicleStatusList(int requested_ApproachId)
 {
 	string vehicleStatusListJsonString{};
 	int noOfVehicle{};
-
+	int temporaryVehicleID{};
+	vector<VehicleStatus> TemporaryVehcileStatusList{};
+	TemporaryVehcileStatusList = VehcileStatusList;
 	Json::Value jsonObject;
 	Json::StreamWriterBuilder builder;
 	builder["commentStyle"] = "None";
@@ -287,24 +297,36 @@ string VehicleStatusManager::getVehicleStatusList(int requested_ApproachId)
 
 	jsonObject["MsgType"] = "VehicleStatusList";
 
-	for (unsigned int i = 0; i < VehcileStatusList.size(); i++)
+	for (unsigned int i = 0; i < TemporaryVehcileStatusList.size(); i++)
 	{
-		if (requested_ApproachId == VehcileStatusList[i].vehicleApproachId)
+		temporaryVehicleID = TemporaryVehcileStatusList[i].vehicleId;
+		if (requested_ApproachId != TemporaryVehcileStatusList[i].vehicleApproachId)
+		{
+			vector<VehicleStatus>::iterator findVehicleIDOnList = std::find_if(std::begin(TemporaryVehcileStatusList), std::end(TemporaryVehcileStatusList),
+																			 [&](VehicleStatus const &p)
+																			 { return p.vehicleId == temporaryVehicleID; });
+
+			TemporaryVehcileStatusList.erase(findVehicleIDOnList);
+			i--;
+		}
+	}
+
+	for (unsigned int i = 0; i < TemporaryVehcileStatusList.size(); i++)
+	{
+		if (requested_ApproachId == TemporaryVehcileStatusList[i].vehicleApproachId)
 		{
 			noOfVehicle++;
-			jsonObject["VehcileStatusList"][i]["vehicleId"] = VehcileStatusList[i].vehicleId;
-			jsonObject["VehcileStatusList"][i]["vehicleType"] = VehcileStatusList[i].vehicleType;
-			jsonObject["VehcileStatusList"][i]["speed_MeterPerSecond"] = VehcileStatusList[i].vehicleSpeed_MeterPerSecond;
-			jsonObject["VehcileStatusList"][i]["heading_Degree"] = VehcileStatusList[i].vehicleHeading_Degree;
-			jsonObject["VehcileStatusList"][i]["inBoundLaneId"] = VehcileStatusList[i].vehicleLaneId;
-			jsonObject["VehcileStatusList"][i]["inBoundApproachId"] = VehcileStatusList[i].vehicleApproachId;
-			jsonObject["VehcileStatusList"][i]["signalGroup"] = VehcileStatusList[i].vehicleSignalGroup;
-			jsonObject["VehcileStatusList"][i]["distanceFromStopBar"] = VehcileStatusList[i].vehicleDistanceFromStopBar;
-			jsonObject["VehcileStatusList"][i]["stoppedDelay"] = VehcileStatusList[i].vehicleStoppedDelay;
-			jsonObject["VehcileStatusList"][i]["locationOnMap"] = VehcileStatusList[i].vehicleLocationOnMap;
+			jsonObject["VehcileStatusList"][i]["vehicleId"] = TemporaryVehcileStatusList[i].vehicleId;
+			jsonObject["VehcileStatusList"][i]["vehicleType"] = TemporaryVehcileStatusList[i].vehicleType;
+			jsonObject["VehcileStatusList"][i]["speed_MeterPerSecond"] = TemporaryVehcileStatusList[i].vehicleSpeed_MeterPerSecond;
+			jsonObject["VehcileStatusList"][i]["heading_Degree"] = TemporaryVehcileStatusList[i].vehicleHeading_Degree;
+			jsonObject["VehcileStatusList"][i]["inBoundLaneId"] = TemporaryVehcileStatusList[i].vehicleLaneId;
+			jsonObject["VehcileStatusList"][i]["inBoundApproachId"] = TemporaryVehcileStatusList[i].vehicleApproachId;
+			jsonObject["VehcileStatusList"][i]["signalGroup"] = TemporaryVehcileStatusList[i].vehicleSignalGroup;
+			jsonObject["VehcileStatusList"][i]["distanceFromStopBar"] = TemporaryVehcileStatusList[i].vehicleDistanceFromStopBar;
+			jsonObject["VehcileStatusList"][i]["stoppedDelay"] = TemporaryVehcileStatusList[i].vehicleStoppedDelay;
+			jsonObject["VehcileStatusList"][i]["locationOnMap"] = TemporaryVehcileStatusList[i].vehicleLocationOnMap;
 		}
-		else
-			continue;
 	}
 
 	jsonObject["NoOfVehicle"] = noOfVehicle;

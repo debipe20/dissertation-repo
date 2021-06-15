@@ -33,6 +33,7 @@
 #define EmergencyVehicle 2
 #define Transit 6
 #define Truck 9
+#define PassengerVehicle 4
 
 using std::vector;
 using std::string;
