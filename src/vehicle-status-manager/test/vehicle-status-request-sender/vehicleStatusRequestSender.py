@@ -16,7 +16,7 @@ dataCollectorSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 dataCollectorSocket.bind((hostIp,port))
 dataCollectorSocket.settimeout(0)
 
-bsmProcessorPort = config["PortNumber"]["PeerToPeerPriority"]
+bsmProcessorPort = config["PortNumber"]["MessageDistributor"]
 communicationInfo = (hostIp, bsmProcessorPort)
 
 msgSendingTime = 0.0
