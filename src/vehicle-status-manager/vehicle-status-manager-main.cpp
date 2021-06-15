@@ -45,7 +45,6 @@ int main()
 
     char receiveBuffer[163840];
     bool timedOutOccur{};
-    int requestedApproachId{};
     string vehicleStatusListJsonString{};
     
     while (true)
