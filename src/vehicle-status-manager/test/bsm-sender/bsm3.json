@@ -1,0 +1,19 @@
+{
+    "BasicVehicle": {
+        "heading_Degree": 92.06,
+        "position": {
+            "elevation_Meter": 742.2638,
+            "latitude_DecimalDegree":  32.235855,
+            "longitude_DecimalDegree": -110.953516
+        },
+        "secMark_Second": 720,
+        "size": {
+            "length_cm": 1220.968,
+            "width_cm": 324.094
+        },
+        "speed_MeterPerSecond": 15.49,
+        "temporaryID": 652,
+        "type": "EmergencyVehicle"
+    },
+    "MsgType": "BSM"
+}

@@ -1,0 +1,36 @@
+{
+    "MsgType": "VehicleStatusList",
+    "NoOfVehicle": 2,
+    "VehcileStatusList": [
+        {
+            "distanceFromStopBar": 56.0,
+            "elevation_Meter": 740.15800000000002,
+            "heading_Degree": 269.44999999999999,
+            "inBoundApproachId": 1,
+            "inBoundLaneId": 3,
+            "latitude_DecimalDegree": 32.236041999999998,
+            "locationOnMap": "Inbound",
+            "longitude_DecimalDegree": -110.951652,
+            "signalGroup": 6,
+            "speed_MeterPerSecond": 17.731000000000002,
+            "stoppedDelay": 0.0,
+            "vehicleId": 602,
+            "vehicleType": "Transit"
+        },
+        {
+            "distanceFromStopBar": 112.0,
+            "elevation_Meter": 742.26480000000004,
+            "heading_Degree": 272.06,
+            "inBoundApproachId": 1,
+            "inBoundLaneId": 2,
+            "latitude_DecimalDegree": 32.236061999999997,
+            "locationOnMap": "Inbound",
+            "longitude_DecimalDegree": -110.951071,
+            "signalGroup": 6,
+            "speed_MeterPerSecond": 16.489999999999998,
+            "stoppedDelay": 0.0,
+            "vehicleId": 650,
+            "vehicleType": "Truck"
+        }
+    ]
+}

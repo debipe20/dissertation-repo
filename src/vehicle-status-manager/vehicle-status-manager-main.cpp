@@ -1,0 +1,81 @@
+/*
+**********************************************************************************
+
+ © 2019 Arizona Board of Regents on behalf of the University of Arizona with rights
+       granted for USDOT OSADP distribution with the Apache 2.0 open source license.
+
+**********************************************************************************
+
+   vehicle-status-manager-main.cpp
+    Created by: Debashis Das
+    University of Arizona   
+    College of Engineering
+
+    This code was developed under the supervision of Professor Larry Head
+    in the Systems and Industrial Engineering Department.
+
+    Description:
+    
+    1. 
+
+*/
+#include "VehicleStatusManager.h"
+#include <UdpSocket.h>
+#include "json/json.h"
+
+int main()
+{
+    std::string configFilename("/nojournal/bin/mmitss-phase3-master-config.json");
+    Json::Value jsonObject;
+    Json::Value receivedJsonObject;
+    ifstream configJson(configFilename);
+    string configJsonString((std::istreambuf_iterator<char>(configJson)), std::istreambuf_iterator<char>());
+    Json::CharReaderBuilder builder;
+    Json::CharReader *reader = builder.newCharReader();
+    string errors{};
+    reader->parse(configJsonString.c_str(), configJsonString.c_str() + configJsonString.size(), &jsonObject, &errors);
+
+    VehicleStatusManager vehicleStatusManager(configFilename);
+    BasicVehicle basicVehicle;
+
+    //Socket Communication
+    UdpSocket vehicleStatusManagerSocket(static_cast<short unsigned int>(jsonObject["PortNumber"]["PeerToPeerPriority"].asInt()), 1, 0);
+    const string HostIP = jsonObject["HostIp"].asString();
+    const int dataCollectorPortNo = jsonObject["PortNumber"]["TrajectoryAware"].asInt();
+
+    char receiveBuffer[40960];
+    bool timedOutOccur{};
+    int requestedApproachId{};
+    string vehicleStatusListJsonString{};
+    
+    while (true)
+    {
+        timedOutOccur = vehicleStatusManagerSocket.receiveData(receiveBuffer, sizeof(receiveBuffer));
+        if (timedOutOccur == false)
+        {
+            string receivedJsonString(receiveBuffer);
+            reader->parse(receivedJsonString.c_str(), receivedJsonString.c_str() + receivedJsonString.size(), &receivedJsonObject, &errors);
+
+            if (receivedJsonObject["MsgType"] == "BSM")
+            {
+                basicVehicle.json2BasicVehicle(receivedJsonString);
+                vehicleStatusManager.manageVehicleStatusList(basicVehicle);
+            }
+
+            else if (receivedJsonObject["MsgType"] == "VehicleStatusListRequest")
+            {
+                cout << "Received Vehicle Status List Request message" << receivedJsonString << endl;
+                requestedApproachId = receivedJsonObject["ApproachId"].asInt();
+                vehicleStatusListJsonString = vehicleStatusManager.getVehicleStatusList(requestedApproachId);                
+                vehicleStatusManagerSocket.sendData(HostIP, static_cast<short unsigned int>(dataCollectorPortNo), vehicleStatusListJsonString);
+            }
+        }
+
+        else
+            vehicleStatusManager.deleteTimedOutVehicleIdFromVehicleStatusList();
+    }
+
+    delete reader;
+    vehicleStatusManagerSocket.closeSocket();
+    return 0;
+}
