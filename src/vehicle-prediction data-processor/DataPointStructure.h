@@ -32,6 +32,7 @@ struct DataPointStructure
         speed = 0.0;
         heading = 0.0;
         distanceToStopBar = 0.0;
+        stoppedDelay = 0.0;
         cellStartPonit = 0.0;
         cellEndPont = 0.0;
         // timeStamp = 0.0;
