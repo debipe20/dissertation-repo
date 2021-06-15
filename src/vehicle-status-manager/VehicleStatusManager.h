@@ -30,6 +30,9 @@
 #include "locAware.h"
 
 #define Vehicle_Timed_Out_Value 10.0
+#define EmergencyVehicle 2
+#define Transit 6
+#define Truck 9
 
 using std::vector;
 using std::string;

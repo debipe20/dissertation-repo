@@ -43,7 +43,7 @@ int main()
     const string HostIP = jsonObject["HostIp"].asString();
     const int dataCollectorPortNo = jsonObject["PortNumber"]["DataCollector"].asInt();
 
-    char receiveBuffer[40960];
+    char receiveBuffer[163840];
     bool timedOutOccur{};
     int requestedApproachId{};
     string vehicleStatusListJsonString{};
@@ -64,9 +64,7 @@ int main()
 
             else if (receivedJsonObject["MsgType"] == "VehicleStatusListRequest")
             {
-                cout << "Received Vehicle Status List Request message" << receivedJsonString << endl;
-                requestedApproachId = receivedJsonObject["ApproachId"].asInt();
-                vehicleStatusListJsonString = vehicleStatusManager.getVehicleStatusList(requestedApproachId);                
+                vehicleStatusListJsonString = vehicleStatusManager.getVehicleStatusList(receivedJsonObject["ApproachId"].asInt());                
                 vehicleStatusManagerSocket.sendData(HostIP, static_cast<short unsigned int>(dataCollectorPortNo), vehicleStatusListJsonString);
             }
         }

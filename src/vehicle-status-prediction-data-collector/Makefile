@@ -10,7 +10,7 @@ CPPFLAGS += -DLOGGING
 #-Wl is used to pass the option(rpath) to the linker --- we probably want to move this into a default rather than a hard coded location
 LIBS        := -L$(J2735_LIB) -L$(MMITSS_COMMON_LIB) -L$(MAPENGINE_LIB) -L$(NETSNMP_LIB) -llocAware -ldsrc -lasn -lmmitss-common -lnetsnmp 
 #cpp's go here
-SRC += VehiclePredictionDataCollector.cpp vehicle-prediction-data-collector-main.cpp
+SRC += VehicleStatusPredictionDataCollector.cpp vehicle-status-prediction-data-collector-main.cpp
 #the name of the executable goes here
 TARGET = M_VehicleStatusPredictionDataCollector
 

@@ -6,7 +6,7 @@
 
 **********************************************************************************
 
-    VehiclePredictionDataCollector.h
+    VehicleStatusPredictionDataCollector.h
     Created by: Debashis Das
     University of Arizona   
     College of Engineering
@@ -16,7 +16,7 @@
 
     Description:
     
-    1. This script is the header file for VehiclePredictionDataCollector.cpp
+    1. This script is the header file for VehicleStatusPredictionDataCollector.cpp
 
 */
 
@@ -55,10 +55,11 @@ enum msgType
     VehicleStatus = 2
 };
 
-class VehiclePredictionDataCollector
+class VehicleStatusPredictionDataCollector
 {
 private:
     int approachId{};
+    int totalNoOfCells{};
     int noOfThroughLanes{};
     int throughLanesLength{};
     int noOfLeftTurnPockets{};
@@ -83,8 +84,8 @@ private:
     vector<int>throughLanesId{};
 
 public:
-    VehiclePredictionDataCollector();
-    ~VehiclePredictionDataCollector();
+    VehicleStatusPredictionDataCollector();
+    ~VehicleStatusPredictionDataCollector();
 
     int getMessageType(string jsonString);
     void readInterIntersectionInformationConfig();

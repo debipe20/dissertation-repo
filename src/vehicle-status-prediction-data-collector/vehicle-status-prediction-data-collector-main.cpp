@@ -19,7 +19,7 @@
     1. 
 
 */
-#include "VehiclePredictionDataCollector.h"
+#include "VehicleStatusPredictionDataCollector.h"
 #include <UdpSocket.h>
 #include "json/json.h"
 
@@ -36,42 +36,38 @@ int main()
     reader->parse(configJsonString.c_str(), configJsonString.c_str() + configJsonString.size(), &jsonObject, &errors);
     delete reader;
 
-    VehiclePredictionDataCollector vehiclePredictionDataCollector;
+    VehicleStatusPredictionDataCollector vehicleStatusPredictionDataCollector;
     BasicVehicle basicVehicle;
 
     //Socket Communication
-    UdpSocket vehiclePredictionDataCollectorSocket(static_cast<short unsigned int>(jsonObject["PortNumber"]["DataCollector"].asInt()));
+    UdpSocket vehicleStatusPredictionDataCollectorSocket(static_cast<short unsigned int>(jsonObject["PortNumber"]["DataCollector"].asInt()));
     const int vehicleStatusManagerPortNo = jsonObject["PortNumber"]["MessageDistributor"].asInt();
     const string HostIp = jsonObject["HostIp"].asString();
-    char receiveBuffer[40960];
+    char receiveBuffer[163840];
     int msgType{};
     string vehicleStatusRequestJsonString{};
 
     while (true)
     {
-        vehiclePredictionDataCollectorSocket.receiveData(receiveBuffer, sizeof(receiveBuffer));
+        vehicleStatusPredictionDataCollectorSocket.receiveData(receiveBuffer, sizeof(receiveBuffer));
         string receivedJsonString(receiveBuffer);
-        msgType = vehiclePredictionDataCollector.getMessageType(receivedJsonString);
+        msgType = vehicleStatusPredictionDataCollector.getMessageType(receivedJsonString);
 
         if (msgType == static_cast<int>(msgType::CurrentState_VehiclePhases))
         {
-            cout << " Received msg is following: \n " << receivedJsonString << endl;
-            vehiclePredictionDataCollector.updatePhaseStatusInDataPointList(receivedJsonString);
+            vehicleStatusPredictionDataCollector.updatePhaseStatusInDataPointList(receivedJsonString);
             
-            if(vehiclePredictionDataCollector.checkVehicleStatusListMessageSendingRequirement())
+            if(vehicleStatusPredictionDataCollector.checkVehicleStatusListMessageSendingRequirement())
             {
-                vehicleStatusRequestJsonString = vehiclePredictionDataCollector.getVehicleStatusListRequestMessage();
-                vehiclePredictionDataCollectorSocket.sendData(HostIp,static_cast<short unsigned int>(vehicleStatusManagerPortNo), vehicleStatusRequestJsonString);
+                vehicleStatusRequestJsonString = vehicleStatusPredictionDataCollector.getVehicleStatusListRequestMessage();
+                vehicleStatusPredictionDataCollectorSocket.sendData(HostIp,static_cast<short unsigned int>(vehicleStatusManagerPortNo), vehicleStatusRequestJsonString);
             }
         }
 
         if (msgType == static_cast<int>(msgType::VehicleStatus))
-        {
-            cout << " Received msg is following: \n " << receivedJsonString << endl;
-            vehiclePredictionDataCollector.fillUpDataPointList(receivedJsonString);
-        }
+            vehicleStatusPredictionDataCollector.fillUpDataPointList(receivedJsonString);
     }
     
-    vehiclePredictionDataCollectorSocket.closeSocket();
+    vehicleStatusPredictionDataCollectorSocket.closeSocket();
     return 0;
 }

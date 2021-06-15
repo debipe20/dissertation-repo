@@ -6,7 +6,7 @@
 
 **********************************************************************************
 
-    VehiclePredictionDataCollector.cpp
+    VehicleStatusPredictionDataCollector.cpp
     Created by: Debashis Das
     University of Arizona   
     College of Engineering
@@ -26,13 +26,13 @@
 #include "locAware.h"
 #include "geoUtils.h"
 #include "msgEnum.h"
-#include "VehiclePredictionDataCollector.h"
+#include "VehicleStatusPredictionDataCollector.h"
 #include "Timestamp.h"
 
 using namespace GeoUtils;
 using namespace MsgEnum;
 
-VehiclePredictionDataCollector::VehiclePredictionDataCollector()
+VehicleStatusPredictionDataCollector::VehicleStatusPredictionDataCollector()
 {
 	readInterIntersectionInformationConfig();
 	createDataPointStructure();
@@ -41,6 +41,8 @@ VehiclePredictionDataCollector::VehiclePredictionDataCollector()
 	logFile.open("vehicle-status-prediction-data.csv");
 
 	logFile << "TimeStamp"
+			<< ","
+			<< "NoOfCells"
 			<< ","
 			<< "InputVehicleId"
 			<< ","
@@ -95,7 +97,7 @@ VehiclePredictionDataCollector::VehiclePredictionDataCollector()
 /*
 	-Get the message type based on the received json string 
 */
-int VehiclePredictionDataCollector::getMessageType(string jsonString)
+int VehicleStatusPredictionDataCollector::getMessageType(string jsonString)
 {
 	int messageType{};
 	Json::Value jsonObject;
@@ -118,7 +120,7 @@ int VehiclePredictionDataCollector::getMessageType(string jsonString)
 	return messageType;
 }
 
-void VehiclePredictionDataCollector::readInterIntersectionInformationConfig()
+void VehicleStatusPredictionDataCollector::readInterIntersectionInformationConfig()
 {
 	Json::Value jsonObject;
 	Json::CharReaderBuilder builder;
@@ -144,6 +146,7 @@ void VehiclePredictionDataCollector::readInterIntersectionInformationConfig()
 		noOfCellsPerLeftTurnPocket = static_cast<int>(leftTurnPocketsLength / cellLength);
 		throughLaneSignalGroup = jsonObject["ThoughLanesSignalGroup"].asInt();
 		leftTurnPocketSignalGroup = jsonObject["LeftTurnPocketsSignalGroup"].asInt();
+		totalNoOfCells = (noOfCellsPerLeftTurnPocket * noOfLeftTurnPockets) + (noOfCellsPerThroughLane * noOfThroughLanes);
 
 		for (int i = 0; i < noOfThroughLanes; i++)
 			throughLanesId.push_back(jsonObject["ThroughLanesId"][i].asInt());
@@ -156,7 +159,7 @@ void VehiclePredictionDataCollector::readInterIntersectionInformationConfig()
 /*
 	- The following method creates the data point structure and fill up the static information for all the cells.
 */
-void VehiclePredictionDataCollector::createDataPointStructure()
+void VehicleStatusPredictionDataCollector::createDataPointStructure()
 {
 	double cellStartPoint{};
 	DataPointStructure dataPointStructure;
@@ -202,7 +205,7 @@ void VehiclePredictionDataCollector::createDataPointStructure()
 /*
 	- The following method can update phase status of all the cells based on the received phase status message
 */
-void VehiclePredictionDataCollector::updatePhaseStatusInDataPointList(string jsonString)
+void VehicleStatusPredictionDataCollector::updatePhaseStatusInDataPointList(string jsonString)
 {
 	int temporarySignalGroup{};
 	Json::Value jsonObject;
@@ -260,7 +263,7 @@ void VehiclePredictionDataCollector::updatePhaseStatusInDataPointList(string jso
 /*
 	- The following method can fill up the vehicle status information based on the receid vehicle status list
 */
-void VehiclePredictionDataCollector::fillUpDataPointList(string jsonString)
+void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString)
 {
 	int temporaryVehicleID{};
 	int temporaryVehicleType{};
@@ -355,13 +358,13 @@ void VehiclePredictionDataCollector::fillUpDataPointList(string jsonString)
 	writeCsvFile();
 }
 
-void VehiclePredictionDataCollector::writeCsvFile()
+void VehicleStatusPredictionDataCollector::writeCsvFile()
 {
 	double timeStamp = getPosixTimestamp();
 
 	for (size_t i = 0; i < DataPointList.size(); i++)
 	{
-		logFile << fixed << showpoint << setprecision(4) << timeStamp << ",";
+		logFile << fixed << showpoint << setprecision(4) << timeStamp << "," << totalNoOfCells << ",";
 		logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].vehicleID << "," << InputDataPointList[i].vehicleType
 				<< "," << InputDataPointList[i].signalGroup << "," << InputDataPointList[i].laneId << "," << InputDataPointList[i].approachId
 				<< "," << InputDataPointList[i].locationOnMap << "," << InputDataPointList[i].phaseStatus << "," << InputDataPointList[i].speed
@@ -379,7 +382,7 @@ void VehiclePredictionDataCollector::writeCsvFile()
 /*
 	- The following method checks the vehicle status list message sending requirement.
 */
-bool VehiclePredictionDataCollector::checkVehicleStatusListMessageSendingRequirement()
+bool VehicleStatusPredictionDataCollector::checkVehicleStatusListMessageSendingRequirement()
 {
 	bool messageSendrequirement{false};
 	double currentTime = getPosixTimestamp();
@@ -393,7 +396,7 @@ bool VehiclePredictionDataCollector::checkVehicleStatusListMessageSendingRequire
 /*
 	- The following method formulates the vehicle status list request message.
 */
-string VehiclePredictionDataCollector::getVehicleStatusListRequestMessage()
+string VehicleStatusPredictionDataCollector::getVehicleStatusListRequestMessage()
 {
 	string vehicleStatusRequestJsonString{};
 	Json::Value jsonObject;
@@ -410,7 +413,7 @@ string VehiclePredictionDataCollector::getVehicleStatusListRequestMessage()
 	return vehicleStatusRequestJsonString;
 }
 
-VehiclePredictionDataCollector::~VehiclePredictionDataCollector()
+VehicleStatusPredictionDataCollector::~VehicleStatusPredictionDataCollector()
 {
 	logFile.close();
 }

@@ -27,6 +27,7 @@
 #include "geoUtils.h"
 #include "msgEnum.h"
 #include "VehicleStatusManager.h"
+#include "Timestamp.h"
 
 using namespace GeoUtils;
 using namespace MsgEnum;
@@ -74,7 +75,7 @@ string VehicleStatusManager::readIntersectionMapConfig(string configFilename)
 
 	outputfile.open(fmap);
 	outputfile << "payload"
-			   << " " << intersectionName << " " << mapPayload << std::endl;
+			   << " " << intersectionName << " " << mapPayload << endl;
 	outputfile.close();
 
 	return fmap;
@@ -136,17 +137,9 @@ void VehicleStatusManager::getVehicleInformationFromMAP(BasicVehicle basicVehicl
 		findVehicleIdInVehicleStatusList->vehicleLaneId = vehicleLaneId;
 		findVehicleIdInVehicleStatusList->vehicleApproachId = vehicleApproachId;
 		findVehicleIdInVehicleStatusList->vehicleSignalGroup = vehicleSignalGroup;
+		findVehicleIdInVehicleStatusList->vehicleLocationOnMap = unsigned(vehicleTracking_t_1.intsectionTrackingState.vehicleIntersectionStatus);
 
-		if (unsigned(vehicleTracking_t_1.intsectionTrackingState.vehicleIntersectionStatus) == static_cast<int>(MsgEnum::mapLocType::onInbound))
-			findVehicleIdInVehicleStatusList->vehicleLocationOnMap = "Inbound";
-
-		else if (unsigned(vehicleTracking_t_1.intsectionTrackingState.vehicleIntersectionStatus) == static_cast<int>(MsgEnum::mapLocType::onOutbound))
-			findVehicleIdInVehicleStatusList->vehicleLocationOnMap = "OutBound";
-
-		else if (unsigned(vehicleTracking_t_1.intsectionTrackingState.vehicleIntersectionStatus) == static_cast<int>(MsgEnum::mapLocType::insideIntersectionBox))
-			findVehicleIdInVehicleStatusList->vehicleLocationOnMap = "insideIntersectionBox";
-
-		currentTime = static_cast<double>(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+		currentTime = getPosixTimestamp();
 
 		if (vehicle_Speed <= 1.0)
 		{
@@ -168,40 +161,41 @@ void VehicleStatusManager::getVehicleInformationFromMAP(BasicVehicle basicVehicl
 void VehicleStatusManager::manageVehicleStatusList(BasicVehicle basicVehicle)
 {
 	int vehicleId{};
+	int vehicleType{};
 	VehicleStatus vehicleStatus;
 	vehicleStatus.reset();
-	double currentTime = static_cast<double>(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
 	
-	cout << "\n[" << currentTime << "] Received BSM" << endl;
-
-	if (addVehicleIDInVehicleStatusList(basicVehicle) == true)
+	if (addVehicleIDInVehicleStatusList(basicVehicle))
 	{
+		if (basicVehicle.getType() == "Transit")
+			vehicleType = Transit;
+		
+		else if (basicVehicle.getType() == "Truck")
+			vehicleType = Truck;
+
+		else if (basicVehicle.getType() == "EmergencyVehicle")
+			vehicleType = EmergencyVehicle;
+
 		vehicleStatus.vehicleId = basicVehicle.getTemporaryID();
-		vehicleStatus.vehicleType = basicVehicle.getType();
-		vehicleStatus.vehicleLatitude_DecimalDegree = basicVehicle.getLatitude_DecimalDegree();
-		vehicleStatus.vehicleLongitude_DecimalDegree = basicVehicle.getLongitude_DecimalDegree();
-		vehicleStatus.vehicleElevation_Meter = basicVehicle.getElevation_Meter();
+		vehicleStatus.vehicleType = vehicleType;
 		vehicleStatus.vehicleSpeed_MeterPerSecond = basicVehicle.getSpeed_MeterPerSecond();
 		vehicleStatus.vehicleHeading_Degree = basicVehicle.getHeading_Degree();
-
-		vehicleStatus.updateTime = static_cast<double>(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+		vehicleStatus.updateTime = getPosixTimestamp();
 
 		VehcileStatusList.push_back(vehicleStatus);
 	}
 
-	else if (updateVehicleIDInVehicleStatusList(basicVehicle) == true)
+	else if (updateVehicleIDInVehicleStatusList(basicVehicle))
 	{
 		vehicleId = basicVehicle.getTemporaryID();
 
 		vector<VehicleStatus>::iterator findVehicleIdInVehicleStatusList = std::find_if(std::begin(VehcileStatusList), std::end(VehcileStatusList),
 																					  [&](VehicleStatus const &p) { return p.vehicleId == vehicleId; });
 
-		findVehicleIdInVehicleStatusList->vehicleLatitude_DecimalDegree = basicVehicle.getLatitude_DecimalDegree();
-		findVehicleIdInVehicleStatusList->vehicleLongitude_DecimalDegree = basicVehicle.getLongitude_DecimalDegree();
-		findVehicleIdInVehicleStatusList->vehicleElevation_Meter = basicVehicle.getElevation_Meter();
 		findVehicleIdInVehicleStatusList->vehicleSpeed_MeterPerSecond = basicVehicle.getSpeed_MeterPerSecond();
 		findVehicleIdInVehicleStatusList->vehicleHeading_Degree = basicVehicle.getHeading_Degree();
 	}
+
 	getVehicleInformationFromMAP(basicVehicle);
 	deleteTimedOutVehicleIdFromVehicleStatusList();
 }
@@ -268,10 +262,10 @@ void VehicleStatusManager::deleteTimedOutVehicleIdFromVehicleStatusList()
 			{
 				vehicleId = VehcileStatusList[i].vehicleId;
 
-				vector<VehicleStatus>::iterator findVehicleIDInTrajectroyList = std::find_if(std::begin(VehcileStatusList), std::end(VehcileStatusList),
+				vector<VehicleStatus>::iterator findVehicleIDInVehicleStatusList = std::find_if(std::begin(VehcileStatusList), std::end(VehcileStatusList),
 																							  [&](VehicleStatus const &p) { return p.vehicleId == vehicleId; });
 
-				VehcileStatusList.erase(findVehicleIDInTrajectroyList);
+				VehcileStatusList.erase(findVehicleIDInVehicleStatusList);
 				i--;
 			}
 		}
@@ -284,7 +278,6 @@ void VehicleStatusManager::deleteTimedOutVehicleIdFromVehicleStatusList()
 string VehicleStatusManager::getVehicleStatusList(int requested_ApproachId)
 {
 	string vehicleStatusListJsonString{};
-	double currentTime{};
 	int noOfVehicle{};
 
 	Json::Value jsonObject;
@@ -301,9 +294,6 @@ string VehicleStatusManager::getVehicleStatusList(int requested_ApproachId)
 			noOfVehicle++;
 			jsonObject["VehcileStatusList"][i]["vehicleId"] = VehcileStatusList[i].vehicleId;
 			jsonObject["VehcileStatusList"][i]["vehicleType"] = VehcileStatusList[i].vehicleType;
-			jsonObject["VehcileStatusList"][i]["latitude_DecimalDegree"] = VehcileStatusList[i].vehicleLatitude_DecimalDegree;
-			jsonObject["VehcileStatusList"][i]["longitude_DecimalDegree"] = VehcileStatusList[i].vehicleLongitude_DecimalDegree;
-			jsonObject["VehcileStatusList"][i]["elevation_Meter"] = VehcileStatusList[i].vehicleElevation_Meter;
 			jsonObject["VehcileStatusList"][i]["speed_MeterPerSecond"] = VehcileStatusList[i].vehicleSpeed_MeterPerSecond;
 			jsonObject["VehcileStatusList"][i]["heading_Degree"] = VehcileStatusList[i].vehicleHeading_Degree;
 			jsonObject["VehcileStatusList"][i]["inBoundLaneId"] = VehcileStatusList[i].vehicleLaneId;
@@ -318,12 +308,7 @@ string VehicleStatusManager::getVehicleStatusList(int requested_ApproachId)
 	}
 
 	jsonObject["NoOfVehicle"] = noOfVehicle;
-
 	vehicleStatusListJsonString = Json::writeString(builder, jsonObject);
-
-	currentTime = static_cast<double>(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
-	cout << "\n[" << currentTime << "] Vehicle Trajectory Json String is following:\n"
-		 << vehicleStatusListJsonString << endl;
 
 	return vehicleStatusListJsonString;
 }
