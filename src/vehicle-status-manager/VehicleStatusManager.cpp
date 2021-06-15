@@ -311,9 +311,10 @@ string VehicleStatusManager::getVehicleStatusList(int requested_ApproachId)
 		}
 	}
 
-	for (unsigned int i = 0; i < TemporaryVehcileStatusList.size(); i++)
+	
+	if (!TemporaryVehcileStatusList.empty())
 	{
-		if (requested_ApproachId == TemporaryVehcileStatusList[i].vehicleApproachId)
+		for (unsigned int i = 0; i < TemporaryVehcileStatusList.size(); i++)
 		{
 			noOfVehicle++;
 			jsonObject["VehcileStatusList"][i]["vehicleId"] = TemporaryVehcileStatusList[i].vehicleId;
