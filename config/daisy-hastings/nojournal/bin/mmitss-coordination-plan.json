@@ -1,0 +1,92 @@
+{
+    "IntersectionName": "daisy-hastings",
+    "CoordinationPattern": [
+        {
+            "CoordinationPlanName": "AM-Peak",
+            "CoordinationPatternNo": 1,
+            "CycleLength": 90,
+            "Offset": 24,
+            "CoordinatedPhase1": 2,
+            "CoordinatedPhase2": 6,
+            "CoordinationSplit": 20.0,
+            "Split": [
+                15,
+                52,
+                0,
+                0,
+                0,
+                67,
+                0,
+                23
+            ]
+        },
+        {
+            "CoordinationPlanName": "PM-Peak",
+            "CoordinationPatternNo": 2,
+            "CycleLength": 90,
+            "Offset": 24,
+            "CoordinatedPhase1": 2,
+            "CoordinatedPhase2": 6,
+            "CoordinationSplit": 20.0,
+            "Split": [
+                15,
+                52,
+                0,
+                0,
+                0,
+                67,
+                0,
+                23
+            ]
+        }
+    ],
+    "CoordinationDayPlan": [
+        {
+            "Days": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday"
+            ],
+            "ActionPlan": [
+                {
+                    "CoordinationPatternNo": 1,
+                    "CoordinationStartTime_Hour": 0,
+                    "CoordinationStartTime_Minute": 1,
+                    "CoordinationEndTime_Hour": 23,
+                    "CoordinationEndTime_Minute": 55
+                },
+                {
+                    "CoordinationPatternNo": 2,
+                    "CoordinationStartTime_Hour": 23,
+                    "CoordinationStartTime_Minute": 56,
+                    "CoordinationEndTime_Hour": 23,
+                    "CoordinationEndTime_Minute": 59
+                }
+            ]
+        },
+        {
+            "Days": [
+                "Saturday",
+                "Sunday"
+            ],
+            "ActionPlan": [
+                {
+                    "CoordinationPatternNo": 1,
+                    "CoordinationStartTime_Hour": 0,
+                    "CoordinationStartTime_Minute": 1,
+                    "CoordinationEndTime_Hour": 23,
+                    "CoordinationEndTime_Minute": 55
+                },
+                {
+                    "CoordinationPatternNo": 2,
+                    "CoordinationStartTime_Hour": 23,
+                    "CoordinationStartTime_Minute": 56,
+                    "CoordinationEndTime_Hour": 23,
+                    "CoordinationEndTime_Minute": 59
+                }
+            ]
+        }
+    ]
+}

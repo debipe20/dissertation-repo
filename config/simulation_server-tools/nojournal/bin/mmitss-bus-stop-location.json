@@ -1,0 +1,15 @@
+{
+    "NoOfBusStop": 1,
+    "BusStopInformation": [
+        {
+            "IntersectionName": "daisy-dedication",
+            "IntersectionID": 45115,
+            "TravelDirection": "EastBound",
+            "ApproachNo": 3,
+            "Latitude_DecimalDegree":  33.842879,
+            "Longitude_DecimalDegree": -112.134322,
+            "Elevation_Meter": 539,
+            "Heading_Degree": 86.0
+        }
+    ]
+}
