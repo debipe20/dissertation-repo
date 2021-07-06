@@ -1,0 +1,35 @@
+{
+	"CoordinatedPhase1": 2,
+	"CoordinatedPhase2": 6,
+	"DeisredSignalGroup":[2,2,2,2,6],
+	"StartTimeOfDiagram": 1625516900,
+	"EndTimeOfDiagram": 1625517500,
+	"NoOfIntersection": 5,
+	"IntersectionName": [
+		"Daisy-Gavilan",
+		"Daisy-Dedication",
+		"Daisy-Meridian",
+		"Daisy-Hastings",
+		"Daisy-Memorial"
+	],
+	"SPaTFileDirectory": [
+		"/home/debashis/Desktop/anthemFieldTest/config/corridor/simulation/daisy-gavilan/nojournal/bin/v2x-data/archive/daisy-gavilan_07052021_131228/daisy-gavilan_spatLog_07052021_131228.csv",
+		"/home/debashis/Desktop/anthemFieldTest/config/corridor/simulation/daisy-dedication/nojournal/bin/v2x-data/archive/daisy-dedication_07052021_131228/daisy-dedication_spatLog_07052021_131228.csv",
+		"/home/debashis/Desktop/anthemFieldTest/config/corridor/simulation/daisy-meridian/nojournal/bin/v2x-data/archive/daisy-meridian_07052021_131228/daisy-meridian_spatLog_07052021_131228.csv",
+		"/home/debashis/Desktop/anthemFieldTest/config/corridor/simulation/daisy-hastings/nojournal/bin/v2x-data/archive/daisy-hastings_07052021_131228/daisy-hastings_spatLog_07052021_131228.csv",
+		"/home/debashis/Desktop/anthemFieldTest/config/corridor/simulation/daisy-memorial/nojournal/bin/v2x-data/archive/daisy-memorial_07052021_131228/daisy-memorial_spatLog_07052021_131228.csv"
+	],
+	"BsmFileDirectory": [
+		"/home/debashis/Desktop/anthemFieldTest/config/corridor/simulation/daisy-gavilan/nojournal/bin/v2x-data/archive/daisy-gavilan_07052021_131228/daisy-gavilan_remoteBsmLog_07052021_131228.csv",
+		"/home/debashis/Desktop/anthemFieldTest/config/corridor/simulation/daisy-dedication/nojournal/bin/v2x-data/archive/daisy-dedication_07052021_131228/daisy-dedication_remoteBsmLog_07052021_131228.csv",
+		"/home/debashis/Desktop/anthemFieldTest/config/corridor/simulation/daisy-hastings/nojournal/bin/v2x-data/archive/daisy-hastings_07052021_131228/daisy-hastings_remoteBsmLog_07052021_131228.csv",
+		"/home/debashis/Desktop/anthemFieldTest/config/corridor/simulation/daisy-memorial/nojournal/bin/v2x-data/archive/daisy-memorial_07052021_131228/daisy-memorial_remoteBsmLog_07052021_131228.csv"
+	],
+	"IntersectionDistance": [
+		600,
+		950,
+		1950,
+		2600,
+		3350
+	]
+}

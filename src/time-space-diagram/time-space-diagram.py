@@ -99,7 +99,7 @@ def timeSpaceDiagram(greenRectangleStartPoint, clearanceRectangleStartPoint, gre
     ax1.set_ylabel('Distance (m)', fontsize=24, fontweight='bold')
     max_x_limit = xAxisRange-100
     plt.xlim([0, max_x_limit])
-    plt.ylim([0, max(distance_Green)+800])
+    plt.ylim([0, max(distance_Green)+400])
     plt.xticks(np.arange(0, xAxisRange-75, 50), fontsize=24)
     ax1.tick_params(axis='y',  labelsize=18)
     for axis in ['top', 'bottom', 'left', 'right']:
