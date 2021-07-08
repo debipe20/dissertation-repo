@@ -43,7 +43,7 @@ int main()
     const string HostIP = jsonObject["HostIp"].asString();
     const int dataCollectorPortNo = jsonObject["PortNumber"]["DataCollector"].asInt();
 
-    char receiveBuffer[163840];
+    char receiveBuffer[10240];
     bool timedOutOccur{};
     string vehicleStatusListJsonString{};
     

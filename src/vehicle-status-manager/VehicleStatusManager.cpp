@@ -150,7 +150,10 @@ void VehicleStatusManager::getVehicleInformationFromMAP(BasicVehicle basicVehicl
 		}
 
 		else
+		{
 			findVehicleIdInVehicleStatusList->updateTime = currentTime;
+			findVehicleIdInVehicleStatusList->vehicleStoppedDelay = 0;
+		}
 	}
 }
 
