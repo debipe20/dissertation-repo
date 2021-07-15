@@ -38,7 +38,7 @@ VehicleStatusPredictionDataCollector::VehicleStatusPredictionDataCollector()
 	createDataPointStructure();
 	msgSendingTime = getPosixTimestamp();
 
-	logFile.open("vehicle-status-prediction-data.csv");
+	logFile.open("vehicle-status-prediction-data.txt");
 
 	logFile << "TimeStamp"
 			<< ","

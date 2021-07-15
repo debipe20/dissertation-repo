@@ -86,6 +86,11 @@ void VehicleStatusManager::getVehicleInformationFromMAP(BasicVehicle basicVehicl
 	int vehicleId{};
 	double currentTime{};
 	bool onMap{false};
+	vehicleId = basicVehicle.getTemporaryID();
+
+	vector<VehicleStatus>::iterator findVehicleIdInVehicleStatusList = std::find_if(std::begin(VehcileStatusList), std::end(VehcileStatusList),
+																					[&](VehicleStatus const &p)
+																					{ return p.vehicleId == vehicleId; });
 
 	//get the vehicle data from BSM
 	double vehicle_Latitude = basicVehicle.getLatitude_DecimalDegree();
@@ -128,12 +133,6 @@ void VehicleStatusManager::getVehicleInformationFromMAP(BasicVehicle basicVehicl
 		int vehicleSignalGroup = unsigned(plocAwareLib->getControlPhaseByIds(static_cast<uint16_t>(regionalId), static_cast<uint16_t>(intersectionId),
 																			 static_cast<uint8_t>(vehicleApproachId), static_cast<uint8_t>(vehicleLaneId)));
 
-		vehicleId = basicVehicle.getTemporaryID();
-
-		vector<VehicleStatus>::iterator findVehicleIdInVehicleStatusList = std::find_if(std::begin(VehcileStatusList), std::end(VehcileStatusList),
-																						[&](VehicleStatus const &p)
-																						{ return p.vehicleId == vehicleId; });
-
 		findVehicleIdInVehicleStatusList->vehicleDistanceFromStopBar = vehicleDistanceFromStopBar;
 		findVehicleIdInVehicleStatusList->vehicleLaneId = vehicleLaneId;
 		findVehicleIdInVehicleStatusList->vehicleApproachId = vehicleApproachId;
@@ -155,6 +154,9 @@ void VehicleStatusManager::getVehicleInformationFromMAP(BasicVehicle basicVehicl
 			findVehicleIdInVehicleStatusList->vehicleStoppedDelay = 0;
 		}
 	}
+
+	else
+		VehcileStatusList.erase(findVehicleIdInVehicleStatusList);
 }
 
 /*
@@ -205,6 +207,7 @@ void VehicleStatusManager::manageVehicleStatusList(BasicVehicle basicVehicle)
 	}
 
 	getVehicleInformationFromMAP(basicVehicle);
+	deleteVehicleIDInVehicleStatusList(basicVehicle);
 	deleteTimedOutVehicleIdFromVehicleStatusList();
 }
 
@@ -256,6 +259,22 @@ bool VehicleStatusManager::updateVehicleIDInVehicleStatusList(BasicVehicle basic
 }
 
 /*
+    - The following method will delete vehicle information from the VehcileStatus List if vehicle is not inBound lane
+*/
+void VehicleStatusManager::deleteVehicleIDInVehicleStatusList(BasicVehicle basicVehicle)
+{
+	if (!VehcileStatusList.empty())
+	{
+		int veheicleID = basicVehicle.getTemporaryID();
+
+		vector<VehicleStatus>::iterator findVehicleIdInVehicleStatusList = std::find_if(std::begin(VehcileStatusList), std::end(VehcileStatusList),
+																						[&](VehicleStatus const &p)
+																						{ return p.vehicleId == veheicleID; });
+		if (findVehicleIdInVehicleStatusList != VehcileStatusList.end() && findVehicleIdInVehicleStatusList->vehicleLocationOnMap != 2)
+			VehcileStatusList.erase(findVehicleIdInVehicleStatusList);
+	}
+}
+/*
     - The following boolean method will determine whether vehicle information is required to delete from the VehcileStatus List
     - If there BSM is not received from a vehicle for more than predifined time(10sec),the method will delete the timed-out vehilce information form VehcileStatus List.
 */
@@ -306,15 +325,14 @@ string VehicleStatusManager::getVehicleStatusList(int requested_ApproachId)
 		if (requested_ApproachId != TemporaryVehcileStatusList[i].vehicleApproachId)
 		{
 			vector<VehicleStatus>::iterator findVehicleIDOnList = std::find_if(std::begin(TemporaryVehcileStatusList), std::end(TemporaryVehcileStatusList),
-																			 [&](VehicleStatus const &p)
-																			 { return p.vehicleId == temporaryVehicleID; });
+																			   [&](VehicleStatus const &p)
+																			   { return p.vehicleId == temporaryVehicleID; });
 
 			TemporaryVehcileStatusList.erase(findVehicleIDOnList);
 			i--;
 		}
 	}
 
-	
 	if (!TemporaryVehcileStatusList.empty())
 	{
 		for (unsigned int i = 0; i < TemporaryVehcileStatusList.size(); i++)
