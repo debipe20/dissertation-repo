@@ -29,8 +29,8 @@ struct DataPointStructure
         approachId = 0;
         locationOnMap = 0;
         phaseStatus = 0;
-        speed = 0.0;
-        heading = 0.0;
+        speed = -1.0;
+        heading = -1.0;
         distanceToStopBar = 0.0;
         stoppedDelay = 0.0;
         cellStartPonit = 0.0;
