@@ -176,7 +176,7 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure()
 			dataPointStructure.cellStartPonit = cellStartPoint;
 			dataPointStructure.cellEndPont = cellStartPoint + cellLength;
 			dataPointStructure.cellStatus = false;
-			dataPointStructure.speed = -1;
+			dataPointStructure.speed = -1.0;
 
 			DataPointList.push_back(dataPointStructure);
 			cellStartPoint = cellStartPoint + cellLength;
@@ -196,7 +196,7 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure()
 			dataPointStructure.cellStartPonit = cellStartPoint;
 			dataPointStructure.cellEndPont = cellStartPoint + cellLength;
 			dataPointStructure.cellStatus = false;
-			dataPointStructure.speed = -1;
+			dataPointStructure.speed = -1.0;
 
 			DataPointList.push_back(dataPointStructure);
 			cellStartPoint = cellStartPoint + cellLength;
