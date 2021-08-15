@@ -15,7 +15,9 @@ struct VehicleStatus
     double vehicleDistanceFromStopBar{};
     double vehicleStoppedDelay{};
     int vehicleLocationOnMap{};
+    bool connected{};
     double updateTime{};
+    
 
     void reset()
     {
@@ -29,6 +31,7 @@ struct VehicleStatus
         vehicleDistanceFromStopBar = 0.0;
         vehicleStoppedDelay = 0.0;
         vehicleLocationOnMap = 0;
+        connected = false;
         updateTime = 0.0;
     }
 };

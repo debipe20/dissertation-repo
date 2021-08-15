@@ -6,6 +6,7 @@ import time
 fileName = "bsm.json"
 fileName2 = "bsm2.json"
 fileName3 = "bsm3.json"
+fileName4 = "bsm4.json"
 microseconds = 0.1
 
 # Read a config file into a json object:
@@ -33,19 +34,30 @@ while True:
         
         time.sleep(microseconds)
 
-        f = open(fileName2, 'r')
-        data = f.read() 
-        s.sendto(data.encode(),communicationInfo)
-        bsmSendingTime = time.time()
-        print("sent second BSM at time", time.time())
+        # f = open(fileName2, 'r')
+        # data = f.read() 
+        # s.sendto(data.encode(),communicationInfo)
+        # bsmSendingTime = time.time()
+        # print("sent second BSM at time", time.time())
 
-        time.sleep(microseconds)
+        # time.sleep(microseconds)
 
-        f = open(fileName3, 'r')
-        data = f.read() 
-        s.sendto(data.encode(),communicationInfo)
-        bsmSendingTime = time.time()
-        print("sent third BSM at time", time.time())
+        # f = open(fileName3, 'r')
+        # data = f.read() 
+        # s.sendto(data.encode(),communicationInfo)
+        # bsmSendingTime = time.time()
+        # print("sent third BSM at time", time.time())
+
+        # time.sleep(microseconds)
+
+        # f = open(fileName4, 'r')
+        # data = f.read() 
+        # s.sendto(data.encode(),communicationInfo)
+        # bsmSendingTime = time.time()
+
+        # print("sent fourth BSM at time", time.time())
+        
+        # time.sleep(microseconds)
 
 f.close()
 s.close()

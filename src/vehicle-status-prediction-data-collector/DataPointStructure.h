@@ -11,13 +11,14 @@ struct DataPointStructure
     int approachId{};
     int locationOnMap{};
     int phaseStatus{};
+    double phaseElapsedTime{};
+    double phaseUpdateTime{};
     double speed{};
     double heading{};
     double distanceToStopBar{};
     double stoppedDelay{};
     double cellStartPonit{};
     double cellEndPont{};
-    // double timeStamp{};
     bool cellStatus{};
     
     void reset()
@@ -29,6 +30,8 @@ struct DataPointStructure
         approachId = 0;
         locationOnMap = 0;
         phaseStatus = 0;
+        phaseElapsedTime = 0.0;
+        phaseUpdateTime = 0.0;
         speed = -1.0;
         heading = -1.0;
         distanceToStopBar = 0.0;

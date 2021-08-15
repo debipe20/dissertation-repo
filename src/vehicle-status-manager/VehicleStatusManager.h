@@ -50,17 +50,24 @@ private:
     string intersectionName{};
     uint16_t intersectionId{};
     uint16_t regionalId{};
+    int noOfConnectedVehiclesInList{};
+    int approachId{};
+    int noOfLanes{};
+    double penetrationRate{};
+    vector<int>lanesId{};
 
     LocAware *plocAwareLib;
-    vector<VehicleStatus>VehcileStatusList{};
+    vector<VehicleStatus>VehicleStatusList{};
 
 public:
     VehicleStatusManager(string configFilename);
     ~VehicleStatusManager();
+    void readConfigFile();
     void getVehicleInformationFromMAP(BasicVehicle basicVehicle);
     void manageVehicleStatusList(BasicVehicle basicVehicle);
     bool addVehicleIDInVehicleStatusList(BasicVehicle basicVehicle);
     bool updateVehicleIDInVehicleStatusList(BasicVehicle basicVehicle);
+    void setConnectedVehicleStatus(int vehicleId);
     void deleteVehicleIDInVehicleStatusList(BasicVehicle basicVehicle);
     void deleteTimedOutVehicleIdFromVehicleStatusList();
     string readIntersectionMapConfig(string configFilename);
