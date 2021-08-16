@@ -56,7 +56,7 @@ void VehicleStatusManager::readConfigFile()
 
 	if (parsingSuccessful)
 	{
-		penetrationRate = jsonObject["CoonectedVehiclePenetrationRate"].asDouble();
+		penetrationRate = jsonObject["ConnectedVehiclePenetrationRate"].asDouble();
 		approachId = jsonObject["ApproachId"].asInt();
 		noOfLanes = jsonObject["NoOfLanes"].asInt();
 

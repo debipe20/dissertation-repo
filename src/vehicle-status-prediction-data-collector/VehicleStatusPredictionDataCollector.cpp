@@ -70,6 +70,8 @@ VehicleStatusPredictionDataCollector::VehicleStatusPredictionDataCollector()
 			<< "DistanceToStopBar"
 			<< ","
 			<< "CellStatus"
+			<< ","
+			<< "VehicleStatus"
 			<< endl;
 }
 
@@ -154,8 +156,9 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure()
 			dataPointStructure.locationOnMap = static_cast<int>(MsgEnum::mapLocType::onInbound);
 			dataPointStructure.cellStartPonit = cellStartPoint;
 			dataPointStructure.cellEndPont = cellStartPoint + cellLength;
-			dataPointStructure.cellStatus = false;
 			dataPointStructure.speed = -1.0;
+			dataPointStructure.cellStatus = false;
+			dataPointStructure.vehicleStatus = false;
 
 			DataPointList.push_back(dataPointStructure);
 			cellStartPoint = cellStartPoint + cellLength;
@@ -174,8 +177,9 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure()
 			dataPointStructure.locationOnMap = static_cast<int>(MsgEnum::mapLocType::onInbound);
 			dataPointStructure.cellStartPonit = cellStartPoint;
 			dataPointStructure.cellEndPont = cellStartPoint + cellLength;
-			dataPointStructure.cellStatus = false;
 			dataPointStructure.speed = -1.0;
+			dataPointStructure.cellStatus = false;
+			dataPointStructure.vehicleStatus = false;
 
 			DataPointList.push_back(dataPointStructure);
 			cellStartPoint = cellStartPoint + cellLength;
@@ -270,9 +274,6 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 	double temporaryDistanceToStopBar{};
 	bool temporaryConnectedVehicleStatus{};
 
-	// vector<int> vehicleId{};
-	// vector<int> randomIndex{};
-
 	InputDataPointList = DataPointList;
 	// OutputDataPointList = DataPointList;
 
@@ -333,7 +334,7 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 						InputDataPointList[k].heading = temporaryHeading;
 						InputDataPointList[k].distanceToStopBar = temporaryDistanceToStopBar;
 						InputDataPointList[k].cellStatus = true;
-
+						InputDataPointList[k].vehicleStatus = true;
 						// vehicleId.push_back(temporaryVehicleID);
 					}
 
@@ -343,6 +344,7 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 					{
 						InputDataPointList[k].vehicleID = temporaryVehicleID;
 						InputDataPointList[k].cellStatus = true;
+						InputDataPointList[k].vehicleStatus = true;
 
 						// vehicleId.push_back(temporaryVehicleID);
 					}
@@ -392,7 +394,7 @@ void VehicleStatusPredictionDataCollector::writeCsvFile()
 				<< InputDataPointList[i].locationOnMap << "," << InputDataPointList[i].phaseStatus << ","
 				<< InputDataPointList[i].phaseElapsedTime << "," << InputDataPointList[i].speed << "," 
 				<< InputDataPointList[i].heading << "," << InputDataPointList[i].distanceToStopBar << "," 
-				<< InputDataPointList[i].cellStatus << endl;
+				<< InputDataPointList[i].cellStatus << "," << InputDataPointList[i].vehicleStatus<< endl;
 	}
 }
 

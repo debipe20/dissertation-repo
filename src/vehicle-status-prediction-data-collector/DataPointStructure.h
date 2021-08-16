@@ -20,6 +20,7 @@ struct DataPointStructure
     double cellStartPonit{};
     double cellEndPont{};
     bool cellStatus{};
+    bool vehicleStatus{};
     
     void reset()
     {
@@ -38,7 +39,7 @@ struct DataPointStructure
         stoppedDelay = 0.0;
         cellStartPonit = 0.0;
         cellEndPont = 0.0;
-        // timeStamp = 0.0;
         cellStatus = false;
+        vehicleStatus = false;
     }
 };
