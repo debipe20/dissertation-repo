@@ -342,7 +342,7 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 						(temporaryLaneId == InputDataPointList[k].laneId) && (!temporaryConnectedVehicleStatus))
 					{
 						InputDataPointList[k].vehicleID = temporaryVehicleID;
-						InputDataPointList[k].cellStatus = false;
+						InputDataPointList[k].cellStatus = true;
 						InputDataPointList[k].vehicleStatus = true;
 					}
 				}
