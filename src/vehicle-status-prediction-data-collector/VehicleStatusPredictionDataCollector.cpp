@@ -335,7 +335,6 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 						InputDataPointList[k].distanceToStopBar = temporaryDistanceToStopBar;
 						InputDataPointList[k].cellStatus = true;
 						InputDataPointList[k].vehicleStatus = true;
-						// vehicleId.push_back(temporaryVehicleID);
 					}
 
 					else if ((temporaryDistanceToStopBar >= InputDataPointList[k].cellStartPonit) &&
@@ -343,10 +342,8 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 						(temporaryLaneId == InputDataPointList[k].laneId) && (!temporaryConnectedVehicleStatus))
 					{
 						InputDataPointList[k].vehicleID = temporaryVehicleID;
-						InputDataPointList[k].cellStatus = true;
+						InputDataPointList[k].cellStatus = false;
 						InputDataPointList[k].vehicleStatus = true;
-
-						// vehicleId.push_back(temporaryVehicleID);
 					}
 				}
 			}
