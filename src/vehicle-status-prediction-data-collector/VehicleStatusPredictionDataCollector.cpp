@@ -70,8 +70,6 @@ VehicleStatusPredictionDataCollector::VehicleStatusPredictionDataCollector()
 			<< "DistanceToStopBar"
 			<< ","
 			<< "CellStatus"
-			<< ","
-			<< "VehicleStatus"
 			<< endl;
 }
 
@@ -156,6 +154,7 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure()
 			dataPointStructure.locationOnMap = static_cast<int>(MsgEnum::mapLocType::onInbound);
 			dataPointStructure.cellStartPonit = cellStartPoint;
 			dataPointStructure.cellEndPont = cellStartPoint + cellLength;
+			dataPointStructure.distanceToStopBar = cellStartPoint;
 			dataPointStructure.speed = -1.0;
 			dataPointStructure.cellStatus = false;
 			dataPointStructure.vehicleStatus = false;
@@ -177,6 +176,7 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure()
 			dataPointStructure.locationOnMap = static_cast<int>(MsgEnum::mapLocType::onInbound);
 			dataPointStructure.cellStartPonit = cellStartPoint;
 			dataPointStructure.cellEndPont = cellStartPoint + cellLength;
+			dataPointStructure.distanceToStopBar = cellStartPoint;
 			dataPointStructure.speed = -1.0;
 			dataPointStructure.cellStatus = false;
 			dataPointStructure.vehicleStatus = false;
@@ -334,7 +334,7 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 						InputDataPointList[k].heading = temporaryHeading;
 						InputDataPointList[k].distanceToStopBar = temporaryDistanceToStopBar;
 						InputDataPointList[k].cellStatus = true;
-						InputDataPointList[k].vehicleStatus = true;
+						// InputDataPointList[k].vehicleStatus = true;
 					}
 
 					else if ((temporaryDistanceToStopBar >= InputDataPointList[k].cellStartPonit) &&
@@ -343,7 +343,7 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 					{
 						InputDataPointList[k].vehicleID = temporaryVehicleID;
 						InputDataPointList[k].cellStatus = true;
-						InputDataPointList[k].vehicleStatus = true;
+						// InputDataPointList[k].vehicleStatus = true;
 					}
 				}
 			}
@@ -391,7 +391,7 @@ void VehicleStatusPredictionDataCollector::writeCsvFile()
 				<< InputDataPointList[i].locationOnMap << "," << InputDataPointList[i].phaseStatus << ","
 				<< InputDataPointList[i].phaseElapsedTime << "," << InputDataPointList[i].speed << "," 
 				<< InputDataPointList[i].heading << "," << InputDataPointList[i].distanceToStopBar << "," 
-				<< InputDataPointList[i].cellStatus << "," << InputDataPointList[i].vehicleStatus<< endl;
+				<< InputDataPointList[i].cellStatus << endl;
 	}
 }
 
