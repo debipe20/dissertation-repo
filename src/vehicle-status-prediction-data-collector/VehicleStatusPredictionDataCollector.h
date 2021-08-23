@@ -88,11 +88,12 @@ public:
     ~VehicleStatusPredictionDataCollector();
 
     int getMessageType(string jsonString);
-    void readInterIntersectionInformationConfig();
+    void readIntersectionInformationConfig();
     void createDataPointStructure();
     void updatePhaseStatusInDataPointList(string jsonString);
     void fillUpDataPointList(string jsonString);
     void writeCsvFile();
     string getVehicleStatusListRequestMessage();
     bool checkVehicleStatusListMessageSendingRequirement();
+    vector <int> generateRandomNumber(int noOfVehicle, int noOfInputVehicle);
 };
