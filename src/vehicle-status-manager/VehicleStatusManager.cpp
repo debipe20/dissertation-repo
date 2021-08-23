@@ -205,6 +205,7 @@ void VehicleStatusManager::manageVehicleStatusList(BasicVehicle basicVehicle)
 
 	if (addVehicleIDInVehicleStatusList(basicVehicle))
 	{
+		vehicleId = basicVehicle.getTemporaryID();
 		if (basicVehicle.getType() == "Transit")
 			vehicleType = Transit;
 
@@ -217,14 +218,14 @@ void VehicleStatusManager::manageVehicleStatusList(BasicVehicle basicVehicle)
 		else if (basicVehicle.getType() == "Car")
 			vehicleType = PassengerVehicle;
 
-		vehicleStatus.vehicleId = basicVehicle.getTemporaryID();
+		vehicleStatus.vehicleId = vehicleId;
 		vehicleStatus.vehicleType = vehicleType;
 		vehicleStatus.vehicleSpeed_MeterPerSecond = basicVehicle.getSpeed_MeterPerSecond();
 		vehicleStatus.vehicleHeading_Degree = basicVehicle.getHeading_Degree();
 		vehicleStatus.updateTime = getPosixTimestamp();
 
 		VehicleStatusList.push_back(vehicleStatus);
-		vehicleId = basicVehicle.getTemporaryID();
+		
 		
 		setConnectedVehicleStatus(vehicleId);
 	}
@@ -262,7 +263,7 @@ void VehicleStatusManager::setConnectedVehicleStatus(int vehicleId)
 		noOfConnectedVehiclesInList++;
 	}
 
-	else if (noOfConnectedVehiclesInList < allowedConnectedVehicle)
+	else if (noOfConnectedVehiclesInList <= allowedConnectedVehicle)
 	{
 		findVehicleIdInVehicleStatusList->connected = true;
 		noOfConnectedVehiclesInList++;
