@@ -54,6 +54,9 @@ private:
     int approachId{};
     int noOfLanes{};
     double penetrationRate{};
+    double msgSendingTime{};
+    double msgSendingFrequency{};
+    
     vector<int>lanesId{};
 
     LocAware *plocAwareLib;
@@ -72,4 +75,6 @@ public:
     void deleteTimedOutVehicleIdFromVehicleStatusList();
     string readIntersectionMapConfig(string configFilename);
     string getVehicleStatusList(int requested_ApproachId);
+    string getVehicleStatusList();
+    bool checkMsgSendingRequirement();
 };

@@ -61,15 +61,25 @@ int main()
                 vehicleStatusManager.manageVehicleStatusList(basicVehicle);
             }
 
-            else if (receivedJsonObject["MsgType"] == "VehicleStatusListRequest")
+            if (vehicleStatusManager.checkMsgSendingRequirement())
             {
-                vehicleStatusListJsonString = vehicleStatusManager.getVehicleStatusList(receivedJsonObject["ApproachId"].asInt());                
+                vehicleStatusListJsonString = vehicleStatusManager.getVehicleStatusList();                
                 vehicleStatusManagerSocket.sendData(HostIP, static_cast<short unsigned int>(dataCollectorPortNo), vehicleStatusListJsonString);
             }
-        }
+            
+
+        //     else if (receivedJsonObject["MsgType"] == "VehicleStatusListRequest")
+        //     {
+        //         vehicleStatusListJsonString = vehicleStatusManager.getVehicleStatusList(receivedJsonObject["ApproachId"].asInt());                
+        //         vehicleStatusManagerSocket.sendData(HostIP, static_cast<short unsigned int>(dataCollectorPortNo), vehicleStatusListJsonString);
+        //     }
+        // }
+
 
         else
             vehicleStatusManager.deleteTimedOutVehicleIdFromVehicleStatusList();
+
+        
     }
 
     delete reader;
