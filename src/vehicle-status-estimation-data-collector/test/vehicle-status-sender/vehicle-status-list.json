@@ -1,9 +1,9 @@
 {
     "MsgType": "VehicleStatusList",
     "NoOfVehicle": 4,
-    "VehcileStatusList": [
+    "VehicleStatusList": [
         {
-            "distanceFromStopBar": 16.0,
+            "distanceFromStopBar": 6.0,
             "heading_Degree": 269.44999999999999,
             "inBoundApproachId": 5,
             "inBoundLaneId": 14,
@@ -12,7 +12,8 @@
             "speed_MeterPerSecond": 17.731000000000002,
             "stoppedDelay": 0.0,
             "vehicleId": 602,
-            "vehicleType": 6
+            "vehicleType": 6,
+            "connectedVehicleStatus": true
         },
         {
             "distanceFromStopBar": 12.0,
@@ -24,10 +25,11 @@
             "speed_MeterPerSecond": 16.489999999999998,
             "stoppedDelay": 0.0,
             "vehicleId": 650,
-            "vehicleType": 9
+            "vehicleType": 9,
+            "connectedVehicleStatus": true
         },
         {
-            "distanceFromStopBar": 66.0,
+            "distanceFromStopBar": 36.0,
             "heading_Degree": 269.44999999999999,
             "inBoundApproachId": 5,
             "inBoundLaneId": 14,
@@ -36,10 +38,11 @@
             "speed_MeterPerSecond": 17.731000000000002,
             "stoppedDelay": 0.0,
             "vehicleId": 624,
-            "vehicleType": 6
+            "vehicleType": 6,
+            "connectedVehicleStatus": true
         },
         {
-            "distanceFromStopBar": 42.0,
+            "distanceFromStopBar": 44.0,
             "heading_Degree": 272.06,
             "inBoundApproachId": 5,
             "inBoundLaneId": 14,
@@ -48,7 +51,8 @@
             "speed_MeterPerSecond": 16.489999999999998,
             "stoppedDelay": 0.0,
             "vehicleId": 652,
-            "vehicleType": 9
+            "vehicleType": 9,
+            "connectedVehicleStatus": true
         }
     ]
 }

@@ -41,7 +41,7 @@ int main()
 
     //Socket Communication
     UdpSocket vehicleStatusPredictionDataCollectorSocket(static_cast<short unsigned int>(jsonObject["PortNumber"]["DataCollector"].asInt()));
-    const int vehicleStatusManagerPortNo = jsonObject["PortNumber"]["MessageDistributor"].asInt();
+    // const int vehicleStatusManagerPortNo = jsonObject["PortNumber"]["MessageDistributor"].asInt();
     const string HostIp = jsonObject["HostIp"].asString();
     char receiveBuffer[163840];
     int msgType{};
@@ -52,6 +52,7 @@ int main()
         vehicleStatusPredictionDataCollectorSocket.receiveData(receiveBuffer, sizeof(receiveBuffer));
         string receivedJsonString(receiveBuffer);
         msgType = vehicleStatusPredictionDataCollector.getMessageType(receivedJsonString);
+        cout << "Received Data: " << receivedJsonString <<endl;
 
         if (msgType == static_cast<int>(msgType::CurrentState_VehiclePhases))
             vehicleStatusPredictionDataCollector.updatePhaseStatusInDataPointList(receivedJsonString);

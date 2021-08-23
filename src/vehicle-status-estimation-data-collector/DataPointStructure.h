@@ -11,6 +11,7 @@ struct DataPointStructure
     int approachId{};
     int locationOnMap{};
     int phaseStatus{};
+    // bool nearestCVStatus{};
     double nearestCVDistanceToStopBar{};
     double nearestCVSpeed{};
     // double backCVDistanceToStopBar{};
@@ -35,6 +36,7 @@ struct DataPointStructure
         approachId = 0;
         locationOnMap = 0;
         phaseStatus = 0;
+        // nearestCVStatus = false;
         nearestCVDistanceToStopBar = 0.0;
         nearestCVSpeed = 0.0;
         // backCVDistanceToStopBar = 0.0;
