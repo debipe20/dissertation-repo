@@ -46,7 +46,7 @@ int main()
     char receiveBuffer[10240];
     bool timedOutOccur{};
     string vehicleStatusListJsonString{};
-    
+
     while (true)
     {
         timedOutOccur = vehicleStatusManagerSocket.receiveData(receiveBuffer, sizeof(receiveBuffer));
@@ -63,25 +63,21 @@ int main()
 
             if (vehicleStatusManager.checkMsgSendingRequirement())
             {
-                vehicleStatusListJsonString = vehicleStatusManager.getVehicleStatusList();                
+                vehicleStatusListJsonString = vehicleStatusManager.getVehicleStatusList();
                 vehicleStatusManagerSocket.sendData(HostIP, static_cast<short unsigned int>(dataCollectorPortNo), vehicleStatusListJsonString);
             }
-            
 
-        //     else if (receivedJsonObject["MsgType"] == "VehicleStatusListRequest")
-        //     {
-        //         vehicleStatusListJsonString = vehicleStatusManager.getVehicleStatusList(receivedJsonObject["ApproachId"].asInt());                
-        //         vehicleStatusManagerSocket.sendData(HostIP, static_cast<short unsigned int>(dataCollectorPortNo), vehicleStatusListJsonString);
-        //     }
-        // }
+            //     else if (receivedJsonObject["MsgType"] == "VehicleStatusListRequest")
+            //     {
+            //         vehicleStatusListJsonString = vehicleStatusManager.getVehicleStatusList(receivedJsonObject["ApproachId"].asInt());
+            //         vehicleStatusManagerSocket.sendData(HostIP, static_cast<short unsigned int>(dataCollectorPortNo), vehicleStatusListJsonString);
+            //     }
+            // }
 
-
-        else
-            vehicleStatusManager.deleteTimedOutVehicleIdFromVehicleStatusList();
-
-        
+            else
+                vehicleStatusManager.deleteTimedOutVehicleIdFromVehicleStatusList();
+        }
     }
-
     delete reader;
     vehicleStatusManagerSocket.closeSocket();
     return 0;
