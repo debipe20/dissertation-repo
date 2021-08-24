@@ -52,7 +52,6 @@ int main()
         vehicleStatusPredictionDataCollectorSocket.receiveData(receiveBuffer, sizeof(receiveBuffer));
         string receivedJsonString(receiveBuffer);
         msgType = vehicleStatusPredictionDataCollector.getMessageType(receivedJsonString);
-        cout << "Received Data: " << receivedJsonString <<endl;
 
         if (msgType == static_cast<int>(msgType::CurrentState_VehiclePhases))
             vehicleStatusPredictionDataCollector.updatePhaseStatusInDataPointList(receivedJsonString);
