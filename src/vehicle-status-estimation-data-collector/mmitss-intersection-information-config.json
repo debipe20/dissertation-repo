@@ -5,7 +5,7 @@
     "ApproachId": 5,
     "ApproachSpeedLimit": 35.0,
     "NoOfThroughLanes":1,
-    "ThroughLanesLength": 77,
+    "ThroughLanesLength": 310,
     "NoOfLeftTurnPocket":0,
     "LeftTurnPocketLength": 0,
     "ThoughLanesSignalGroup": 2,

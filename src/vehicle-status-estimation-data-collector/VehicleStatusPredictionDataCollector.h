@@ -92,6 +92,7 @@ public:
     void createDataPointStructure();
     void updatePhaseStatusInDataPointList(string jsonString);
     void fillUpDataPointList(string jsonString);
+    void fillUpFrontCellInformation();
     void writeCsvFile();
     string getVehicleStatusListRequestMessage();
     bool checkVehicleStatusListMessageSendingRequirement();

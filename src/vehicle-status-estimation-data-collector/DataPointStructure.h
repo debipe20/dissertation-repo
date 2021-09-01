@@ -12,8 +12,8 @@ struct DataPointStructure
     int locationOnMap{};
     int phaseStatus{};
     // bool nearestCVStatus{};
-    double nearestCVDistanceToStopBar{};
-    double nearestCVSpeed{};
+    bool frontCellStatus{};
+    double frontCellVehicleSpeed{};
     // double backCVDistanceToStopBar{};
     // double backCVSpeed{};
     double phaseElapsedTime{};
@@ -25,7 +25,6 @@ struct DataPointStructure
     double cellStartPonit{};
     double cellEndPont{};
     bool cellStatus{};
-    bool vehicleStatus{};
 
     void reset()
     {
@@ -37,8 +36,8 @@ struct DataPointStructure
         locationOnMap = 0;
         phaseStatus = 0;
         // nearestCVStatus = false;
-        nearestCVDistanceToStopBar = 0.0;
-        nearestCVSpeed = 0.0;
+        frontCellStatus = false;
+        frontCellVehicleSpeed = 0.0;
         // backCVDistanceToStopBar = 0.0;
         // backCVSpeed = 0.0;
         phaseElapsedTime = 0.0;
@@ -50,6 +49,5 @@ struct DataPointStructure
         cellStartPonit = 0.0;
         cellEndPont = 0.0;
         cellStatus = false;
-        vehicleStatus = false;
     }
 };

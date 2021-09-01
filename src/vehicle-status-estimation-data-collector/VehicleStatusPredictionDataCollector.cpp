@@ -51,27 +51,17 @@ VehicleStatusPredictionDataCollector::VehicleStatusPredictionDataCollector()
 			<< ","
 			<< "VehicleType"
 			<< ","
-			<< "SignalGroup"
-			<< ","
-			<< "LaneId"
-			<< ","
-			<< "ApproachId"
-			<< ","
-			<< "LocationOnMap"
-			<< ","
 			<< "PhaseStatus"
 			<< ","
 			<< "PhaseElapsedTime"
 			<< ","
 			<< "Speed"
 			<< ","
-			<< "Heading"
-			<< ","
 			<< "DistanceToStopBar"
 			<< ","
-			<< "NearestCVDistanceToStopBar"
+			<< "FrontCellStatus"
 			<< ","
-			<< "NearestCVSpeed"
+			<< "FrontCellVehicleSpeed"
 			<< ","
 			<< "CellStatus"
 			<< endl;
@@ -158,12 +148,11 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure()
 			dataPointStructure.locationOnMap = static_cast<int>(MsgEnum::mapLocType::onInbound);
 			dataPointStructure.cellStartPonit = cellStartPoint;
 			dataPointStructure.cellEndPont = cellStartPoint + cellLength;
-			dataPointStructure.distanceToStopBar = cellStartPoint + (cellLength/2);
-			dataPointStructure.nearestCVDistanceToStopBar = 0.0;
-			dataPointStructure.nearestCVSpeed = -1.0;
+			dataPointStructure.distanceToStopBar = cellStartPoint + (cellLength / 2);
 			dataPointStructure.speed = -1.0;
 			dataPointStructure.cellStatus = false;
-			dataPointStructure.vehicleStatus = false;
+			dataPointStructure.frontCellStatus = false;
+			dataPointStructure.frontCellVehicleSpeed = -1.0;
 
 			DataPointList.push_back(dataPointStructure);
 			cellStartPoint = cellStartPoint + cellLength;
@@ -182,12 +171,11 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure()
 			dataPointStructure.locationOnMap = static_cast<int>(MsgEnum::mapLocType::onInbound);
 			dataPointStructure.cellStartPonit = cellStartPoint;
 			dataPointStructure.cellEndPont = cellStartPoint + cellLength;
-			dataPointStructure.distanceToStopBar = cellStartPoint + (cellLength/2);
-			dataPointStructure.nearestCVDistanceToStopBar = 0.0;
-			dataPointStructure.nearestCVSpeed = -1.0;
+			dataPointStructure.distanceToStopBar = cellStartPoint + (cellLength / 2);
 			dataPointStructure.speed = -1.0;
 			dataPointStructure.cellStatus = false;
-			dataPointStructure.vehicleStatus = false;
+			dataPointStructure.frontCellStatus = false;
+			dataPointStructure.frontCellVehicleSpeed = -1.0;
 
 			DataPointList.push_back(dataPointStructure);
 			cellStartPoint = cellStartPoint + cellLength;
@@ -329,7 +317,7 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 
 			if (temporaryApproachId == approachId)
 			{
-				for (size_t k = 1; k < InputDataPointList.size(); k++)
+				for (size_t k = 0; k < InputDataPointList.size(); k++)
 				{
 					if ((temporaryDistanceToStopBar >= InputDataPointList[k].cellStartPonit) &&
 						(temporaryDistanceToStopBar <= InputDataPointList[k].cellEndPont) &&
@@ -355,41 +343,21 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 		}
 	}
 
-	//Setting up nearest connected vehicle information
-	for (size_t k = 1; k < InputDataPointList.size(); k++)
-	{
-		if (k == 1) // For second cell first cell is the front CV
-		{
-			// InputDataPointList[k].nearestCVStatus = true;
-			InputDataPointList[k].nearestCVDistanceToStopBar = InputDataPointList[0].distanceToStopBar;
-			InputDataPointList[k].nearestCVSpeed = 0.0;
-		}
-
-		else
-		{
-			int noOfForwardCell = static_cast<int>(k);
-			bool frontCellStatusAvalability(false);
-			for (int l = 0; l < noOfForwardCell; l++)
-			{
-				if (InputDataPointList[l].cellStatus == true)
-				{
-					// InputDataPointList[k].nearestCVStatus = true;
-					InputDataPointList[k].nearestCVDistanceToStopBar = InputDataPointList[l].distanceToStopBar;
-					InputDataPointList[k].nearestCVSpeed = InputDataPointList[l].speed;
-					frontCellStatusAvalability = true;
-					break;
-				}
-			}
-			if (!frontCellStatusAvalability)//If there is no front CV then first cell is the front CV
-			{
-				// InputDataPointList[k].nearestCVStatus = true;
-				InputDataPointList[k].nearestCVDistanceToStopBar = InputDataPointList[0].distanceToStopBar;
-				InputDataPointList[k].nearestCVSpeed = 0.0;
-			}
-		}
-	}
+	fillUpFrontCellInformation();
 
 	writeCsvFile();
+}
+
+void VehicleStatusPredictionDataCollector::fillUpFrontCellInformation()
+{
+	for (size_t k = 1; k < InputDataPointList.size(); k++)
+	{
+		if (InputDataPointList[k - 1].cellStatus == true)
+		{
+			InputDataPointList[k].frontCellStatus = true;
+			InputDataPointList[k].frontCellVehicleSpeed = InputDataPointList[k - 1].speed;
+		}
+	}
 }
 
 vector<int> VehicleStatusPredictionDataCollector::generateRandomNumber(int noOfVehicle, int noOfInputVehicle)
@@ -423,15 +391,12 @@ void VehicleStatusPredictionDataCollector::writeCsvFile()
 
 	for (size_t i = 1; i < InputDataPointList.size(); i++)
 	{
-		logFile << fixed << showpoint << setprecision(4) << timeStamp << "," << totalNoOfCells << ",";
+		logFile << fixed << showpoint << setprecision(4) << timeStamp << "," << totalNoOfCells-1 << ",";
 		logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].vehicleID << ","
-				<< InputDataPointList[i].vehicleType << "," << InputDataPointList[i].signalGroup << ","
-				<< InputDataPointList[i].laneId << "," << InputDataPointList[i].approachId << ","
-				<< InputDataPointList[i].locationOnMap << "," << InputDataPointList[i].phaseStatus << ","
+				<< InputDataPointList[i].vehicleType << "," << InputDataPointList[i].phaseStatus << ","
 				<< InputDataPointList[i].phaseElapsedTime << "," << InputDataPointList[i].speed << ","
-				<< InputDataPointList[i].heading << "," << InputDataPointList[i].distanceToStopBar << ","
-				<< InputDataPointList[i].nearestCVDistanceToStopBar << "," << InputDataPointList[i].nearestCVSpeed << "," 
-				<< InputDataPointList[i].cellStatus << endl;
+				<< InputDataPointList[i].distanceToStopBar << "," << InputDataPointList[i].frontCellStatus << "," 
+				<< InputDataPointList[i].frontCellVehicleSpeed << "," << InputDataPointList[i].cellStatus << endl;
 	}
 }
 
