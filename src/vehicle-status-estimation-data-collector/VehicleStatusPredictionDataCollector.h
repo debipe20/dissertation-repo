@@ -70,6 +70,7 @@ private:
     int leftTurnPocketSignalGroup{};
     int throughLanePhaseStatus{};
     int leftTurnPocketPhaseStatus{};
+    int noOfConnectedVehicle{};
     double cellLength{};
     double penetrationRate{};
     double msgSendingTime{};

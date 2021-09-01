@@ -471,7 +471,7 @@ bool VehicleStatusManager::checkMsgSendingRequirement()
 	bool messageSendrequirement{false};
 	double currentTime = getPosixTimestamp();
 
-	if (((currentTime - msgSendingTime) >= msgSendingFrequency) && VehicleStatusList.size() >= 3)
+	if (((currentTime - msgSendingTime) >= msgSendingFrequency) && VehicleStatusList.size() >= 2)
 		messageSendrequirement = true;
 
 	return messageSendrequirement;

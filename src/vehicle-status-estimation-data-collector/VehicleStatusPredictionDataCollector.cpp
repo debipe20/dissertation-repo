@@ -268,6 +268,7 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 	double temporaryHeading{};
 	double temporaryDistanceToStopBar{};
 	bool temporaryConnectedVehicleStatus{};
+	noOfConnectedVehicle = 0;
 
 	InputDataPointList = DataPointList;
 	// OutputDataPointList = DataPointList;
@@ -329,6 +330,7 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 						InputDataPointList[k].heading = temporaryHeading;
 						// InputDataPointList[k].distanceToStopBar = temporaryDistanceToStopBar;
 						InputDataPointList[k].cellStatus = true;
+						noOfConnectedVehicle ++;
 					}
 
 					else if ((temporaryDistanceToStopBar >= InputDataPointList[k].cellStartPonit) &&
@@ -343,9 +345,11 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 		}
 	}
 
-	fillUpFrontCellInformation();
-
-	writeCsvFile();
+	if(noOfConnectedVehicle >=2)
+	{
+		fillUpFrontCellInformation();
+		writeCsvFile();
+	}
 }
 
 void VehicleStatusPredictionDataCollector::fillUpFrontCellInformation()
