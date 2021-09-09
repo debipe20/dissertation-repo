@@ -5,4 +5,4 @@ import glob
 extension = 'csv'
 all_filenames = [j for j in glob.glob('*.{}'.format(extension))]
 combined_csv = pd.concat([pd.read_csv(f, header=None, low_memory=False) for f in all_filenames],axis=0)
-np.savetxt("combined-data-withoutheader.txt", combined_csv.values, fmt='%1.7s', delimiter =",")
+np.savetxt("combined-data.txt", combined_csv.values, fmt='%1.7s', delimiter =",")

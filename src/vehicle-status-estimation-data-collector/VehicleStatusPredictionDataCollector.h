@@ -71,6 +71,7 @@ private:
     int throughLanePhaseStatus{};
     int leftTurnPocketPhaseStatus{};
     int noOfConnectedVehicle{};
+    int noOfNonConnectedVehicle{};
     double cellLength{};
     double penetrationRate{};
     double msgSendingTime{};

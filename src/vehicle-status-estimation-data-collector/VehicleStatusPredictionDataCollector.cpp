@@ -41,11 +41,16 @@ VehicleStatusPredictionDataCollector::VehicleStatusPredictionDataCollector()
 	stringstream stream;
 	stream << fixed << setprecision(2) << penetrationRate;
 	string penetrationRateString = stream.str();
-	logFile.open("data/vehicle-status-data-" + penetrationRateString + ".csv");
+	logFile.open("data/sample-vehicle-status-data-" + penetrationRateString + ".csv");
 
 	logFile << "TimeStamp"
 			<< ","
 			<< "NoOfCells"
+			<< ","
+			<< "NoOfConnectedVehicle"
+			<< ","
+			<< "NoOfNonConnectedVehicle"
+			<< "CellNo"
 			<< ","
 			<< "VehicleId"
 			<< ","
@@ -135,13 +140,18 @@ void VehicleStatusPredictionDataCollector::readIntersectionInformationConfig()
 void VehicleStatusPredictionDataCollector::createDataPointStructure()
 {
 	double cellStartPoint{};
+	int cellNumber{};
 	DataPointStructure dataPointStructure;
 	dataPointStructure.reset();
 
 	for (int i = 0; i < noOfLeftTurnPockets; i++)
 	{
+		cellStartPoint = 0.0;
+		cellNumber = 0;
+
 		for (int j = 0; j < noOfCellsPerLeftTurnPocket; j++)
 		{
+			dataPointStructure.cellNo = cellNumber++;
 			dataPointStructure.signalGroup = leftTurnPocketSignalGroup;
 			dataPointStructure.laneId = leftTurnPocketsId.at(i);
 			dataPointStructure.approachId = approachId;
@@ -162,9 +172,11 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure()
 	for (int i = 0; i < noOfThroughLanes; i++)
 	{
 		cellStartPoint = 0.0;
+		cellNumber = 0;
 
 		for (int j = 0; j < noOfCellsPerThroughLane; j++)
 		{
+			dataPointStructure.cellNo = cellNumber++;
 			dataPointStructure.signalGroup = throughLaneSignalGroup;
 			dataPointStructure.laneId = throughLanesId.at(i);
 			dataPointStructure.approachId = approachId;
@@ -269,6 +281,7 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 	double temporaryDistanceToStopBar{};
 	bool temporaryConnectedVehicleStatus{};
 	noOfConnectedVehicle = 0;
+	noOfNonConnectedVehicle = 0;
 
 	InputDataPointList = DataPointList;
 	// OutputDataPointList = DataPointList;
@@ -330,7 +343,9 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 						InputDataPointList[k].heading = temporaryHeading;
 						// InputDataPointList[k].distanceToStopBar = temporaryDistanceToStopBar;
 						InputDataPointList[k].cellStatus = true;
-						noOfConnectedVehicle ++;
+
+						if (temporarySpeed >= 0.0 && k > 0)
+							noOfConnectedVehicle++;
 					}
 
 					else if ((temporaryDistanceToStopBar >= InputDataPointList[k].cellStartPonit) &&
@@ -339,13 +354,14 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 					{
 						InputDataPointList[k].vehicleID = temporaryVehicleID;
 						InputDataPointList[k].cellStatus = true;
+						noOfNonConnectedVehicle++;
 					}
 				}
 			}
 		}
 	}
 
-	if(noOfConnectedVehicle >=2)
+	if (noOfConnectedVehicle >= 1)
 	{
 		fillUpFrontCellInformation();
 		writeCsvFile();
@@ -356,7 +372,7 @@ void VehicleStatusPredictionDataCollector::fillUpFrontCellInformation()
 {
 	for (size_t k = 1; k < InputDataPointList.size(); k++)
 	{
-		if (InputDataPointList[k - 1].cellStatus == true)
+		if (InputDataPointList[k - 1].speed >= 0.0)
 		{
 			InputDataPointList[k].frontCellStatus = true;
 			InputDataPointList[k].frontCellVehicleSpeed = InputDataPointList[k - 1].speed;
@@ -395,11 +411,12 @@ void VehicleStatusPredictionDataCollector::writeCsvFile()
 
 	for (size_t i = 1; i < InputDataPointList.size(); i++)
 	{
-		logFile << fixed << showpoint << setprecision(4) << timeStamp << "," << totalNoOfCells-1 << ",";
-		logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].vehicleID << ","
+		logFile << fixed << showpoint << setprecision(4) << timeStamp << "," << totalNoOfCells - 1 << ","
+				<< noOfConnectedVehicle << "," << noOfNonConnectedVehicle << ",";
+		logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].cellNo << "," << InputDataPointList[i].vehicleID << ","
 				<< InputDataPointList[i].vehicleType << "," << InputDataPointList[i].phaseStatus << ","
 				<< InputDataPointList[i].phaseElapsedTime << "," << InputDataPointList[i].speed << ","
-				<< InputDataPointList[i].distanceToStopBar << "," << InputDataPointList[i].frontCellStatus << "," 
+				<< InputDataPointList[i].distanceToStopBar << "," << InputDataPointList[i].frontCellStatus << ","
 				<< InputDataPointList[i].frontCellVehicleSpeed << "," << InputDataPointList[i].cellStatus << endl;
 	}
 }

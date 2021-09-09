@@ -4,6 +4,7 @@
 
 struct DataPointStructure
 {
+    int cellNo{};
     int vehicleID{};
     int vehicleType{};
     int signalGroup{};
@@ -28,6 +29,7 @@ struct DataPointStructure
 
     void reset()
     {
+        cellNo = 0;
         vehicleID = 0;
         vehicleType = 0;
         signalGroup = 0;

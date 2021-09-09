@@ -94,7 +94,14 @@ def getTrajectoryPoint(dataFrame, startTime, approachLength):
     timePoint = []
     distancePoint = []
     for idx, row in dataFrame.loc[:].iterrows():
-        if row['CellStatus'] == 1:
+        # if row['CellStatus'] == 1:
+        #     timePoint.append(row['TimeStamp']-startTime)
+        #     distancePoint.append(approachLength - row['DistanceToStopBar'])
+        if row['CellStatus'] >0 and row['PredictedCellStatus'] > 0.15:
+            timePoint.append(row['TimeStamp']-startTime)
+            distancePoint.append(approachLength - row['DistanceToStopBar'])
+
+        elif row['CellStatus'] <=0 and row['PredictedCellStatus'] <= 0.05:
             timePoint.append(row['TimeStamp']-startTime)
             distancePoint.append(approachLength - row['DistanceToStopBar'])
 
