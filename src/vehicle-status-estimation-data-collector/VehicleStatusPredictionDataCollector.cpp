@@ -150,7 +150,7 @@ void VehicleStatusPredictionDataCollector::createLogFile()
 				<< ","
 				<< "ConnectedVehicleId"
 				<< ","
-				<< "Non-ConnectedVehicleId"
+				<< "NonConnectedVehicleId"
 				<< ","
 				<< "VehicleType"
 				<< ","
