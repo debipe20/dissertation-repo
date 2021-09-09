@@ -57,6 +57,7 @@ void VehicleStatusManager::readConfigFile()
 	if (parsingSuccessful)
 	{
 		penetrationRate = jsonObject["ConnectedVehiclePenetrationRate"].asDouble();
+		msgSendingFrequency = jsonObject["FrequencyOfRequest"].asDouble();
 		approachId = jsonObject["ApproachId"].asInt();
 		noOfLanes = jsonObject["NoOfLanes"].asInt();
 
@@ -204,6 +205,7 @@ void VehicleStatusManager::manageVehicleStatusList(BasicVehicle basicVehicle)
 
 	if (addVehicleIDInVehicleStatusList(basicVehicle))
 	{
+		vehicleId = basicVehicle.getTemporaryID();
 		if (basicVehicle.getType() == "Transit")
 			vehicleType = Transit;
 
@@ -216,14 +218,14 @@ void VehicleStatusManager::manageVehicleStatusList(BasicVehicle basicVehicle)
 		else if (basicVehicle.getType() == "Car")
 			vehicleType = PassengerVehicle;
 
-		vehicleStatus.vehicleId = basicVehicle.getTemporaryID();
+		vehicleStatus.vehicleId = vehicleId;
 		vehicleStatus.vehicleType = vehicleType;
 		vehicleStatus.vehicleSpeed_MeterPerSecond = basicVehicle.getSpeed_MeterPerSecond();
 		vehicleStatus.vehicleHeading_Degree = basicVehicle.getHeading_Degree();
 		vehicleStatus.updateTime = getPosixTimestamp();
 
 		VehicleStatusList.push_back(vehicleStatus);
-		vehicleId = basicVehicle.getTemporaryID();
+		
 		
 		setConnectedVehicleStatus(vehicleId);
 	}
@@ -261,7 +263,7 @@ void VehicleStatusManager::setConnectedVehicleStatus(int vehicleId)
 		noOfConnectedVehiclesInList++;
 	}
 
-	else if (noOfConnectedVehiclesInList < allowedConnectedVehicle)
+	else if (noOfConnectedVehiclesInList <= allowedConnectedVehicle)
 	{
 		findVehicleIdInVehicleStatusList->connected = true;
 		noOfConnectedVehiclesInList++;
@@ -424,6 +426,55 @@ string VehicleStatusManager::getVehicleStatusList(int requested_ApproachId)
 	vehicleStatusListJsonString = Json::writeString(builder, jsonObject);
 
 	return vehicleStatusListJsonString;
+}
+
+string VehicleStatusManager::getVehicleStatusList()
+{
+	string vehicleStatusListJsonString{};
+	int noOfVehicle{};
+
+	Json::Value jsonObject;
+	Json::StreamWriterBuilder builder;
+	builder["commentStyle"] = "None";
+	builder["indentation"] = "";
+
+	jsonObject["MsgType"] = "VehicleStatusList";
+
+	if (!VehicleStatusList.empty())
+	{
+		for (unsigned int i = 0; i < VehicleStatusList.size(); i++)
+		{
+			noOfVehicle++;
+			jsonObject["VehicleStatusList"][i]["vehicleId"] = VehicleStatusList[i].vehicleId;
+			jsonObject["VehicleStatusList"][i]["vehicleType"] = VehicleStatusList[i].vehicleType;
+			jsonObject["VehicleStatusList"][i]["speed_MeterPerSecond"] = VehicleStatusList[i].vehicleSpeed_MeterPerSecond;
+			jsonObject["VehicleStatusList"][i]["heading_Degree"] = VehicleStatusList[i].vehicleHeading_Degree;
+			jsonObject["VehicleStatusList"][i]["inBoundLaneId"] = VehicleStatusList[i].vehicleLaneId;
+			jsonObject["VehicleStatusList"][i]["inBoundApproachId"] = VehicleStatusList[i].vehicleApproachId;
+			jsonObject["VehicleStatusList"][i]["signalGroup"] = VehicleStatusList[i].vehicleSignalGroup;
+			jsonObject["VehicleStatusList"][i]["distanceFromStopBar"] = VehicleStatusList[i].vehicleDistanceFromStopBar;
+			jsonObject["VehicleStatusList"][i]["locationOnMap"] = VehicleStatusList[i].vehicleLocationOnMap;
+			jsonObject["VehicleStatusList"][i]["connectedVehicleStatus"] = VehicleStatusList[i].connected;
+
+		}
+	}
+
+	jsonObject["NoOfVehicle"] = noOfVehicle;
+	vehicleStatusListJsonString = Json::writeString(builder, jsonObject);
+	msgSendingTime = getPosixTimestamp();
+
+	return vehicleStatusListJsonString;
+}
+
+bool VehicleStatusManager::checkMsgSendingRequirement()
+{
+	bool messageSendrequirement{false};
+	double currentTime = getPosixTimestamp();
+
+	if (((currentTime - msgSendingTime) >= msgSendingFrequency) && VehicleStatusList.size() >= 2)
+		messageSendrequirement = true;
+
+	return messageSendrequirement;
 }
 
 VehicleStatusManager::~VehicleStatusManager()
