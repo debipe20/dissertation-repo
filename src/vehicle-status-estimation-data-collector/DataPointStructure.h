@@ -5,18 +5,16 @@
 struct DataPointStructure
 {
     int cellNo{};
-    int vehicleID{};
+    int connectedVehicleID{};
+    int nonConnectedVehicleID{};
     int vehicleType{};
     int signalGroup{};
     int laneId{};
     int approachId{};
     int locationOnMap{};
     int phaseStatus{};
-    // bool nearestCVStatus{};
     bool frontCellStatus{};
     double frontCellVehicleSpeed{};
-    // double backCVDistanceToStopBar{};
-    // double backCVSpeed{};
     double phaseElapsedTime{};
     double phaseUpdateTime{};
     double speed{};
@@ -30,18 +28,16 @@ struct DataPointStructure
     void reset()
     {
         cellNo = 0;
-        vehicleID = 0;
+        connectedVehicleID = 0;
+        nonConnectedVehicleID = 0; 
         vehicleType = 0;
         signalGroup = 0;
         laneId = 0;
         approachId = 0;
         locationOnMap = 0;
         phaseStatus = 0;
-        // nearestCVStatus = false;
         frontCellStatus = false;
         frontCellVehicleSpeed = 0.0;
-        // backCVDistanceToStopBar = 0.0;
-        // backCVSpeed = 0.0;
         phaseElapsedTime = 0.0;
         phaseUpdateTime = 0.0;
         speed = -1.0;

@@ -1,5 +1,6 @@
 {
     "IntersectionName" : "speedway-mountain",
+    "TrainingData": true,
     "FrequencyOfRequest": 0.1,
     "CoonectedVehiclePenetrationRate": 0.2,
     "ApproachId": 5,

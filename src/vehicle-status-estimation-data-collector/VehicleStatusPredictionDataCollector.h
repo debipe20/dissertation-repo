@@ -76,6 +76,7 @@ private:
     double penetrationRate{};
     double msgSendingTime{};
     double msgSendingFrequency{};
+    bool trainingData{};
 
     ofstream logFile;
 
@@ -95,6 +96,7 @@ public:
     void updatePhaseStatusInDataPointList(string jsonString);
     void fillUpDataPointList(string jsonString);
     void fillUpFrontCellInformation();
+    void createLogFile();
     void writeCsvFile();
     string getVehicleStatusListRequestMessage();
     bool checkVehicleStatusListMessageSendingRequirement();
