@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
 
-def timeSpaceDiagram(timePoint, distancePoint, approachLength, timeLength, greenRectangleStartPoint, greenRectangleTime, clearanceRectangleStartPoint, clearanceRectangleTime):
+def timeSpaceDiagram(connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint, approachLength, timeLength, greenRectangleStartPoint, greenRectangleTime, clearanceRectangleStartPoint, clearanceRectangleTime):
     fig, ax1 = plt.subplots()
 
     ax1.set_xlabel('Time (s)', fontsize=24, fontweight='bold')
@@ -33,9 +33,13 @@ def timeSpaceDiagram(timePoint, distancePoint, approachLength, timeLength, green
             (x, y), clearanceRectangleTime[i], 10, angle=0.0, color='red', linewidth=2))
 
     # Plot VehicleTrajectory
-    if len(timePoint) > 0:
-        ax1.scatter(timePoint, distancePoint, c="black",  linewidths=4,
-                    marker=".",  edgecolor="none",  s=50, label='Vehicle Trajectory', zorder=2)
+    if len(connectedVehicleTimePoint) > 0:
+        ax1.scatter(connectedVehicleTimePoint, connectedVehicleDistancePoint, c="blue",  linewidths=4,
+                    marker=".",  edgecolor="none",  s=50, label='ConnectedVehicle Trajectory', zorder=2)
+
+    if len(nonConnectedVehicleTimePoint) > 0:
+        ax1.scatter(nonConnectedVehicleTimePoint, nonConnectedVehicleDistancePoint, c="black",  linewidths=2,
+                    marker=".",  edgecolor="none",  s=50, label='ConnectedVehicle Trajectory', zorder=2)
 
     ax1.legend(loc='upper right', prop={"size": 16})
     ax1.set_title("Time-Space Diagram", fontsize=20, fontweight='bold')
@@ -90,23 +94,42 @@ def getPhaseStatusPoint(dataFrame, startTime):
     return greenRectangleStartPoint, greenRectangleTime, clearanceRectangleStartPoint, clearanceRectangleTime
 
 
-def getTrajectoryPoint(dataFrame, startTime, approachLength):
-    timePoint = []
-    distancePoint = []
+def getTrajectoryPoint(dataFrame, startTime, approachLength, estimatedData):
+    connectedVehicleTimePoint = []
+    nonConnectedVehicleTimePoint = []
+    connectedVehicleDistancePoint = []
+    nonConnectedVehicleDistancePoint = []
+
     for idx, row in dataFrame.loc[:].iterrows():
-        # if row['CellStatus'] == 1:
-        #     timePoint.append(row['TimeStamp']-startTime)
-        #     distancePoint.append(approachLength - row['DistanceToStopBar'])
-        if row['CellStatus'] >0 and row['PredictedCellStatus'] > 0.15:
-            timePoint.append(row['TimeStamp']-startTime)
-            distancePoint.append(approachLength - row['DistanceToStopBar'])
+        # For Estimated Data
+        if bool(estimatedData):
+            if row['CellStatus'] >0 and row['PredictedCellStatus'] > 0.15 and row['ConnectedVehicleId'] > 0:
+                connectedVehicleTimePoint.append(row['TimeStamp']-startTime)
+                connectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
 
-        elif row['CellStatus'] <=0 and row['PredictedCellStatus'] <= 0.05:
-            timePoint.append(row['TimeStamp']-startTime)
-            distancePoint.append(approachLength - row['DistanceToStopBar'])
+            elif row['CellStatus'] <=0 and row['PredictedCellStatus'] <= 0.05 and row['ConnectedVehicleId'] > 0:
+                connectedVehicleTimePoint.append(row['TimeStamp']-startTime)
+                connectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
 
-    return timePoint, distancePoint
+            if row['CellStatus'] >0 and row['PredictedCellStatus'] > 0.15 and row['NonConnectedVehicleId'] > 0:
+                nonConnectedVehicleTimePoint.append(row['TimeStamp']-startTime)
+                nonConnectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
 
+            elif row['CellStatus'] <=0 and row['PredictedCellStatus'] <= 0.05 and row['NonConnectedVehicleId'] > 0:
+                nonConnectedVehicleTimePoint.append(row['TimeStamp']-startTime)
+                nonConnectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
+
+        # For Sample Data
+        else:
+            if row['CellStatus'] == 1 and row['ConnectedVehicleId'] > 0:
+                connectedVehicleTimePoint.append(row['TimeStamp']-startTime)
+                connectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
+            
+            elif row['CellStatus'] == 1 and row['NonConnectedVehicleId'] > 0:
+                nonConnectedVehicleTimePoint.append(row['TimeStamp']-startTime)
+                nonConnectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
+
+    return connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint
 
 def main():
     # Read the config file into a json object:
@@ -117,19 +140,21 @@ def main():
 
     dataFrame = pd.read_csv(config["FileName"])
     approachLength = config["ApproachLength"]
+    estimatedData = config["EstimatedData"]
+
     startTime = dataFrame['TimeStamp'][0]
     timeLength = dataFrame['TimeStamp'].iloc[-1] - dataFrame['TimeStamp'][0]
     print("Start Time is:", startTime)
 
-    timePoint, distancePoint = getTrajectoryPoint(
-        dataFrame, startTime, approachLength)
+    connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint = getTrajectoryPoint(
+        dataFrame, startTime, approachLength, estimatedData)
 
     greenRectangleStartPoint, greenRectangleTime, clearanceRectangleStartPoint, clearanceRectangleTime = getPhaseStatusPoint(
         dataFrame, startTime)
 
     print("Iteration is done")
 
-    timeSpaceDiagram(timePoint, distancePoint, approachLength, timeLength, greenRectangleStartPoint,
+    timeSpaceDiagram(connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint, approachLength, timeLength, greenRectangleStartPoint,
                      greenRectangleTime, clearanceRectangleStartPoint, clearanceRectangleTime)
 
 

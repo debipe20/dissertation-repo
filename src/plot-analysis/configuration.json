@@ -1,4 +1,5 @@
 {
     "FileName":"prediction-sample-data.csv",
-    "ApproachLength": 250
+    "ApproachLength": 250,
+    "EstimatedData": true
 }
