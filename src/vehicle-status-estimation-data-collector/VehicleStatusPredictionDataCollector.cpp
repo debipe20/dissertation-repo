@@ -192,8 +192,8 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure()
 			dataPointStructure.connectedVehicleID = 0;
 			dataPointStructure.nonConnectedVehicleID = 0;
 			dataPointStructure.signalGroup = leftTurnPocketSignalGroup;
-			dataPointStructure.laneId = leftTurnPocketsId.at(i);
-			dataPointStructure.approachId = approachId;
+			// dataPointStructure.laneId = leftTurnPocketsId.at(i);
+			// dataPointStructure.approachId = approachId;
 			dataPointStructure.locationOnMap = static_cast<int>(MsgEnum::mapLocType::onInbound);
 			dataPointStructure.cellStartPonit = cellStartPoint;
 			dataPointStructure.cellEndPont = cellStartPoint + cellLength;
@@ -219,8 +219,8 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure()
 			dataPointStructure.connectedVehicleID = 0;
 			dataPointStructure.nonConnectedVehicleID = 0;
 			dataPointStructure.signalGroup = throughLaneSignalGroup;
-			dataPointStructure.laneId = throughLanesId.at(i);
-			dataPointStructure.approachId = approachId;
+			// dataPointStructure.laneId = throughLanesId.at(i);
+			// dataPointStructure.approachId = approachId;
 			dataPointStructure.locationOnMap = static_cast<int>(MsgEnum::mapLocType::onInbound);
 			dataPointStructure.cellStartPonit = cellStartPoint;
 			dataPointStructure.cellEndPont = cellStartPoint + cellLength;
@@ -315,10 +315,10 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 {
 	int temporaryVehicleID{};
 	int temporaryVehicleType{};
-	int temporaryLaneId{};
-	int temporaryApproachId{};
+	// int temporaryLaneId{};
+	// int temporaryApproachId{};
 	double temporarySpeed{};
-	double temporaryHeading{};
+	// double temporaryHeading{};
 	double temporaryDistanceToStopBar{};
 	bool temporaryConnectedVehicleStatus{};
 	noOfConnectedVehicle = 0;
@@ -351,17 +351,17 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 				else if (values[i].getMemberNames()[j] == "vehicleType")
 					temporaryVehicleType = values[i][values[i].getMemberNames()[j]].asInt();
 
-				else if (values[i].getMemberNames()[j] == "inBoundLaneId")
-					temporaryLaneId = values[i][values[i].getMemberNames()[j]].asInt();
+				// else if (values[i].getMemberNames()[j] == "inBoundLaneId")
+				// 	temporaryLaneId = values[i][values[i].getMemberNames()[j]].asInt();
 
-				else if (values[i].getMemberNames()[j] == "inBoundApproachId")
-					temporaryApproachId = values[i][values[i].getMemberNames()[j]].asInt();
+				// else if (values[i].getMemberNames()[j] == "inBoundApproachId")
+				// 	temporaryApproachId = values[i][values[i].getMemberNames()[j]].asInt();
 
 				else if (values[i].getMemberNames()[j] == "speed_MeterPerSecond")
 					temporarySpeed = values[i][values[i].getMemberNames()[j]].asDouble();
 
-				else if (values[i].getMemberNames()[j] == "heading_Degree")
-					temporaryHeading = values[i][values[i].getMemberNames()[j]].asDouble();
+				// else if (values[i].getMemberNames()[j] == "heading_Degree")
+				// 	temporaryHeading = values[i][values[i].getMemberNames()[j]].asDouble();
 
 				else if (values[i].getMemberNames()[j] == "distanceFromStopBar")
 					temporaryDistanceToStopBar = values[i][values[i].getMemberNames()[j]].asDouble();
@@ -370,32 +370,27 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 					temporaryConnectedVehicleStatus = values[i][values[i].getMemberNames()[j]].asBool();
 			}
 
-			if (temporaryApproachId == approachId)
+			for (size_t k = 0; k < InputDataPointList.size(); k++)
 			{
-				for (size_t k = 0; k < InputDataPointList.size(); k++)
+				if ((temporaryDistanceToStopBar >= InputDataPointList[k].cellStartPonit) &&
+					(temporaryDistanceToStopBar <= InputDataPointList[k].cellEndPont) && (temporaryConnectedVehicleStatus))
 				{
-					if ((temporaryDistanceToStopBar >= InputDataPointList[k].cellStartPonit) &&
-						(temporaryDistanceToStopBar <= InputDataPointList[k].cellEndPont) &&
-						(temporaryLaneId == InputDataPointList[k].laneId) && (temporaryConnectedVehicleStatus))
-					{
-						InputDataPointList[k].connectedVehicleID = temporaryVehicleID;
-						InputDataPointList[k].vehicleType = temporaryVehicleType;
-						InputDataPointList[k].speed = temporarySpeed;
-						InputDataPointList[k].heading = temporaryHeading;
-						InputDataPointList[k].cellStatus = true;
+					InputDataPointList[k].connectedVehicleID = temporaryVehicleID;
+					InputDataPointList[k].vehicleType = temporaryVehicleType;
+					InputDataPointList[k].speed = temporarySpeed;
+					// InputDataPointList[k].heading = temporaryHeading;
+					InputDataPointList[k].cellStatus = true;
 
-						if (temporarySpeed >= 0.0 && k > 0)
-							noOfConnectedVehicle++;
-					}
+					if (temporarySpeed >= 0.0 && k > 0)
+						noOfConnectedVehicle++;
+				}
 
-					else if ((temporaryDistanceToStopBar >= InputDataPointList[k].cellStartPonit) &&
-							 (temporaryDistanceToStopBar <= InputDataPointList[k].cellEndPont) &&
-							 (temporaryLaneId == InputDataPointList[k].laneId) && (!temporaryConnectedVehicleStatus))
-					{
-						InputDataPointList[k].nonConnectedVehicleID = temporaryVehicleID;
-						InputDataPointList[k].cellStatus = true;
-						noOfNonConnectedVehicle++;
-					}
+				else if ((temporaryDistanceToStopBar >= InputDataPointList[k].cellStartPonit) &&
+						 (temporaryDistanceToStopBar <= InputDataPointList[k].cellEndPont) && (!temporaryConnectedVehicleStatus))
+				{
+					InputDataPointList[k].nonConnectedVehicleID = temporaryVehicleID;
+					InputDataPointList[k].cellStatus = true;
+					noOfNonConnectedVehicle++;
 				}
 			}
 		}
