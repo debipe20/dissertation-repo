@@ -15,5 +15,6 @@
         "temporaryID": 652,
         "type": "EmergencyVehicle"
     },
-    "MsgType": "BSM"
+    "MsgType": "BSM",
+    "Timestamp_posix":1631302225.3531291
 }

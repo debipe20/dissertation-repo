@@ -109,7 +109,7 @@ string VehicleStatusManager::readIntersectionMapConfig(string configFilename)
 void VehicleStatusManager::getVehicleInformationFromMAP(BasicVehicle basicVehicle)
 {
 	int vehicleId{};
-	double currentTime{};
+	// double currentTime{};
 	bool onMap{false};
 	vehicleId = basicVehicle.getTemporaryID();
 
@@ -149,35 +149,37 @@ void VehicleStatusManager::getVehicleInformationFromMAP(BasicVehicle basicVehicl
 		plocAwareLib->getPtDist2D(vehicleTracking_t_1, point2D_t_2);
 		double vehicleDistanceFromStopBar = unsigned(point2D_t_1.distance2pt(point2D_t_2)) / 100; //unit of meters
 
-		int vehicleLaneId = plocAwareLib->getLaneIdByIndexes(unsigned(vehicleTracking_t_1.intsectionTrackingState.intersectionIndex),
-															 unsigned(vehicleTracking_t_1.intsectionTrackingState.approachIndex),
-															 unsigned(vehicleTracking_t_1.intsectionTrackingState.laneIndex));
+		// int vehicleLaneId = plocAwareLib->getLaneIdByIndexes(unsigned(vehicleTracking_t_1.intsectionTrackingState.intersectionIndex),
+		// 													 unsigned(vehicleTracking_t_1.intsectionTrackingState.approachIndex),
+		// 													 unsigned(vehicleTracking_t_1.intsectionTrackingState.laneIndex));
 
-		int vehicleApproachId = plocAwareLib->getApproachIdByLaneId(regionalId, intersectionId, (unsigned char)((unsigned)vehicleLaneId));
+		// int vehicleApproachId = plocAwareLib->getApproachIdByLaneId(regionalId, intersectionId, (unsigned char)((unsigned)vehicleLaneId));
 
-		int vehicleSignalGroup = unsigned(plocAwareLib->getControlPhaseByIds(static_cast<uint16_t>(regionalId), static_cast<uint16_t>(intersectionId),
-																			 static_cast<uint8_t>(vehicleApproachId), static_cast<uint8_t>(vehicleLaneId)));
+		// int vehicleSignalGroup = unsigned(plocAwareLib->getControlPhaseByIds(static_cast<uint16_t>(regionalId), static_cast<uint16_t>(intersectionId),
+		// 																	 static_cast<uint8_t>(vehicleApproachId), static_cast<uint8_t>(vehicleLaneId)));
 
 		findVehicleIdInVehicleStatusList->vehicleDistanceFromStopBar = vehicleDistanceFromStopBar;
-		findVehicleIdInVehicleStatusList->vehicleLaneId = vehicleLaneId;
-		findVehicleIdInVehicleStatusList->vehicleApproachId = vehicleApproachId;
-		findVehicleIdInVehicleStatusList->vehicleSignalGroup = vehicleSignalGroup;
+		// findVehicleIdInVehicleStatusList->vehicleLaneId = vehicleLaneId;
+		// findVehicleIdInVehicleStatusList->vehicleApproachId = vehicleApproachId;
+		// findVehicleIdInVehicleStatusList->vehicleSignalGroup = vehicleSignalGroup;
 		findVehicleIdInVehicleStatusList->vehicleLocationOnMap = unsigned(vehicleTracking_t_1.intsectionTrackingState.vehicleIntersectionStatus);
+		findVehicleIdInVehicleStatusList->updateTime = getPosixTimestamp();
+		
+		// currentTime = getPosixTimestamp();
+		
 
-		currentTime = getPosixTimestamp();
+		// if (vehicle_Speed <= 2.0)
+		// {
+		// 	double vehicleStoppedDelay = findVehicleIdInVehicleStatusList->vehicleStoppedDelay + currentTime - findVehicleIdInVehicleStatusList->updateTime;
+		// 	findVehicleIdInVehicleStatusList->vehicleStoppedDelay = vehicleStoppedDelay;
+		// 	findVehicleIdInVehicleStatusList->updateTime = currentTime;
+		// }
 
-		if (vehicle_Speed <= 1.0)
-		{
-			double vehicleStoppedDelay = findVehicleIdInVehicleStatusList->vehicleStoppedDelay + currentTime - findVehicleIdInVehicleStatusList->updateTime;
-			findVehicleIdInVehicleStatusList->vehicleStoppedDelay = vehicleStoppedDelay;
-			findVehicleIdInVehicleStatusList->updateTime = currentTime;
-		}
-
-		else
-		{
-			findVehicleIdInVehicleStatusList->updateTime = currentTime;
-			findVehicleIdInVehicleStatusList->vehicleStoppedDelay = 0;
-		}
+		// else
+		// {
+		// 	findVehicleIdInVehicleStatusList->updateTime = currentTime;
+		// 	findVehicleIdInVehicleStatusList->vehicleStoppedDelay = 0;
+		// }
 	}
 
 	else
@@ -221,12 +223,11 @@ void VehicleStatusManager::manageVehicleStatusList(BasicVehicle basicVehicle)
 		vehicleStatus.vehicleId = vehicleId;
 		vehicleStatus.vehicleType = vehicleType;
 		vehicleStatus.vehicleSpeed_MeterPerSecond = basicVehicle.getSpeed_MeterPerSecond();
-		vehicleStatus.vehicleHeading_Degree = basicVehicle.getHeading_Degree();
+		// vehicleStatus.vehicleHeading_Degree = basicVehicle.getHeading_Degree();
 		vehicleStatus.updateTime = getPosixTimestamp();
 
 		VehicleStatusList.push_back(vehicleStatus);
-		
-		
+				
 		setConnectedVehicleStatus(vehicleId);
 	}
 
@@ -239,7 +240,8 @@ void VehicleStatusManager::manageVehicleStatusList(BasicVehicle basicVehicle)
 																						{ return p.vehicleId == vehicleId; });
 
 		findVehicleIdInVehicleStatusList->vehicleSpeed_MeterPerSecond = basicVehicle.getSpeed_MeterPerSecond();
-		findVehicleIdInVehicleStatusList->vehicleHeading_Degree = basicVehicle.getHeading_Degree();
+		// findVehicleIdInVehicleStatusList->vehicleHeading_Degree = basicVehicle.getHeading_Degree();
+		findVehicleIdInVehicleStatusList->updateTime = getPosixTimestamp();
 	}
 
 	getVehicleInformationFromMAP(basicVehicle);
@@ -370,63 +372,6 @@ void VehicleStatusManager::deleteTimedOutVehicleIdFromVehicleStatusList()
 		}
 	}
 }
-/*
-	- The following method can formulate JSON formatted message based on the Vehicle Status List.
-	- It matches the request approachId with the vehicle approachId in the Vehicle Status List.
-*/
-string VehicleStatusManager::getVehicleStatusList(int requested_ApproachId)
-{
-	string vehicleStatusListJsonString{};
-	int noOfVehicle{};
-	int temporaryVehicleID{};
-	vector<VehicleStatus> TemporaryVehcileStatusList{};
-	TemporaryVehcileStatusList = VehicleStatusList;
-	Json::Value jsonObject;
-	Json::StreamWriterBuilder builder;
-	builder["commentStyle"] = "None";
-	builder["indentation"] = "";
-
-	jsonObject["MsgType"] = "VehicleStatusList";
-
-	for (unsigned int i = 0; i < TemporaryVehcileStatusList.size(); i++)
-	{
-		temporaryVehicleID = TemporaryVehcileStatusList[i].vehicleId;
-		if (requested_ApproachId != TemporaryVehcileStatusList[i].vehicleApproachId)
-		{
-			vector<VehicleStatus>::iterator findVehicleIDOnList = std::find_if(std::begin(TemporaryVehcileStatusList), std::end(TemporaryVehcileStatusList),
-																			   [&](VehicleStatus const &p)
-																			   { return p.vehicleId == temporaryVehicleID; });
-
-			TemporaryVehcileStatusList.erase(findVehicleIDOnList);
-			i--;
-		}
-	}
-
-	if (!TemporaryVehcileStatusList.empty())
-	{
-		for (unsigned int i = 0; i < TemporaryVehcileStatusList.size(); i++)
-		{
-			noOfVehicle++;
-			jsonObject["VehicleStatusList"][i]["vehicleId"] = TemporaryVehcileStatusList[i].vehicleId;
-			jsonObject["VehicleStatusList"][i]["vehicleType"] = TemporaryVehcileStatusList[i].vehicleType;
-			jsonObject["VehicleStatusList"][i]["speed_MeterPerSecond"] = TemporaryVehcileStatusList[i].vehicleSpeed_MeterPerSecond;
-			jsonObject["VehicleStatusList"][i]["heading_Degree"] = TemporaryVehcileStatusList[i].vehicleHeading_Degree;
-			jsonObject["VehicleStatusList"][i]["inBoundLaneId"] = TemporaryVehcileStatusList[i].vehicleLaneId;
-			jsonObject["VehicleStatusList"][i]["inBoundApproachId"] = TemporaryVehcileStatusList[i].vehicleApproachId;
-			jsonObject["VehicleStatusList"][i]["signalGroup"] = TemporaryVehcileStatusList[i].vehicleSignalGroup;
-			jsonObject["VehicleStatusList"][i]["distanceFromStopBar"] = TemporaryVehcileStatusList[i].vehicleDistanceFromStopBar;
-			// jsonObject["VehicleStatusList"][i]["stoppedDelay"] = TemporaryVehcileStatusList[i].vehicleStoppedDelay;
-			jsonObject["VehicleStatusList"][i]["locationOnMap"] = TemporaryVehcileStatusList[i].vehicleLocationOnMap;
-			jsonObject["VehicleStatusList"][i]["connectedVehicleStatus"] = TemporaryVehcileStatusList[i].connected;
-
-		}
-	}
-
-	jsonObject["NoOfVehicle"] = noOfVehicle;
-	vehicleStatusListJsonString = Json::writeString(builder, jsonObject);
-
-	return vehicleStatusListJsonString;
-}
 
 string VehicleStatusManager::getVehicleStatusList()
 {
@@ -448,12 +393,12 @@ string VehicleStatusManager::getVehicleStatusList()
 			jsonObject["VehicleStatusList"][i]["vehicleId"] = VehicleStatusList[i].vehicleId;
 			jsonObject["VehicleStatusList"][i]["vehicleType"] = VehicleStatusList[i].vehicleType;
 			jsonObject["VehicleStatusList"][i]["speed_MeterPerSecond"] = VehicleStatusList[i].vehicleSpeed_MeterPerSecond;
-			jsonObject["VehicleStatusList"][i]["heading_Degree"] = VehicleStatusList[i].vehicleHeading_Degree;
-			jsonObject["VehicleStatusList"][i]["inBoundLaneId"] = VehicleStatusList[i].vehicleLaneId;
-			jsonObject["VehicleStatusList"][i]["inBoundApproachId"] = VehicleStatusList[i].vehicleApproachId;
-			jsonObject["VehicleStatusList"][i]["signalGroup"] = VehicleStatusList[i].vehicleSignalGroup;
+			// jsonObject["VehicleStatusList"][i]["heading_Degree"] = VehicleStatusList[i].vehicleHeading_Degree;
+			// jsonObject["VehicleStatusList"][i]["inBoundLaneId"] = VehicleStatusList[i].vehicleLaneId;
+			// jsonObject["VehicleStatusList"][i]["inBoundApproachId"] = VehicleStatusList[i].vehicleApproachId;
+			// jsonObject["VehicleStatusList"][i]["signalGroup"] = VehicleStatusList[i].vehicleSignalGroup;
 			jsonObject["VehicleStatusList"][i]["distanceFromStopBar"] = VehicleStatusList[i].vehicleDistanceFromStopBar;
-			jsonObject["VehicleStatusList"][i]["locationOnMap"] = VehicleStatusList[i].vehicleLocationOnMap;
+			// jsonObject["VehicleStatusList"][i]["locationOnMap"] = VehicleStatusList[i].vehicleLocationOnMap;
 			jsonObject["VehicleStatusList"][i]["connectedVehicleStatus"] = VehicleStatusList[i].connected;
 
 		}
@@ -471,7 +416,7 @@ bool VehicleStatusManager::checkMsgSendingRequirement()
 	bool messageSendrequirement{false};
 	double currentTime = getPosixTimestamp();
 
-	if (((currentTime - msgSendingTime) >= msgSendingFrequency) && VehicleStatusList.size() >= 2)
+	if ((currentTime - msgSendingTime) >= msgSendingFrequency)
 		messageSendrequirement = true;
 
 	return messageSendrequirement;

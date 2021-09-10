@@ -15,5 +15,6 @@
         "temporaryID": 602,
         "type": "Transit"
     },
-    "MsgType": "BSM"
+    "MsgType": "BSM",
+    "Timestamp_posix":1631302225.3531291
 }
