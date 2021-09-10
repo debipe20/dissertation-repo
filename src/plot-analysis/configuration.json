@@ -1,5 +1,5 @@
 {
-    "FileName":"prediction-sample-data.csv",
+    "FileName":"prediction-sample-data-20.csv",
     "ApproachLength": 250,
-    "EstimatedData": true
+    "EstimatedData": false
 }

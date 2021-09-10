@@ -35,11 +35,12 @@ def timeSpaceDiagram(connectedVehicleTimePoint, nonConnectedVehicleTimePoint, co
     # Plot VehicleTrajectory
     if len(connectedVehicleTimePoint) > 0:
         ax1.scatter(connectedVehicleTimePoint, connectedVehicleDistancePoint, c="blue",  linewidths=4,
-                    marker=".",  edgecolor="none",  s=50, label='ConnectedVehicle Trajectory', zorder=2)
+                    marker=".",  edgecolor="none",  s=50, label='Connected Vehicles Trajectory', zorder=2)
 
     if len(nonConnectedVehicleTimePoint) > 0:
-        ax1.scatter(nonConnectedVehicleTimePoint, nonConnectedVehicleDistancePoint, c="black",  linewidths=2,
-                    marker=".",  edgecolor="none",  s=50, label='ConnectedVehicle Trajectory', zorder=2)
+        ax1.scatter(nonConnectedVehicleTimePoint, nonConnectedVehicleDistancePoint, c="gray",  linewidths=4,
+                    marker=".",  edgecolor="none",  s=20, label='Non-Connected Vehicles Trajectory', zorder=2)
+   
 
     ax1.legend(loc='upper right', prop={"size": 16})
     ax1.set_title("Time-Space Diagram", fontsize=20, fontweight='bold')
@@ -103,30 +104,22 @@ def getTrajectoryPoint(dataFrame, startTime, approachLength, estimatedData):
     for idx, row in dataFrame.loc[:].iterrows():
         # For Estimated Data
         if bool(estimatedData):
-            if row['CellStatus'] >0 and row['PredictedCellStatus'] > 0.15 and row['ConnectedVehicleId'] > 0:
-                connectedVehicleTimePoint.append(row['TimeStamp']-startTime)
+            if row['CellStatus'] == 1 and row['ConnectedVehicleId'] > 0:
+                connectedVehicleTimePoint.append(row['TimeStamp'] - startTime)
                 connectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
 
-            elif row['CellStatus'] <=0 and row['PredictedCellStatus'] <= 0.05 and row['ConnectedVehicleId'] > 0:
-                connectedVehicleTimePoint.append(row['TimeStamp']-startTime)
-                connectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
-
-            if row['CellStatus'] >0 and row['PredictedCellStatus'] > 0.15 and row['NonConnectedVehicleId'] > 0:
-                nonConnectedVehicleTimePoint.append(row['TimeStamp']-startTime)
-                nonConnectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
-
-            elif row['CellStatus'] <=0 and row['PredictedCellStatus'] <= 0.05 and row['NonConnectedVehicleId'] > 0:
-                nonConnectedVehicleTimePoint.append(row['TimeStamp']-startTime)
+            elif row['CellStatus'] >0 and row['PredictedCellStatus'] > 0.05 and row['NonConnectedVehicleId'] > 0:
+                nonConnectedVehicleTimePoint.append(row['TimeStamp'] - startTime)
                 nonConnectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
 
         # For Sample Data
         else:
-            if row['CellStatus'] == 1 and row['ConnectedVehicleId'] > 0:
-                connectedVehicleTimePoint.append(row['TimeStamp']-startTime)
+            if row['CellStatus'] == 1 and row['ConnectedVehicleId'] >0:
+                connectedVehicleTimePoint.append(row['TimeStamp'] - startTime)
                 connectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
             
             elif row['CellStatus'] == 1 and row['NonConnectedVehicleId'] > 0:
-                nonConnectedVehicleTimePoint.append(row['TimeStamp']-startTime)
+                nonConnectedVehicleTimePoint.append(row['TimeStamp'] - startTime)
                 nonConnectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
 
     return connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint
