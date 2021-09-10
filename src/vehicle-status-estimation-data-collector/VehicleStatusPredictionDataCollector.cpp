@@ -396,11 +396,8 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 		}
 	}
 
-	if (noOfConnectedVehicle >= 1)
-	{
-		fillUpFrontCellInformation();
-		writeCsvFile();
-	}
+	fillUpFrontCellInformation();
+	writeCsvFile();
 }
 
 void VehicleStatusPredictionDataCollector::fillUpFrontCellInformation()
