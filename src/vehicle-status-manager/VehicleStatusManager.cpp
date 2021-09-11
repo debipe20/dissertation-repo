@@ -400,7 +400,6 @@ string VehicleStatusManager::getVehicleStatusList()
 			jsonObject["VehicleStatusList"][i]["distanceFromStopBar"] = VehicleStatusList[i].vehicleDistanceFromStopBar;
 			// jsonObject["VehicleStatusList"][i]["locationOnMap"] = VehicleStatusList[i].vehicleLocationOnMap;
 			jsonObject["VehicleStatusList"][i]["connectedVehicleStatus"] = VehicleStatusList[i].connected;
-
 		}
 	}
 
@@ -416,7 +415,8 @@ bool VehicleStatusManager::checkMsgSendingRequirement()
 	bool messageSendrequirement{false};
 	double currentTime = getPosixTimestamp();
 
-	if (((currentTime - msgSendingTime) >= msgSendingFrequency) && VehicleStatusList.size() > 0)
+	// if (((currentTime - msgSendingTime) >= msgSendingFrequency) && VehicleStatusList.size() > 0)
+	if ((currentTime - msgSendingTime) >= msgSendingFrequency)
 		messageSendrequirement = true;
 
 	return messageSendrequirement;
