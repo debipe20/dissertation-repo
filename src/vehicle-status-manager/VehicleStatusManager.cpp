@@ -164,9 +164,8 @@ void VehicleStatusManager::getVehicleInformationFromMAP(BasicVehicle basicVehicl
 		// findVehicleIdInVehicleStatusList->vehicleSignalGroup = vehicleSignalGroup;
 		findVehicleIdInVehicleStatusList->vehicleLocationOnMap = unsigned(vehicleTracking_t_1.intsectionTrackingState.vehicleIntersectionStatus);
 		findVehicleIdInVehicleStatusList->updateTime = getPosixTimestamp();
-		
+
 		// currentTime = getPosixTimestamp();
-		
 
 		// if (vehicle_Speed <= 2.0)
 		// {
@@ -184,11 +183,10 @@ void VehicleStatusManager::getVehicleInformationFromMAP(BasicVehicle basicVehicl
 
 	else
 	{
-		if(findVehicleIdInVehicleStatusList->connected)
-			noOfConnectedVehiclesInList--;
+		// if (findVehicleIdInVehicleStatusList->connected)
+		// 	noOfConnectedVehiclesInList--;
 
 		VehicleStatusList.erase(findVehicleIdInVehicleStatusList);
-		
 	}
 }
 
@@ -227,7 +225,7 @@ void VehicleStatusManager::manageVehicleStatusList(BasicVehicle basicVehicle)
 		vehicleStatus.updateTime = getPosixTimestamp();
 
 		VehicleStatusList.push_back(vehicleStatus);
-				
+
 		setConnectedVehicleStatus(vehicleId);
 	}
 
@@ -247,32 +245,38 @@ void VehicleStatusManager::manageVehicleStatusList(BasicVehicle basicVehicle)
 	getVehicleInformationFromMAP(basicVehicle);
 	deleteVehicleIDInVehicleStatusList(basicVehicle);
 	deleteTimedOutVehicleIdFromVehicleStatusList();
-
 }
 
 void VehicleStatusManager::setConnectedVehicleStatus(int vehicleId)
 {
-	int noOfVehiclesInList = static_cast<int>(VehicleStatusList.size());
-	int allowedConnectedVehicle = static_cast<int>(noOfVehiclesInList * penetrationRate);
+	bool connectedVehicleStatus = rand() % 100 < (penetrationRate * 100);
 
 	vector<VehicleStatus>::iterator findVehicleIdInVehicleStatusList = std::find_if(std::begin(VehicleStatusList), std::end(VehicleStatusList),
-																						[&](VehicleStatus const &p)
-																						{ return p.vehicleId == vehicleId; });
+																					[&](VehicleStatus const &p)
+																					{ return p.vehicleId == vehicleId; });
+	findVehicleIdInVehicleStatusList->connected = connectedVehicleStatus;
 
-	if (noOfVehiclesInList == 1)
-	{
-		findVehicleIdInVehicleStatusList->connected = true;
-		noOfConnectedVehiclesInList++;
-	}
+	// int noOfVehiclesInList = static_cast<int>(VehicleStatusList.size());
+	// int allowedConnectedVehicle = static_cast<int>(noOfVehiclesInList * penetrationRate);
 
-	else if (noOfConnectedVehiclesInList <= allowedConnectedVehicle)
-	{
-		findVehicleIdInVehicleStatusList->connected = true;
-		noOfConnectedVehiclesInList++;
-	}
+	// vector<VehicleStatus>::iterator findVehicleIdInVehicleStatusList = std::find_if(std::begin(VehicleStatusList), std::end(VehicleStatusList),
+	// 																					[&](VehicleStatus const &p)
+	// 																					{ return p.vehicleId == vehicleId; });
 
-	else
-		findVehicleIdInVehicleStatusList->connected = false;
+	// if (noOfVehiclesInList == 1)
+	// {
+	// 	findVehicleIdInVehicleStatusList->connected = true;
+	// 	noOfConnectedVehiclesInList++;
+	// }
+
+	// else if (noOfConnectedVehiclesInList <= allowedConnectedVehicle)
+	// {
+	// 	findVehicleIdInVehicleStatusList->connected = true;
+	// 	noOfConnectedVehiclesInList++;
+	// }
+
+	// else
+	// 	findVehicleIdInVehicleStatusList->connected = false;
 }
 
 /*
@@ -336,8 +340,8 @@ void VehicleStatusManager::deleteVehicleIDInVehicleStatusList(BasicVehicle basic
 																						{ return p.vehicleId == veheicleID; });
 		if (findVehicleIdInVehicleStatusList != VehicleStatusList.end() && findVehicleIdInVehicleStatusList->vehicleLocationOnMap != 2)
 		{
-			if(findVehicleIdInVehicleStatusList->connected)
-				noOfConnectedVehiclesInList--;
+			// if (findVehicleIdInVehicleStatusList->connected)
+			// 	noOfConnectedVehiclesInList--;
 
 			VehicleStatusList.erase(findVehicleIdInVehicleStatusList);
 		}
@@ -363,9 +367,9 @@ void VehicleStatusManager::deleteTimedOutVehicleIdFromVehicleStatusList()
 				vector<VehicleStatus>::iterator findVehicleIDInVehicleStatusList = std::find_if(std::begin(VehicleStatusList), std::end(VehicleStatusList),
 																								[&](VehicleStatus const &p)
 																								{ return p.vehicleId == vehicleId; });
-				if (findVehicleIDInVehicleStatusList->connected)
-					noOfConnectedVehiclesInList--;
-					
+				// if (findVehicleIDInVehicleStatusList->connected)
+				// 	noOfConnectedVehiclesInList--;
+
 				VehicleStatusList.erase(findVehicleIDInVehicleStatusList);
 				i--;
 			}
