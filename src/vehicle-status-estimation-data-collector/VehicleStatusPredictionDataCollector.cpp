@@ -206,6 +206,7 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure()
 			dataPointStructure.cellStatus = false;
 			dataPointStructure.frontCellStatus = false;
 			dataPointStructure.frontCellVehicleSpeed = -1.0;
+			dataPointStructure.outputSpeed = -1.0;
 
 			DataPointList.push_back(dataPointStructure);
 			cellStartPoint = cellStartPoint + cellLength;
@@ -233,6 +234,7 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure()
 			dataPointStructure.cellStatus = false;
 			dataPointStructure.frontCellStatus = false;
 			dataPointStructure.frontCellVehicleSpeed = -1.0;
+			dataPointStructure.outputSpeed = -1.0;
 
 			DataPointList.push_back(dataPointStructure);
 			cellStartPoint = cellStartPoint + cellLength;
@@ -384,7 +386,7 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 					InputDataPointList[k].speed = temporarySpeed;
 					// InputDataPointList[k].heading = temporaryHeading;
 					InputDataPointList[k].cellStatus = true;
-					InputDataPointList[i].outputSpeed = temporarySpeed;
+					InputDataPointList[k].outputSpeed = temporarySpeed;
 
 					if (temporarySpeed >= 0.0 && k > 0)
 						noOfConnectedVehicle++;
@@ -395,7 +397,7 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 				{
 					InputDataPointList[k].nonConnectedVehicleID = temporaryVehicleID;
 					InputDataPointList[k].cellStatus = true; 
-					InputDataPointList[i].outputSpeed = temporarySpeed;
+					InputDataPointList[k].outputSpeed = temporarySpeed;
 					noOfNonConnectedVehicle++;
 				}
 			}
