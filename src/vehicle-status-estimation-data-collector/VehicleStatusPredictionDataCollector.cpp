@@ -126,11 +126,13 @@ void VehicleStatusPredictionDataCollector::createLogFile()
 				<< ","
 				<< "DistanceToStopBar"
 				<< ","
-				<< "FrontCellStatus"
-				<< ","
-				<< "FrontCellVehicleSpeed"
-				<< ","
+				// << "FrontCellStatus"
+				// << ","
+				// << "FrontCellVehicleSpeed"
+				// << ","
 				<< "CellStatus"
+				<< ","
+				<< "OutputSpeed"
 				<< endl;
 	}
 
@@ -162,11 +164,13 @@ void VehicleStatusPredictionDataCollector::createLogFile()
 				<< ","
 				<< "DistanceToStopBar"
 				<< ","
-				<< "FrontCellStatus"
-				<< ","
-				<< "FrontCellVehicleSpeed"
-				<< ","
+				// << "FrontCellStatus"
+				// << ","
+				// << "FrontCellVehicleSpeed"
+				// << ","
 				<< "CellStatus"
+				<< ","
+				<< "OutputSpeed"
 				<< endl;
 	}
 }
@@ -380,6 +384,7 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 					InputDataPointList[k].speed = temporarySpeed;
 					// InputDataPointList[k].heading = temporaryHeading;
 					InputDataPointList[k].cellStatus = true;
+					InputDataPointList[i].outputSpeed = temporarySpeed;
 
 					if (temporarySpeed >= 0.0 && k > 0)
 						noOfConnectedVehicle++;
@@ -389,14 +394,15 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 						 (temporaryDistanceToStopBar <= InputDataPointList[k].cellEndPont) && (!temporaryConnectedVehicleStatus))
 				{
 					InputDataPointList[k].nonConnectedVehicleID = temporaryVehicleID;
-					InputDataPointList[k].cellStatus = true;
+					InputDataPointList[k].cellStatus = true; 
+					InputDataPointList[i].outputSpeed = temporarySpeed;
 					noOfNonConnectedVehicle++;
 				}
 			}
 		}
 	}
 
-	fillUpFrontCellInformation();
+	// fillUpFrontCellInformation();
 	writeCsvFile();
 }
 
@@ -448,8 +454,8 @@ void VehicleStatusPredictionDataCollector::writeCsvFile()
 			logFile << fixed << showpoint << setprecision(4) << timeStamp << "," << totalNoOfCells - 1 << ",";
 			logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].vehicleType << "," << InputDataPointList[i].phaseStatus << ","
 					<< InputDataPointList[i].phaseElapsedTime << "," << InputDataPointList[i].speed << ","
-					<< InputDataPointList[i].distanceToStopBar << "," << InputDataPointList[i].frontCellStatus << ","
-					<< InputDataPointList[i].frontCellVehicleSpeed << "," << InputDataPointList[i].cellStatus << endl;
+					<< InputDataPointList[i].distanceToStopBar << "," << "," << InputDataPointList[i].cellStatus << "," 
+					<< InputDataPointList[i].outputSpeed << endl;
 		}
 	}
 
@@ -463,8 +469,8 @@ void VehicleStatusPredictionDataCollector::writeCsvFile()
 			logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].connectedVehicleID << "," << InputDataPointList[i].nonConnectedVehicleID << ","
 					<< InputDataPointList[i].vehicleType << "," << InputDataPointList[i].phaseStatus << ","
 					<< InputDataPointList[i].phaseElapsedTime << "," << InputDataPointList[i].speed << ","
-					<< InputDataPointList[i].distanceToStopBar << "," << InputDataPointList[i].frontCellStatus << ","
-					<< InputDataPointList[i].frontCellVehicleSpeed << "," << InputDataPointList[i].cellStatus << endl;
+					<< InputDataPointList[i].distanceToStopBar << "," << InputDataPointList[i].cellStatus<< "," 
+					<< InputDataPointList[i].outputSpeed << endl;
 		}
 	}
 }

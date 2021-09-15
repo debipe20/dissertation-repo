@@ -24,6 +24,7 @@ struct DataPointStructure
     double cellStartPonit{};
     double cellEndPont{};
     bool cellStatus{};
+    double outputSpeed{};
 
     void reset()
     {
@@ -47,5 +48,6 @@ struct DataPointStructure
         cellStartPonit = 0.0;
         cellEndPont = 0.0;
         cellStatus = false;
+        outputSpeed = 0.0;
     }
 };
