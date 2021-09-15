@@ -1,6 +1,6 @@
 {
     "IntersectionName" : "speedway-mountain",
-    "ConnectedVehiclePenetrationRate": 0.5,
+    "ConnectedVehiclePenetrationRate": 0.2,
     "FrequencyOfRequest": 0.3,
     "ApproachId": 5,
     "NoOfLanes":1,

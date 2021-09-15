@@ -64,7 +64,6 @@ int main()
             if (vehicleStatusManager.checkMsgSendingRequirement())
             {
                 vehicleStatusListJsonString = vehicleStatusManager.getVehicleStatusList();
-                cout << vehicleStatusListJsonString << endl;
                 vehicleStatusManagerSocket.sendData(HostIP, static_cast<short unsigned int>(dataCollectorPortNo), vehicleStatusListJsonString);
             }
 
