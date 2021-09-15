@@ -454,7 +454,7 @@ void VehicleStatusPredictionDataCollector::writeCsvFile()
 			logFile << fixed << showpoint << setprecision(4) << timeStamp << "," << totalNoOfCells - 1 << ",";
 			logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].vehicleType << "," << InputDataPointList[i].phaseStatus << ","
 					<< InputDataPointList[i].phaseElapsedTime << "," << InputDataPointList[i].speed << ","
-					<< InputDataPointList[i].distanceToStopBar << "," << "," << InputDataPointList[i].cellStatus << "," 
+					<< InputDataPointList[i].distanceToStopBar << "," << InputDataPointList[i].cellStatus << "," 
 					<< InputDataPointList[i].outputSpeed << endl;
 		}
 	}
