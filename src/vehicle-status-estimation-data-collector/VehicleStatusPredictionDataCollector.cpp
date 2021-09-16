@@ -453,7 +453,7 @@ void VehicleStatusPredictionDataCollector::writeCsvFile()
 	{
 		for (size_t i = 0; i < InputDataPointList.size(); i++)
 		{
-			logFile << fixed << showpoint << setprecision(4) << timeStamp << "," << totalNoOfCells - 1 << ",";
+			logFile << fixed << showpoint << setprecision(4) << timeStamp << "," << totalNoOfCells << ",";
 			logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].vehicleType << "," << InputDataPointList[i].phaseStatus << ","
 					<< InputDataPointList[i].phaseElapsedTime << "," << InputDataPointList[i].speed << ","
 					<< InputDataPointList[i].distanceToStopBar << "," << InputDataPointList[i].cellStatus << "," 
@@ -465,7 +465,7 @@ void VehicleStatusPredictionDataCollector::writeCsvFile()
 	{
 		for (size_t i = 0; i < InputDataPointList.size(); i++)
 		{
-			logFile << fixed << showpoint << setprecision(4) << timeStamp << "," << totalNoOfCells - 1 << ",";
+			logFile << fixed << showpoint << setprecision(4) << timeStamp << "," << totalNoOfCells << ",";
 			logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].cellNo << ",";
 			logFile << fixed << showpoint << setprecision(2) << noOfConnectedVehicle << "," << noOfNonConnectedVehicle << ",";
 			logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].connectedVehicleID << "," << InputDataPointList[i].nonConnectedVehicleID << ","
