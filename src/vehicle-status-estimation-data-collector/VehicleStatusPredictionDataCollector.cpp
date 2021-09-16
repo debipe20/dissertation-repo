@@ -451,7 +451,7 @@ void VehicleStatusPredictionDataCollector::writeCsvFile()
 
 	if (trainingData)
 	{
-		for (size_t i = 1; i < InputDataPointList.size(); i++)
+		for (size_t i = 0; i < InputDataPointList.size(); i++)
 		{
 			logFile << fixed << showpoint << setprecision(4) << timeStamp << "," << totalNoOfCells - 1 << ",";
 			logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].vehicleType << "," << InputDataPointList[i].phaseStatus << ","
@@ -463,7 +463,7 @@ void VehicleStatusPredictionDataCollector::writeCsvFile()
 
 	else
 	{
-		for (size_t i = 1; i < InputDataPointList.size(); i++)
+		for (size_t i = 0; i < InputDataPointList.size(); i++)
 		{
 			logFile << fixed << showpoint << setprecision(4) << timeStamp << "," << totalNoOfCells - 1 << ",";
 			logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].cellNo << ",";
