@@ -29,7 +29,7 @@
 #include <json/json.h>
 #include "locAware.h"
 
-#define Vehicle_Timed_Out_Value 1.0
+#define Vehicle_Timed_Out_Value 2.0
 #define EmergencyVehicle 2
 #define Transit 6
 #define Truck 9
@@ -74,7 +74,6 @@ public:
     void deleteVehicleIDInVehicleStatusList(BasicVehicle basicVehicle);
     void deleteTimedOutVehicleIdFromVehicleStatusList();
     string readIntersectionMapConfig(string configFilename);
-    string getVehicleStatusList(int requested_ApproachId);
     string getVehicleStatusList();
     bool checkMsgSendingRequirement();
 };

@@ -34,30 +34,30 @@ while True:
         
         time.sleep(microseconds)
 
-        # f = open(fileName2, 'r')
-        # data = f.read() 
-        # s.sendto(data.encode(),communicationInfo)
-        # bsmSendingTime = time.time()
-        # print("sent second BSM at time", time.time())
+        f = open(fileName2, 'r')
+        data = f.read() 
+        s.sendto(data.encode(),communicationInfo)
+        bsmSendingTime = time.time()
+        print("sent second BSM at time", time.time())
 
-        # time.sleep(microseconds)
+        time.sleep(microseconds)
 
-        # f = open(fileName3, 'r')
-        # data = f.read() 
-        # s.sendto(data.encode(),communicationInfo)
-        # bsmSendingTime = time.time()
-        # print("sent third BSM at time", time.time())
+        f = open(fileName3, 'r')
+        data = f.read() 
+        s.sendto(data.encode(),communicationInfo)
+        bsmSendingTime = time.time()
+        print("sent third BSM at time", time.time())
 
-        # time.sleep(microseconds)
+        time.sleep(microseconds)
 
-        # f = open(fileName4, 'r')
-        # data = f.read() 
-        # s.sendto(data.encode(),communicationInfo)
-        # bsmSendingTime = time.time()
+        f = open(fileName4, 'r')
+        data = f.read() 
+        s.sendto(data.encode(),communicationInfo)
+        bsmSendingTime = time.time()
 
-        # print("sent fourth BSM at time", time.time())
+        print("sent fourth BSM at time", time.time())
         
-        # time.sleep(microseconds)
+        time.sleep(microseconds)
 
 f.close()
 s.close()
