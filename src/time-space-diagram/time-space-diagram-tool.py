@@ -19,12 +19,12 @@ def main():
     timeSpaceDiagramManager = TimeSpaceDiagramManager()
 
     """
-    Process SPaT file
+    Process SPaT files
     """ 
     greenTimeStartPoint, clearanceTimeStartPoint, greenTime, clearanceTime, intersectionDistance_Green, intersectionDistance_Clearance = spatDataManager.manageSpatData()
 
     """
-    Process BSM file
+    Process BSM files
     """
     
     evTrajectoryTimePoint, evTrajectoryDistancePoint, transitTrajectoryTimePoint, transitTrajectoryDistancePoint, truckTrajectoryTimePoint, truckTrajectoryDistancePoint, carTrajectoryTimePoint, carTrajectoryDistancePoint, connectedVehicleTrajectoryTimePoint, connectedVehicleTrajectoryDistancePoint = bsmDataManager.manageBsmData()
