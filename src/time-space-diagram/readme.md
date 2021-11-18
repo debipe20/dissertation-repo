@@ -8,7 +8,7 @@ The time-space-diagram-tool python component calls an instance of SpatDataManage
 - complete offline processing of the BSM files using MAP-BSM-Processor component before using this tool
 
 ## Configuration
-In the `mmitss-phase3-master-config.json` (config) file following keys need to be assigned with appropriate values:
+In the `configuration.json` (config) file following keys need to be assigned with appropriate values:
 - `DeisredSignalGroup`: a list that contains phase number of the desired coordinated movements for each intersection
 - `StartTimeOfDiagram`: specify the start time of the diagram (get the log_timestamp_posix or timestamp_posix value from a SPaT file)
 - `EndTimeOfDiagram`: specify the end time of the diagram (get the log_timestamp_posix or timestamp_posix value from a SPaT file)

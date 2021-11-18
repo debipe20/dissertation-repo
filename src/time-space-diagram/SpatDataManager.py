@@ -19,7 +19,12 @@ in the Systems and Industrial Engineering Department.
 Description:
 ------------
 The methods available from this class are the following:
-- getSpatFileDirecyoryList():
+- getSpatConfigData(): method to get config data for the SPaT files
+- manageSpatData(): method to manage list for green time start point, clearance time start point, green time, clearance time, intersection distance for green time, intersection distance for clearance 
+- processSpatFile(spatFile, distance): method to process all the SPaT files sequentially
+- getStartAndEndTimeIndex(dataframe): method to get index for the start time and end time of the diagram
+- modifyPhaseStatusForDesiredSignalGroup(dataframe): method to convert  the phase state from string to numeric 
+- getGreenAndClearanceTime(dataframe, startTimeIndex, endTimeIndex, distance): method to get list for green rectangle start point, green rectangle time, clearance rectangle start point, clearance rectangle time
 ***************************************************************************************
 """
 
@@ -41,7 +46,9 @@ class SpatDataManager:
         
 
     def getSpatConfigData(self):
-
+        """
+        method to get config data for the SPaT files
+        """
         [self.fileDirectoryList_SPaT.append(fileDirectory) for fileDirectory in self.config["SPaTFileDirectory"]]
         [self.intersectionName.append(corridorName) for corridorName in self.config["IntersectionName"]]
         [self.intersectionDistanceApart.append(distance) for distance in self.config["IntersectionDistance"]]
@@ -50,13 +57,15 @@ class SpatDataManager:
         self.endTime = self.config["EndTimeOfDiagram"]
 
     def manageSpatData(self):
+        """
+        manages list for green time start point, clearance time start point, green time, clearance time, intersection distance for green time, intersection distance for clearance 
+        """
         greenTimeStartPoint, clearanceTimeStartPoint, greenTime, clearanceTime, intersectionDistance_Green, intersectionDistance_Clearance = ([
         ] for i in range(6))
         
         self.getSpatConfigData()
 
         for index, spatFile in enumerate(self.fileDirectoryList_SPaT):
-            print("intersection name is: ", self.intersectionName[index])
             desiredSignaGroup = self.signalGroup[index]
             self.desiredSignalGroupString = "v" + str(desiredSignaGroup) + "_currState"
             greenRectangleStartPoint, greenRectangleTime, distance_Green, clearanceRectangleStartPoint, clearanceRectangleTime, distance_Clearance = self.processSpatFile(
@@ -78,6 +87,9 @@ class SpatDataManager:
 
 
     def processSpatFile(self, spatFile, distance):
+        """
+        method to process all the SPaT files sequentially
+        """
         df = pd.read_csv(spatFile)
 
         startTimeIndex, endTimeIndex = self.getStartAndEndTimeIndex(df)
@@ -85,15 +97,14 @@ class SpatDataManager:
         df = self.modifyPhaseStatusForDesiredSignalGroup(df)
         
         greenRectangleStartPoint, greenRectangleTime, distance_Green, clearanceRectangleStartPoint, clearanceRectangleTime, distance_Clearance = self.getGreenAndClearanceTime(df, startTimeIndex, endTimeIndex, distance)
-        # timeList, phaseStateList = self.getTimeAndPhaseStateList(df, startTimeIndex, endTimeIndex)
-
-        # greenRectangleStartPoint, greenRectangleTime, distance_Green, clearanceRectangleStartPoint, clearanceRectangleTime, distance_Clearance = self.calculateGreenAndRedTime(
-        #     timeList, phaseStateList, distance)
 
         return greenRectangleStartPoint, greenRectangleTime, distance_Green, clearanceRectangleStartPoint, clearanceRectangleTime, distance_Clearance
 
 
     def getStartAndEndTimeIndex(self, dataframe):
+        """
+        method to get index for the start time and end time of the diagram
+        """
         startTimeIndexList = dataframe.index[dataframe['timestamp_posix'] == self.startTime].tolist()
         endTimeIndexList = dataframe.index[dataframe['timestamp_posix'] == self.endTime].tolist()
 
@@ -111,6 +122,9 @@ class SpatDataManager:
 
 
     def modifyPhaseStatusForDesiredSignalGroup(self, dataframe):
+        """
+        method to convert  the phase state from string to numeric 
+        """
         dataframe[self.desiredSignalGroupString] = dataframe[self.desiredSignalGroupString].replace('red', 1)
         dataframe[self.desiredSignalGroupString] = dataframe[self.desiredSignalGroupString].replace('yellow', 1)
         dataframe[self.desiredSignalGroupString] = dataframe[self.desiredSignalGroupString].replace('green', 0)
@@ -118,6 +132,9 @@ class SpatDataManager:
         return dataframe
 
     def getGreenAndClearanceTime(self, dataframe, startTimeIndex, endTimeIndex, distance):
+        """
+        method to get list for green rectangle start point, green rectangle time, clearance rectangle start point, clearance rectangle time
+        """
         greenRectangleStartPoint, clearanceRectangleStartPoint, greenRectangleTime, clearanceRectangleTime, distance_Green, distance_Clearance = ([
         ] for i in range(6))
 
@@ -159,6 +176,8 @@ class SpatDataManager:
         return greenRectangleStartPoint, greenRectangleTime, distance_Green, clearanceRectangleStartPoint, clearanceRectangleTime, distance_Clearance
 
     def getTimeAndPhaseStateList(self, dataframe, startTimeIndex, endTimeIndex):
+        """
+        """
         timeList = []
         phaseStateList = []
         currentState = dataframe[self.desiredSignalGroupString][startTimeIndex]
