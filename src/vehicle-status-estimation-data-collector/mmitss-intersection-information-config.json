@@ -5,12 +5,12 @@
     "FrequencyOfRequest": 0.3,    
     "ApproachId": 5,
     "ApproachSpeedLimit": 35.0,
-    "NoOfThroughLanes":1,
-    "ThroughLanesLength": 240,
-    "NoOfLeftTurnPocket":0,
-    "LeftTurnPocketLength": 0,
+    "NoOfThroughLanes":3,
+    "ThroughLanesLength": 300,
+    "NoOfLeftTurnPocket":1,
+    "LeftTurnPocketLength": 115,
     "ThoughLanesSignalGroup": 2,
-    "LeftTurnPocketsSignalGroup": 0,
-    "ThroughLanesId": [14],
-    "LeftTurnPocketsId": []
+    "LeftTurnPocketsSignalGroup": 5,
+    "ThroughLanesId": [12,13,14],
+    "LeftTurnPocketsId": [15]
 }
