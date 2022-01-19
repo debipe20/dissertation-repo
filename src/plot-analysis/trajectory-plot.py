@@ -42,9 +42,12 @@ def timeSpaceDiagram(connectedVehicleTimePoint, nonConnectedVehicleTimePoint, co
                     marker=".",  edgecolor="none",  s=20, label='Non-Connected Vehicles Trajectory', zorder=2)
 
     ax1.legend(loc='upper right', prop={"size": 14})
-    ax1.set_title("Time-Space-Trajectory Diagram [" + str(startTime) + ", " + str(endTime) + "]", fontsize=20, fontweight='bold')
+    # ax1.set_title("Time-Space-Trajectory Diagram [" + str(startTime) + ", " + str(endTime) + "]", fontsize=20, fontweight='bold')
+    ax1.set_title("Time-Space-Trajectory Diagram", fontsize=20, fontweight='bold')
+    
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
     plt.grid(color='black', linestyle='-', linewidth=0.5)
+    print("Generate Diagram")
     plt.show()
 
 
@@ -230,7 +233,7 @@ def getNonConnectedVehicleTrajectory(dataFrame, vehicleId, approachLength, start
     for idx, row in dataFrame.loc[:].iterrows():
         # For Estimated Data
         if bool(estimatedData):
-            if row['CellStatus'] == 1 and row['PredictedCellStatus'] > 0.05 and row['TimeStamp'] - previousStartTime >= 0.3 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
+            if row['CellStatus'] == 1 and row['PredictedCellStatus'] > 0.12 and row['TimeStamp'] - previousStartTime >= 0.3 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
                 nonConnectedVehicleTimePoint.append(
                     row['TimeStamp'] - startTime)
                 nonConnectedVehicleDistancePoint.append(
