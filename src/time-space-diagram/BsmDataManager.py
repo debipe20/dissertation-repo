@@ -8,7 +8,7 @@
 
 BsmDataManager.py
 Created by: Debashis Das
-University of Arizona   
+University of Arizona
 College of Engineering
 
 This code was developed under the supervision of Professor Larry Head
@@ -25,6 +25,7 @@ The methods available from this class are the following:
 
 import pandas as pd
 
+
 class BsmDataManager:
     def __init__(self, config):
         self.config = config
@@ -35,22 +36,28 @@ class BsmDataManager:
         self.signalGroup = []
 
     def getBsmConfigData(self):
-        [self.fileDirectoryList_BSM.append(fileDirectory)for fileDirectory in self.config["BsmFileDirectory"]]
-        [self.intersectionDistanceApart.append(distance) for distance in self.config["IntersectionDistance"]]
-        [self.signalGroup.append(phase) for phase in self.config["DeisredSignalGroup"]]
+        [self.fileDirectoryList_BSM.append(
+            fileDirectory)for fileDirectory in self.config["BsmFileDirectory"]]
+        [self.intersectionDistanceApart.append(
+            distance) for distance in self.config["IntersectionDistance"]]
+        [self.signalGroup.append(phase)
+                                 for phase in self.config["DeisredSignalGroup"]]
         self.startTime = self.config["StartTimeOfDiagram"]
         self.endTime = self.config["EndTimeOfDiagram"]
 
     def manageBsmData(self):
 
         self.getBsmConfigData()
-        evTrajectoryTimePoint, evTrajectoryDistancePoint = ([] for i in range(2))
+        evTrajectoryTimePoint, evTrajectoryDistancePoint = (
+            [] for i in range(2))
         transitTrajectoryTimePoint, transitTrajectoryDistancePoint = (
             [] for i in range(2))
         truckTrajectoryTimePoint, truckTrajectoryDistancePoint = (
             [] for i in range(2))
-        carTrajectoryTimePoint, carTrajectoryDistancePoint = ([] for i in range(2))
-        connectedVehicleTrajectoryTimePoint, connectedVehicleTrajectoryDistancePoint = ([] for i in range(2))
+        carTrajectoryTimePoint, carTrajectoryDistancePoint = (
+            [] for i in range(2))
+        connectedVehicleTrajectoryTimePoint, connectedVehicleTrajectoryDistancePoint = (
+            [] for i in range(2))
 
         for index, bsmFile in enumerate(self.fileDirectoryList_BSM):
             desiredSignaGroup = self.signalGroup[index]
@@ -88,9 +95,24 @@ class BsmDataManager:
         vehicleTrajectoryTimePoint = []
         vehicleTrajectoryDistancePoint = []
         vehicleType = []
+        currentSignalGroup = 0
 
         dataframe = pd.read_csv(BsmFile)
-        
+        """
+        Data Collector don't know current signal group information if a vehicle is not on inBound lane.
+        Following section of the code is to deal with that situation.
+        """
+        for idx, row in dataframe.loc[:].iterrows():
+            
+            if row['current_signal_group'] == 0:
+               dataframe['current_signal_group'][idx] = currentSignalGroup
+               dataframe['trajectory_signal_group'][idx] = currentSignalGroup
+            else:
+                currentSignalGroup = row['current_signal_group']
+
+        # dataframe.to_csv(BsmFile)
+        """ end of the section """
+                
         dataframe = dataframe.loc[dataframe["trajectory_signal_group"] == desiredSignaGroup]
         uniqueVehicleId = self.findUniqueVehicleIdInDataFrame(dataframe, desiredSignaGroup)
 

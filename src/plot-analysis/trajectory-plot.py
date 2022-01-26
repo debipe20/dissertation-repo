@@ -42,9 +42,12 @@ def timeSpaceDiagram(connectedVehicleTimePoint, nonConnectedVehicleTimePoint, co
                     marker=".",  edgecolor="none",  s=20, label='Non-Connected Vehicles Trajectory', zorder=2)
 
     ax1.legend(loc='upper right', prop={"size": 14})
-    ax1.set_title("Time-Space-Trajectory Diagram [" + str(startTime) + ", " + str(endTime) + "]", fontsize=20, fontweight='bold')
+    # ax1.set_title("Time-Space-Trajectory Diagram [" + str(startTime) + ", " + str(endTime) + "]", fontsize=20, fontweight='bold')
+    ax1.set_title("Time-Space-Trajectory Diagram", fontsize=20, fontweight='bold')
+    
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
     plt.grid(color='black', linestyle='-', linewidth=0.5)
+    print("Generate Diagram")
     plt.show()
 
 

@@ -2,8 +2,8 @@
 	"CoordinatedPhase1": 2,
 	"CoordinatedPhase2": 6,
 	"DeisredSignalGroup":[2,2,2,2,6],
-	"StartTimeOfDiagram": 1625605000,
-	"EndTimeOfDiagram": 1625606000,
+	"StartTimeOfDiagram": 1629498800,
+	"EndTimeOfDiagram": 1629499800,
 	"NoOfIntersection": 5,
 	"IntersectionName": [
 		"Daisy-Gavilan",
@@ -13,18 +13,18 @@
 		"Daisy-Memorial"
 	],
 	"SPaTFileDirectory": [
-		"/home/debashis/Desktop/anthemFieldTest/config/corridor/simulation/daisy-gavilan/nojournal/bin/v2x-data/archive/daisy-gavilan_07062021_133623/daisy-gavilan_spatLog_07062021_133623.csv",
-		"/home/debashis/Desktop/anthemFieldTest/config/corridor/simulation/daisy-dedication/nojournal/bin/v2x-data/archive/daisy-dedication_07062021_133624/daisy-dedication_spatLog_07062021_133624.csv",
-		"/home/debashis/Desktop/anthemFieldTest/config/corridor/simulation/daisy-meridian/nojournal/bin/v2x-data/archive/daisy-meridian_07062021_133622/daisy-meridian_spatLog_07062021_133622.csv",
-		"/home/debashis/Desktop/anthemFieldTest/config/corridor/simulation/daisy-hastings/nojournal/bin/v2x-data/archive/daisy-hastings_07062021_133625/daisy-hastings_spatLog_07062021_133625.csv",
-		"/home/debashis/Desktop/anthemFieldTest/config/corridor/simulation/daisy-memorial/nojournal/bin/v2x-data/archive/daisy-memorial_07062021_133622/daisy-memorial_spatLog_07062021_133622.csv"
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-gavilan_spatLog_08202021_000000.csv",
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-dedication_spatLog_08202021_000000.csv",
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-meridian_spatLog_08202021_000000.csv",
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-hastings_spatLog_08202021_000000.csv",
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-memorial_spatLog_08202021_000000.csv"
 	],
 	"BsmFileDirectory": [
-		"/home/debashis/Desktop/anthemFieldTest/config/corridor/simulation/daisy-gavilan/nojournal/bin/v2x-data/archive/daisy-gavilan_07062021_133623/daisy-gavilan_remoteBsmLog_07062021_133623.csv",
-		"/home/debashis/Desktop/anthemFieldTest/config/corridor/simulation/daisy-dedication/nojournal/bin/v2x-data/archive/daisy-dedication_07062021_133624/daisy-dedication_remoteBsmLog_07062021_133624.csv",
-		"/home/debashis/Desktop/anthemFieldTest/config/corridor/simulation/daisy-meridian/nojournal/bin/v2x-data/archive/daisy-meridian_07062021_133622/daisy-meridian_remoteBsmLog_07062021_133622.csv",
-		"/home/debashis/Desktop/anthemFieldTest/config/corridor/simulation/daisy-hastings/nojournal/bin/v2x-data/archive/daisy-hastings_07062021_133625/daisy-hastings_remoteBsmLog_07062021_133625.csv",
-		"/home/debashis/Desktop/anthemFieldTest/config/corridor/simulation/daisy-memorial/nojournal/bin/v2x-data/archive/daisy-memorial_07062021_133622/daisy-memorial_remoteBsmLog_07062021_133622.csv"
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-gavilan_remoteBsmLog_08202021_000000.csv",
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-dedication_remoteBsmLog_08202021_000000.csv",
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-meridian_remoteBsmLog_08202021_000000.csv",
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-hastings_remoteBsmLog_08202021_000000.csv",
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-memorial_remoteBsmLog_08202021_000000.csv"
 	],
 	"IntersectionDistance": [
 		600,
