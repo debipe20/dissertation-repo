@@ -1,7 +1,7 @@
 {
     "FileName":"sample-vehicle-status-data-0.20.csv",
     "ApproachLength": 350,
-    "EstimatedData": true,
-    "StartTimeOfDiagram": 1631505075,
-	"EndTimeOfDiagram": 1631506090
+    "EstimatedData": false,
+    "StartTimeOfDiagram": 1631505111.321,
+	"EndTimeOfDiagram": 1631505426.9927
 }

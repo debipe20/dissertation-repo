@@ -149,19 +149,19 @@ void VehicleStatusManager::getVehicleInformationFromMAP(BasicVehicle basicVehicl
 		plocAwareLib->getPtDist2D(vehicleTracking_t_1, point2D_t_2);
 		double vehicleDistanceFromStopBar = unsigned(point2D_t_1.distance2pt(point2D_t_2)) / 100; //unit of meters
 
-		// int vehicleLaneId = plocAwareLib->getLaneIdByIndexes(unsigned(vehicleTracking_t_1.intsectionTrackingState.intersectionIndex),
-		// 													 unsigned(vehicleTracking_t_1.intsectionTrackingState.approachIndex),
-		// 													 unsigned(vehicleTracking_t_1.intsectionTrackingState.laneIndex));
+		int vehicleLaneId = plocAwareLib->getLaneIdByIndexes(unsigned(vehicleTracking_t_1.intsectionTrackingState.intersectionIndex),
+															 unsigned(vehicleTracking_t_1.intsectionTrackingState.approachIndex),
+															 unsigned(vehicleTracking_t_1.intsectionTrackingState.laneIndex));
 
-		// int vehicleApproachId = plocAwareLib->getApproachIdByLaneId(regionalId, intersectionId, (unsigned char)((unsigned)vehicleLaneId));
+		int vehicleApproachId = plocAwareLib->getApproachIdByLaneId(regionalId, intersectionId, (unsigned char)((unsigned)vehicleLaneId));
 
-		// int vehicleSignalGroup = unsigned(plocAwareLib->getControlPhaseByIds(static_cast<uint16_t>(regionalId), static_cast<uint16_t>(intersectionId),
-		// 																	 static_cast<uint8_t>(vehicleApproachId), static_cast<uint8_t>(vehicleLaneId)));
+		int vehicleSignalGroup = unsigned(plocAwareLib->getControlPhaseByIds(static_cast<uint16_t>(regionalId), static_cast<uint16_t>(intersectionId),
+																			 static_cast<uint8_t>(vehicleApproachId), static_cast<uint8_t>(vehicleLaneId)));
 
 		findVehicleIdInVehicleStatusList->vehicleDistanceFromStopBar = vehicleDistanceFromStopBar;
-		// findVehicleIdInVehicleStatusList->vehicleLaneId = vehicleLaneId;
-		// findVehicleIdInVehicleStatusList->vehicleApproachId = vehicleApproachId;
-		// findVehicleIdInVehicleStatusList->vehicleSignalGroup = vehicleSignalGroup;
+		findVehicleIdInVehicleStatusList->vehicleLaneId = vehicleLaneId;
+		findVehicleIdInVehicleStatusList->vehicleApproachId = vehicleApproachId;
+		findVehicleIdInVehicleStatusList->vehicleSignalGroup = vehicleSignalGroup;
 		findVehicleIdInVehicleStatusList->vehicleLocationOnMap = unsigned(vehicleTracking_t_1.intsectionTrackingState.vehicleIntersectionStatus);
 		findVehicleIdInVehicleStatusList->updateTime = getPosixTimestamp();
 
@@ -398,9 +398,9 @@ string VehicleStatusManager::getVehicleStatusList()
 			jsonObject["VehicleStatusList"][i]["vehicleType"] = VehicleStatusList[i].vehicleType;
 			jsonObject["VehicleStatusList"][i]["speed_MeterPerSecond"] = VehicleStatusList[i].vehicleSpeed_MeterPerSecond;
 			// jsonObject["VehicleStatusList"][i]["heading_Degree"] = VehicleStatusList[i].vehicleHeading_Degree;
-			// jsonObject["VehicleStatusList"][i]["inBoundLaneId"] = VehicleStatusList[i].vehicleLaneId;
-			// jsonObject["VehicleStatusList"][i]["inBoundApproachId"] = VehicleStatusList[i].vehicleApproachId;
-			// jsonObject["VehicleStatusList"][i]["signalGroup"] = VehicleStatusList[i].vehicleSignalGroup;
+			jsonObject["VehicleStatusList"][i]["inBoundLaneId"] = VehicleStatusList[i].vehicleLaneId;
+			jsonObject["VehicleStatusList"][i]["inBoundApproachId"] = VehicleStatusList[i].vehicleApproachId;
+			jsonObject["VehicleStatusList"][i]["signalGroup"] = VehicleStatusList[i].vehicleSignalGroup;
 			jsonObject["VehicleStatusList"][i]["distanceFromStopBar"] = VehicleStatusList[i].vehicleDistanceFromStopBar;
 			// jsonObject["VehicleStatusList"][i]["locationOnMap"] = VehicleStatusList[i].vehicleLocationOnMap;
 			jsonObject["VehicleStatusList"][i]["connectedVehicleStatus"] = VehicleStatusList[i].connected;
