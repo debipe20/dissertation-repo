@@ -118,6 +118,8 @@ void VehicleStatusPredictionDataCollector::createLogFile()
 				<< ","
 				<< "VehicleType"
 				<< ","
+				<< "SignalGroup"
+				<< ","
 				<< "PhaseStatus"
 				<< ","
 				<< "PhaseElapsedTime"
@@ -157,6 +159,8 @@ void VehicleStatusPredictionDataCollector::createLogFile()
 				<< "NonConnectedVehicleId"
 				<< ","
 				<< "VehicleType"
+				<< ","
+				<< "SignalGroup"
 				<< ","
 				<< "PhaseStatus"
 				<< ","
@@ -460,7 +464,8 @@ void VehicleStatusPredictionDataCollector::writeCsvFile()
 		for (size_t i = 0; i < InputDataPointList.size(); i++)
 		{
 			logFile << fixed << showpoint << setprecision(4) << timeStamp << "," << totalNoOfCells << ",";
-			logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].vehicleType << "," << InputDataPointList[i].phaseStatus << ","
+			logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].vehicleType << ","
+					<< InputDataPointList[i].signalGroup << "," << InputDataPointList[i].phaseStatus << ","
 					<< InputDataPointList[i].phaseElapsedTime << "," << InputDataPointList[i].speed << ","
 					<< InputDataPointList[i].distanceToStopBar << "," << InputDataPointList[i].laneId << ","
 					<< InputDataPointList[i].cellStatus << "," << InputDataPointList[i].outputSpeed << endl;
@@ -475,7 +480,7 @@ void VehicleStatusPredictionDataCollector::writeCsvFile()
 			logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].cellNo << ",";
 			logFile << fixed << showpoint << setprecision(2) << noOfConnectedVehicle << "," << noOfNonConnectedVehicle << ",";
 			logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].connectedVehicleID << "," << InputDataPointList[i].nonConnectedVehicleID << ","
-					<< InputDataPointList[i].vehicleType << "," << InputDataPointList[i].phaseStatus << ","
+					<< InputDataPointList[i].vehicleType << "," << InputDataPointList[i].signalGroup << "," << InputDataPointList[i].phaseStatus << ","
 					<< InputDataPointList[i].phaseElapsedTime << "," << InputDataPointList[i].speed << ","
 					<< InputDataPointList[i].distanceToStopBar << "," << InputDataPointList[i].laneId << ","
 					<< InputDataPointList[i].cellStatus << "," << InputDataPointList[i].outputSpeed << endl;
