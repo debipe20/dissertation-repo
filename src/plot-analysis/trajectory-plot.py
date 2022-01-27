@@ -48,7 +48,7 @@ def timeSpaceDiagram(connectedVehicleTimePoint, nonConnectedVehicleTimePoint, co
     plt.show()
 
 
-def getPhaseStatusPoint(dataFrame, startTime):
+def getPhaseStatusPoint(dataFrame, startTime, laneId):
 
     greenRectangleStartPoint = []
     greenRectangleTime = []
@@ -56,9 +56,11 @@ def getPhaseStatusPoint(dataFrame, startTime):
     clearanceRectangleTime = []
 
     currentPhaseStatusStartTime = startTime
-
+    dataFrame = dataFrame.loc[dataFrame["LaneId"] == laneId]
+    dataFrame = dataFrame.reset_index(drop=True)
     dataFrame["PhaseStatus"].replace({2: 4, 3: 4}, inplace=True)
     currentPhaseStatus = dataFrame['PhaseStatus'][0]
+
 
     if currentPhaseStatus == 1:
         greenRectangleStartPoint.append(0.0)
@@ -130,7 +132,7 @@ def getTrajectoryPoint(dataFrame, startTime, approachLength, estimatedData):
     return connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint
 
 #Method 2
-def getVehicleTrajectoryPoint(dataFrame, startTime, endTime, approachLength, estimatedData):
+def getVehicleTrajectoryPoint(dataFrame, startTime, endTime, laneId, approachLength, estimatedData):
 
     connectedVehicleTimePoint = []
     connectedVehicleDistancePoint = []
@@ -138,28 +140,28 @@ def getVehicleTrajectoryPoint(dataFrame, startTime, endTime, approachLength, est
     nonConnectedVehicleDistancePoint = []
 
     uniqueConnectedVehicleId = findUniqueConnectedVehicleIdInDataFrame(
-        dataFrame, startTime, endTime)
+        dataFrame, startTime, endTime, laneId)
     
     print("Connected Vehicles Id: ", uniqueConnectedVehicleId)
     print("No of Connected Vehicles: ", len(uniqueConnectedVehicleId))
     
     uniqueNonConnectedVehicleId = findUniqueNonConnectedVehicleIdInDataFrame(
-        dataFrame, startTime, endTime)
+        dataFrame, startTime, endTime, laneId)
 
     print("Non-Connected Vehicles Id: ", uniqueNonConnectedVehicleId)
     print("No of Non-Connected Vehicles:", len(uniqueNonConnectedVehicleId))
 
     for vehicleId in uniqueConnectedVehicleId:
-        connectedVehicleTimePointList,  connectedVehicleDistancePointList = getConnectedVehicleTrajectory(
-            dataFrame, vehicleId, approachLength, startTime, endTime, estimatedData)
+        connectedVehicleTimePointList, connectedVehicleDistancePointList = getConnectedVehicleTrajectory(
+            dataFrame, vehicleId, laneId, approachLength, startTime, endTime, estimatedData)
         [connectedVehicleTimePoint.append(element)
          for element in connectedVehicleTimePointList]
         [connectedVehicleDistancePoint.append(
             element) for element in connectedVehicleDistancePointList]
 
     for vehicleId in uniqueNonConnectedVehicleId:
-        nonConnectedVehicleTimePointList,  nonConnectedVehicleDistancePointList = getNonConnectedVehicleTrajectory(
-            dataFrame, vehicleId, approachLength, startTime, endTime, estimatedData)
+        nonConnectedVehicleTimePointList, nonConnectedVehicleDistancePointList = getNonConnectedVehicleTrajectory(
+            dataFrame, vehicleId, laneId, approachLength, startTime, endTime, estimatedData)
         [nonConnectedVehicleTimePoint.append(
             element) for element in nonConnectedVehicleTimePointList]
         [nonConnectedVehicleDistancePoint.append(
@@ -168,12 +170,12 @@ def getVehicleTrajectoryPoint(dataFrame, startTime, endTime, approachLength, est
     return connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint
 
 
-def findUniqueConnectedVehicleIdInDataFrame(bsmDf, startTime, endTime):
+def findUniqueConnectedVehicleIdInDataFrame(bsmDf, startTime, endTime, laneId):
     uniqueConnectedVehicleId = []
 
     if not bsmDf.empty:
         for idx, row in bsmDf.loc[:].iterrows():
-            if row['ConnectedVehicleId'] not in uniqueConnectedVehicleId and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
+            if row['ConnectedVehicleId'] not in uniqueConnectedVehicleId and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime and row['LaneId'] == laneId:
                 uniqueConnectedVehicleId.append(row['ConnectedVehicleId'])
 
     uniqueConnectedVehicleId.remove(0)
@@ -181,12 +183,12 @@ def findUniqueConnectedVehicleIdInDataFrame(bsmDf, startTime, endTime):
     return uniqueConnectedVehicleId
 
 
-def findUniqueNonConnectedVehicleIdInDataFrame(bsmDf, startTime, endTime):
+def findUniqueNonConnectedVehicleIdInDataFrame(bsmDf, startTime, endTime, laneId):
     uniqueNonConnectedVehicleId = []
 
     if not bsmDf.empty:
         for idx, row in bsmDf.loc[:].iterrows():
-            if row['NonConnectedVehicleId'] not in uniqueNonConnectedVehicleId and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
+            if row['NonConnectedVehicleId'] not in uniqueNonConnectedVehicleId and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime and row['LaneId'] == laneId:
                 uniqueNonConnectedVehicleId.append(
                     row['NonConnectedVehicleId'])
 
@@ -194,7 +196,7 @@ def findUniqueNonConnectedVehicleIdInDataFrame(bsmDf, startTime, endTime):
     return uniqueNonConnectedVehicleId
 
 
-def getConnectedVehicleTrajectory(dataFrame, vehicleId, approachLength, startTime, endTime, estimatedData):
+def getConnectedVehicleTrajectory(dataFrame, vehicleId, laneId, approachLength, startTime, endTime, estimatedData):
 
     previousStartTime = startTime - 1.0
     connectedVehicleTimePoint = []
@@ -205,7 +207,7 @@ def getConnectedVehicleTrajectory(dataFrame, vehicleId, approachLength, startTim
     for idx, row in dataFrame.loc[:].iterrows():
         # For Estimated Data
         if bool(estimatedData):
-            if row['CellStatus'] == 1 and row['TimeStamp'] - previousStartTime >= 0.3 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
+            if row['CellStatus'] == 1 and row['TimeStamp'] - previousStartTime >= 0.3 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime and row['LaneId'] == laneId:
                 connectedVehicleTimePoint.append(row['TimeStamp'] - startTime)
                 connectedVehicleDistancePoint.append(
                     approachLength - row['DistanceToStopBar'])
@@ -213,7 +215,7 @@ def getConnectedVehicleTrajectory(dataFrame, vehicleId, approachLength, startTim
 
         # For Sample Data
         else:
-            if row['CellStatus'] == 1 and row['TimeStamp'] - previousStartTime >= 0.3 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
+            if row['CellStatus'] == 1 and row['TimeStamp'] - previousStartTime >= 0.3 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime and row['LaneId'] == laneId:
                 connectedVehicleTimePoint.append(row['TimeStamp'] - startTime)
                 connectedVehicleDistancePoint.append(
                     approachLength - row['DistanceToStopBar'])
@@ -221,7 +223,7 @@ def getConnectedVehicleTrajectory(dataFrame, vehicleId, approachLength, startTim
     return connectedVehicleTimePoint,  connectedVehicleDistancePoint
 
 
-def getNonConnectedVehicleTrajectory(dataFrame, vehicleId, approachLength, startTime, endTime, estimatedData):
+def getNonConnectedVehicleTrajectory(dataFrame, vehicleId, laneId, approachLength, startTime, endTime, estimatedData):
     previousStartTime = startTime - 1.0
     nonConnectedVehicleTimePoint = []
     nonConnectedVehicleDistancePoint = []
@@ -230,7 +232,7 @@ def getNonConnectedVehicleTrajectory(dataFrame, vehicleId, approachLength, start
     for idx, row in dataFrame.loc[:].iterrows():
         # For Estimated Data
         if bool(estimatedData):
-            if row['CellStatus'] == 1 and row['PredictedCellStatus'] > 0.05 and row['TimeStamp'] - previousStartTime >= 0.3 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
+            if row['CellStatus'] == 1 and row['PredictedCellStatus'] > 0.05 and row['TimeStamp'] - previousStartTime >= 0.3 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime and row['LaneId'] == laneId:
                 nonConnectedVehicleTimePoint.append(
                     row['TimeStamp'] - startTime)
                 nonConnectedVehicleDistancePoint.append(
@@ -239,7 +241,7 @@ def getNonConnectedVehicleTrajectory(dataFrame, vehicleId, approachLength, start
 
         # For Sample Data
         else:
-            if row['CellStatus'] == 1 and row['TimeStamp'] - previousStartTime >= 0.3 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
+            if row['CellStatus'] == 1 and row['TimeStamp'] - previousStartTime >= 0.3 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime and row['LaneId'] == laneId:
                 nonConnectedVehicleTimePoint.append(
                     row['TimeStamp'] - startTime)
                 nonConnectedVehicleDistancePoint.append(
@@ -258,6 +260,7 @@ def main():
     configFile.close()
 
     dataFrame = pd.read_csv(config["FileName"])
+    laneId = config["LaneId"]
     approachLength = config["ApproachLength"]
     estimatedData = config["EstimatedData"]
 
@@ -270,14 +273,14 @@ def main():
     timeLength = endTime - startTime
     print("Start Time is:", startTime)
 
-    # connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint = getTrajectoryPoint(
-    #     dataFrame, startTime, approachLength, estimatedData)
+    connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint = getTrajectoryPoint(
+        dataFrame, startTime, approachLength, estimatedData)
 
     connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint = getVehicleTrajectoryPoint(
-        dataFrame, startTime, endTime, approachLength, estimatedData)
+        dataFrame, startTime, endTime, laneId, approachLength, estimatedData)
 
     greenRectangleStartPoint, greenRectangleTime, clearanceRectangleStartPoint, clearanceRectangleTime = getPhaseStatusPoint(
-        dataFrame, startTime)
+        dataFrame, startTime, laneId)
 
     print("Iteration is done")
 
