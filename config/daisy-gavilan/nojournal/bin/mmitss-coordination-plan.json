@@ -5,7 +5,7 @@
             "CoordinationPlanName": "AM-Peak",
             "CoordinationPatternNo": 1,
             "CycleLength": 90,
-            "Offset": 0,
+            "Offset": 55,
             "CoordinatedPhase1": 2,
             "CoordinatedPhase2": 6,
             "CoordinationSplit": 20.0,
@@ -47,42 +47,15 @@
                 "Tuesday",
                 "Wednesday",
                 "Thursday",
-                "Friday"
-            ],
-            "ActionPlan": [
-                {
-                    "CoordinationPatternNo": 1,
-                    "CoordinationStartTime_Hour": 0,
-                    "CoordinationStartTime_Minute": 1,
-                    "CoordinationEndTime_Hour": 23,
-                    "CoordinationEndTime_Minute": 55
-                },
-                {
-                    "CoordinationPatternNo": 2,
-                    "CoordinationStartTime_Hour": 23,
-                    "CoordinationStartTime_Minute": 56,
-                    "CoordinationEndTime_Hour": 23,
-                    "CoordinationEndTime_Minute": 59
-                }
-            ]
-        },
-        {
-            "Days": [
+                "Friday",
                 "Saturday",
                 "Sunday"
             ],
             "ActionPlan": [
                 {
-                    "CoordinationPatternNo": 1,
+                    "CoordinationPatternNo": 2,
                     "CoordinationStartTime_Hour": 0,
                     "CoordinationStartTime_Minute": 1,
-                    "CoordinationEndTime_Hour": 23,
-                    "CoordinationEndTime_Minute": 55
-                },
-                {
-                    "CoordinationPatternNo": 2,
-                    "CoordinationStartTime_Hour": 23,
-                    "CoordinationStartTime_Minute": 56,
                     "CoordinationEndTime_Hour": 23,
                     "CoordinationEndTime_Minute": 59
                 }
