@@ -1,8 +1,8 @@
 {
-    "IntersectionName" : "speedway-mountain",
-    "ConnectedVehiclePenetrationRate": 0.2,
+    "IntersectionName" : "daisy-gavilan",
+    "ConnectedVehiclePenetrationRate": 1.0,
     "FrequencyOfRequest": 0.3,
     "ApproachId": 5,
-    "NoOfLanes":1,
-    "LaneId":[14]
+    "NoOfLanes":4,
+    "LaneId":[16,17,18,19]
 }

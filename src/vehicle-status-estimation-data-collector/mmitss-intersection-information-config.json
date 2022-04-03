@@ -1,6 +1,6 @@
 {
-    "IntersectionName" : "speedway-mountain",
-    "TrainingData": false,
+    "IntersectionName" : "daisy-gavilan",
+    "TrainingData": true,
     "CoonectedVehiclePenetrationRate": 0.2,
     "FrequencyOfRequest": 0.3,    
     "ApproachId": 5,
@@ -8,9 +8,9 @@
     "NoOfThroughLanes":3,
     "ThroughLanesLength": 350,
     "NoOfLeftTurnPocket":1,
-    "LeftTurnPocketLength": 115,
+    "LeftTurnPocketLength": 100,
     "ThoughLanesSignalGroup": 2,
     "LeftTurnPocketsSignalGroup": 5,
-    "ThroughLanesId": [12,13,14],
-    "LeftTurnPocketsId": [15]
+    "ThroughLanesId": [16,17,18],
+    "LeftTurnPocketsId": [19]
 }
