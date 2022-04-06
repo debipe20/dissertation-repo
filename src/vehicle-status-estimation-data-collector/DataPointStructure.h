@@ -9,7 +9,7 @@ struct DataPointStructure
     int nonConnectedVehicleID{};
     int vehicleType{};
     int signalGroup{};
-    // int laneId{};
+    int laneId{};
     // int approachId{};
     int locationOnMap{};
     int phaseStatus{};
@@ -33,7 +33,7 @@ struct DataPointStructure
         nonConnectedVehicleID = 0; 
         vehicleType = 0;
         signalGroup = 0;
-        // laneId = 0;
+        laneId = 0;
         // approachId = 0;
         locationOnMap = 0;
         phaseStatus = 0;

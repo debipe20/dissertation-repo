@@ -19,7 +19,8 @@ in the Systems and Industrial Engineering Department.
 Description:
 ------------
 The methods available from this class are the following:
-- getSpatFileDirecyoryList():
+- getParameters(): method to initialize the parameters and variables
+- timeSpaceDiagramMethod: method to generate the time-space diagram based on the SPaT and BSM data
 ***************************************************************************************
 """
 
@@ -37,7 +38,9 @@ class TimeSpaceDiagramManager:
                     transitTrajectoryTimePoint, transitTrajectoryDistancePoint, truckTrajectoryTimePoint, 
                     truckTrajectoryDistancePoint, carTrajectoryTimePoint, carTrajectoryDistancePoint, 
                     connectedVehicleTrajectoryTimePoint, connectedVehicleTrajectoryDistancePoint, textString, xAxisRange):
-        
+        """
+        method to initialize the parameters and variables
+        """
         self.greenRectangleStartPoint = greenRectangleStartPoint
         self.clearanceRectangleStartPoint = clearanceRectangleStartPoint
         self.greenTime = greenTime
@@ -53,6 +56,9 @@ class TimeSpaceDiagramManager:
         self.xAxisRange = xAxisRange
 
     def timeSpaceDiagramMethod(self):
+        """
+        method to generate the time-space diagram based on the SPaT and BSM data
+        """
         fig, ax1 = plt.subplots()
 
         ax1.set_xlabel('Time (s)', fontsize=24, fontweight='bold')

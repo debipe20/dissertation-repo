@@ -19,7 +19,11 @@ in the Systems and Industrial Engineering Department.
 Description:
 ------------
 The methods available from this class are the following:
-- getSpatFileDirecyoryList():
+- getBsmConfigData(): method to get config data for the BSM files
+- manageBsmData(): method to store vehicle trajectories based on their vehicle type
+- processBsmFile(BsmFile, desiredSignaGroup, distance): method to process each BSM file to obtain vehicle trajectories
+- findUniqueVehicleIdInDataFrame(bsmDf, desiredSignaGroup): method to compute unique vehicle ID that are travelling along the desired signal group
+- getVehicleTrajectory(uniqueVehicleId, dataframe, distance): method to obtain vehicle trajectory for a specific vehicle ID
 ***************************************************************************************
 """
 
@@ -36,6 +40,9 @@ class BsmDataManager:
         self.signalGroup = []
 
     def getBsmConfigData(self):
+        """
+        method to get config data for the BSM files
+        """
         [self.fileDirectoryList_BSM.append(
             fileDirectory)for fileDirectory in self.config["BsmFileDirectory"]]
         [self.intersectionDistanceApart.append(
@@ -46,7 +53,9 @@ class BsmDataManager:
         self.endTime = self.config["EndTimeOfDiagram"]
 
     def manageBsmData(self):
-
+        """
+        method to store vehicle trajectories based on their vehicle type
+        """
         self.getBsmConfigData()
         evTrajectoryTimePoint, evTrajectoryDistancePoint = (
             [] for i in range(2))
@@ -92,6 +101,10 @@ class BsmDataManager:
         return evTrajectoryTimePoint, evTrajectoryDistancePoint, transitTrajectoryTimePoint, transitTrajectoryDistancePoint, truckTrajectoryTimePoint, truckTrajectoryDistancePoint, carTrajectoryTimePoint, carTrajectoryDistancePoint, connectedVehicleTrajectoryTimePoint, connectedVehicleTrajectoryDistancePoint
 
     def processBsmFile(self, BsmFile, desiredSignaGroup, distance):
+        """
+        modifies the dataframe when vehicle is on insideintersectionbox or outbound lane
+        call the findUniqueVehicleIdInDataFrame() and getVehicleTrajectory() methods to get the vehicle trajectories
+        """
         vehicleTrajectoryTimePoint = []
         vehicleTrajectoryDistancePoint = []
         vehicleType = []
@@ -131,6 +144,9 @@ class BsmDataManager:
         return vehicleTrajectoryTimePoint, vehicleTrajectoryDistancePoint, vehicleType
 
     def findUniqueVehicleIdInDataFrame(self, bsmDf, desiredSignaGroup):
+        """
+        This method computes unique vehicle ID that are travelling along the desired signal group
+        """
         uniqueVehicleId = []
 
         if not bsmDf.empty:
@@ -142,11 +158,15 @@ class BsmDataManager:
 
 
     def getVehicleTrajectory(self, uniqueVehicleId, dataframe, distance):
-
+        """
+        method to obtain vehicle trajectory for a specific vehicle ID from the dataframe
+        if a vehicle is on inbound lane and trajectory time stamp is between the start time and end time of the diagram generation time, store that trajectory data
+        if a vehicle is on intersection box or outbound lane and trajectory time stamp is between the start time and end time of the diagram generation time, 
+            - consider 'dist_to_stopbar' column data to calutate the trajectory distance (calculate the difference between total distance along the path and inbound distance along the path)        
+        """
         vehicleTrajectoryTimeList = []
         vehicleTrajectoryDistanceList = []
         vehicleTypeList = []
-        temporaryDistanceAlongPath = -5.0
         inboundDistanceAlongPath = 0.0
         cumulativeTime = 0.0
         currentStateTime = self.startTime
@@ -160,7 +180,6 @@ class BsmDataManager:
                 temporaryDistance = distance - row['dist_to_stopbar']
                 vehicleTrajectoryDistanceList.append(temporaryDistance)
                 inboundDistanceAlongPath = row['distance_along_path']
-                temporaryDistanceAlongPath = row['distance_along_path']
                 cumulativeTime += row['timestamp_posix'] - previousStartTime
                 vehicleTrajectoryTimeList.append(cumulativeTime)
                 vehicleTypeList.append(row['type'])
@@ -169,7 +188,6 @@ class BsmDataManager:
             elif (row['position_on_map'] == "insideIntersectionBox" or row['position_on_map'] == "outbound") and row['timestamp_posix'] >= self.startTime and row['timestamp_posix'] <= self.endTime and row['timestamp_posix'] - previousStartTime >= 1.0:
                 vehicleTrajectoryDistanceList.append(
                     temporaryDistance + (row['distance_along_path'] - inboundDistanceAlongPath))
-                temporaryDistanceAlongPath = row['distance_along_path']
                 cumulativeTime += row['timestamp_posix'] - previousStartTime
                 vehicleTrajectoryTimeList.append(cumulativeTime)
                 vehicleTypeList.append(row['type'])
