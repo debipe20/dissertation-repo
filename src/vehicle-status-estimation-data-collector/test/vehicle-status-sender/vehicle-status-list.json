@@ -1,0 +1,69 @@
+{
+    "MsgType": "VehicleStatusList",
+    "NoOfVehicle": 9,
+    "VehicleStatusList": [
+        {
+            "connectedVehicleStatus": false,
+            "distanceFromStopBar": 11.0,
+            "speed_MeterPerSecond": 3.3999999999999999,
+            "vehicleId": 21,
+            "vehicleType": 4
+        },
+        {
+            "connectedVehicleStatus": true,
+            "distanceFromStopBar": 19.0,
+            "speed_MeterPerSecond": 0.28000000000000003,
+            "vehicleId": 22,
+            "vehicleType": 4
+        },
+        {
+            "connectedVehicleStatus": false,
+            "distanceFromStopBar": 26.0,
+            "speed_MeterPerSecond": 0.0,
+            "vehicleId": 23,
+            "vehicleType": 4
+        },
+        {
+            "connectedVehicleStatus": false,
+            "distanceFromStopBar": 33.0,
+            "speed_MeterPerSecond": 0.0,
+            "vehicleId": 24,
+            "vehicleType": 4
+        },
+        {
+            "connectedVehicleStatus": false,
+            "distanceFromStopBar": 39.0,
+            "speed_MeterPerSecond": 0.0,
+            "vehicleId": 25,
+            "vehicleType": 4
+        },
+        {
+            "connectedVehicleStatus": false,
+            "distanceFromStopBar": 46.0,
+            "speed_MeterPerSecond": 0.0,
+            "vehicleId": 26,
+            "vehicleType": 4
+        },
+        {
+            "connectedVehicleStatus": false,
+            "distanceFromStopBar": 52.0,
+            "speed_MeterPerSecond": 0.40000000000000002,
+            "vehicleId": 27,
+            "vehicleType": 4
+        },
+        {
+            "connectedVehicleStatus": false,
+            "distanceFromStopBar": 137.0,
+            "speed_MeterPerSecond": 14.960000000000001,
+            "vehicleId": 28,
+            "vehicleType": 4
+        },
+        {
+            "connectedVehicleStatus": false,
+            "distanceFromStopBar": 341.0,
+            "speed_MeterPerSecond": 14.81,
+            "vehicleId": 29,
+            "vehicleType": 4
+        }
+    ]
+}

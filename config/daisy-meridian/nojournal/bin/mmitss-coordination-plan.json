@@ -1,0 +1,65 @@
+{
+    "IntersectionName": "daisy-meridian",
+    "CoordinationPattern": [
+        {
+            "CoordinationPlanName": "AM-Peak",
+            "CoordinationPatternNo": 1,
+            "CycleLength": 90,
+            "Offset": 85,
+            "CoordinatedPhase1": 2,
+            "CoordinatedPhase2": 6,
+            "CoordinationSplit": 20.0,
+            "Split": [
+                12,
+                48,
+                0,
+                0,
+                0,
+                60,
+                0,
+                30
+            ]
+        },
+        {
+            "CoordinationPlanName": "PM-Peak",
+            "CoordinationPatternNo": 2,
+            "CycleLength": 90,
+            "Offset": 70,
+            "CoordinatedPhase1": 2,
+            "CoordinatedPhase2": 6,
+            "CoordinationSplit": 20.0,
+            "Split": [
+                14,
+                52,
+                0,
+                0,
+                0,
+                66,
+                0,
+                24
+            ]
+        }
+    ],
+    "CoordinationDayPlan": [
+        {
+            "Days": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday"
+            ],
+            "ActionPlan": [
+                {
+                    "CoordinationPatternNo": 2,
+                    "CoordinationStartTime_Hour": 0,
+                    "CoordinationStartTime_Minute": 1,
+                    "CoordinationEndTime_Hour": 23,
+                    "CoordinationEndTime_Minute": 59
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,36 @@
+{
+	"CoordinatedPhase1": 2,
+	"CoordinatedPhase2": 6,
+	"DeisredSignalGroup":[2,2,2,2,6],
+	"StartTimeOfDiagram": 1629498800,
+	"EndTimeOfDiagram": 1629499800,
+	"NoOfIntersection": 5,
+	"IntersectionName": [
+		"Daisy-Gavilan",
+		"Daisy-Dedication",
+		"Daisy-Meridian",
+		"Daisy-Hastings",
+		"Daisy-Memorial"
+	],
+	"SPaTFileDirectory": [
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-gavilan_spatLog_08202021_000000.csv",
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-dedication_spatLog_08202021_000000.csv",
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-meridian_spatLog_08202021_000000.csv",
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-hastings_spatLog_08202021_000000.csv",
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-memorial_spatLog_08202021_000000.csv"
+	],
+	"BsmFileDirectory": [
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-gavilan_remoteBsmLog_08202021_000000.csv",
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-dedication_remoteBsmLog_08202021_000000.csv",
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-meridian_remoteBsmLog_08202021_000000.csv",
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-hastings_remoteBsmLog_08202021_000000.csv",
+		"/home/debashis/Desktop/anthem-coordination/08-20-2021/daisy-memorial_remoteBsmLog_08202021_000000.csv"
+	],
+	"IntersectionDistance": [
+		600,
+		950,
+		1950,
+		2600,
+		3350
+	]
+}

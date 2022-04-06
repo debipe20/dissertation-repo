@@ -1,0 +1,65 @@
+{
+    "IntersectionName": "daisy-dedication",
+    "CoordinationPattern": [
+        {
+            "CoordinationPlanName": "AM-Peak",
+            "CoordinationPatternNo": 1,
+            "CycleLength": 90,
+            "Offset": 40,
+            "CoordinatedPhase1": 2,
+            "CoordinatedPhase2": 6,
+            "CoordinationSplit": 20.0,
+            "Split": [
+                0,
+                60,
+                0,
+                30,
+                12,
+                48,
+                0,
+                0
+            ]
+        },
+        {
+            "CoordinationPlanName": "PM-Peak",
+            "CoordinationPatternNo": 2,
+            "CycleLength": 90,
+            "Offset": 30,
+            "CoordinatedPhase1": 2,
+            "CoordinatedPhase2": 6,
+            "CoordinationSplit": 20.0,
+            "Split": [
+                0,
+                63,
+                0,
+                27,
+                21,
+                42,
+                0,
+                0
+            ]
+        }
+    ],
+    "CoordinationDayPlan": [
+        {
+            "Days": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday"
+            ],
+            "ActionPlan": [
+                {
+                    "CoordinationPatternNo": 2,
+                    "CoordinationStartTime_Hour": 0,
+                    "CoordinationStartTime_Minute": 1,
+                    "CoordinationEndTime_Hour": 23,
+                    "CoordinationEndTime_Minute": 59
+                }
+            ]
+        }
+    ]
+}

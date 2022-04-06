@@ -1,0 +1,32 @@
+{
+	"CoordinatedPhase1": 2,
+	"CoordinatedPhase2": 6,
+	"DeisredSignalGroup":[6,6,6,6],
+	"StartTimeOfDiagram": 1625555580,
+	"EndTimeOfDiagram": 1625556680,
+	"NoOfIntersection": 4,
+	"IntersectionName": [
+		"speedway-campbell",
+		"speedway-cherry",		
+		"speedway-mountain",
+		"speedway-park"	
+	],
+	"SPaTFileDirectory": [
+		"/home/debashis/Desktop/speedway-coordination/config/speedway-campbell/nojournal/bin/v2x-data/archive/speedway-campbell_07062021_000512/speedway-campbell_spatLog_07062021_000512.csv",
+		"/home/debashis/Desktop/speedway-coordination/config/speedway-cherry/nojournal/bin/v2x-data/archive/speedway-cherry_07062021_000512/speedway-cherry_spatLog_07062021_000512.csv",
+		"/home/debashis/Desktop/speedway-coordination/config/speedway-mountain/nojournal/bin/v2x-data/archive/speedway-mountain_07062021_000510/speedway-mountain_spatLog_07062021_000510.csv",
+		"/home/debashis/Desktop/speedway-coordination/config/speedway-park/nojournal/bin/v2x-data/archive/speedway-park_07062021_000511/speedway-park_spatLog_07062021_000511.csv"		
+	],
+	"BsmFileDirectory": [
+		"/home/debashis/Desktop/speedway-coordination/config/speedway-campbell/nojournal/bin/v2x-data/archive/speedway-campbell_07062021_000512/speedway-campbell_remoteBsmLog_07062021_000512.csv",
+		"/home/debashis/Desktop/speedway-coordination/config/speedway-cherry/nojournal/bin/v2x-data/archive/speedway-cherry_07062021_000512/speedway-cherry_remoteBsmLog_07062021_000512.csv",
+		"/home/debashis/Desktop/speedway-coordination/config/speedway-mountain/nojournal/bin/v2x-data/archive/speedway-mountain_07062021_000510/speedway-mountain_remoteBsmLog_07062021_000510.csv",
+		"/home/debashis/Desktop/speedway-coordination/config/speedway-park/nojournal/bin/v2x-data/archive/speedway-park_07062021_000511/speedway-park_remoteBsmLog_07062021_000511.csv"
+	],
+	"IntersectionDistance": [
+		600,
+		1010,
+		1420,
+		1840
+	]
+}

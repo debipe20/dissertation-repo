@@ -1,0 +1,14 @@
+{
+    "MsgType": "CurrentState_VehiclePhases",
+    "Intersection": "speedway-mountain",
+    "States": [
+        "red",
+        "green",
+        "red",
+        "red",
+        "permissive_yellow",
+        "red",
+        "red",
+        "red"
+    ]
+}

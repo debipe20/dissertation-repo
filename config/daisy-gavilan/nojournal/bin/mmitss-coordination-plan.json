@@ -1,0 +1,65 @@
+{
+    "IntersectionName": "daisy-gavilan",
+    "CoordinationPattern": [
+        {
+            "CoordinationPlanName": "AM-Peak",
+            "CoordinationPatternNo": 1,
+            "CycleLength": 90,
+            "Offset": 55,
+            "CoordinatedPhase1": 2,
+            "CoordinatedPhase2": 6,
+            "CoordinationSplit": 20.0,
+            "Split": [
+                17,
+                37,
+                12,
+                24,
+                17,
+                37,
+                14,
+                22
+            ]
+        },
+        {
+            "CoordinationPlanName": "PM-Peak",
+            "CoordinationPatternNo": 2,
+            "CycleLength": 90,
+            "Offset": 0,
+            "CoordinatedPhase1": 2,
+            "CoordinatedPhase2": 6,
+            "CoordinationSplit": 20.0,
+            "Split": [
+                17,
+                37,
+                12,
+                24,
+                17,
+                37,
+                14,
+                22
+            ]
+        }
+    ],
+    "CoordinationDayPlan": [
+        {
+            "Days": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday"
+            ],
+            "ActionPlan": [
+                {
+                    "CoordinationPatternNo": 2,
+                    "CoordinationStartTime_Hour": 0,
+                    "CoordinationStartTime_Minute": 1,
+                    "CoordinationEndTime_Hour": 23,
+                    "CoordinationEndTime_Minute": 59
+                }
+            ]
+        }
+    ]
+}

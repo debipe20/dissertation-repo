@@ -1,0 +1,8 @@
+{
+    "FileName":"sample-vehicle-status-data-0.20.csv",
+    "ApproachLength": 350,
+    "LaneId": 13,
+    "EstimatedData": true,
+    "StartTimeOfDiagram": 1643057500,
+	"EndTimeOfDiagram": 1643057800
+}
