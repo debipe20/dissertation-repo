@@ -324,10 +324,10 @@ void VehicleStatusPredictionDataCollector::updatePhaseStatusInDataPointList(vect
 
 void VehicleStatusPredictionDataCollector::processSpatData(string jsonString)
 {
-	updatePhaseStatusInDataPointList(DataPointListApproach1, jsonString, approach1ThroughSignalGroup, approach1LeftTurnSignalGroup);
-	updatePhaseStatusInDataPointList(DataPointListApproach2, jsonString, approach2ThroughSignalGroup, approach2LeftTurnSignalGroup);
-	// updatePhaseStatusInDataPointList(DataPointListApproach3, jsonString, approach3ThroughSignalGroup, approach3LeftTurnSignalGroup);
-	// updatePhaseStatusInDataPointList(DataPointListApproach4, jsonString, approach4ThroughSignalGroup, approach4LeftTurnSignalGroup);
+	updatePhaseStatusInDataPointList(InputDataPointListApproach1, jsonString, approach1ThroughSignalGroup, approach1LeftTurnSignalGroup);
+	updatePhaseStatusInDataPointList(InputDataPointListApproach2, jsonString, approach2ThroughSignalGroup, approach2LeftTurnSignalGroup);
+	// updatePhaseStatusInDataPointList(InputDataPointListApproach3, jsonString, approach3ThroughSignalGroup, approach3LeftTurnSignalGroup);
+	// updatePhaseStatusInDataPointList(InputDataPointListApproach4, jsonString, approach4ThroughSignalGroup, approach4LeftTurnSignalGroup);
 }
 /*
 	- The following method can fill up the vehicle status information based on the receid vehicle status list

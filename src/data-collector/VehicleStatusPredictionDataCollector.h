@@ -116,7 +116,7 @@ public:
     void createDataPointStructure(vector<int> signalGroup, vector<int> laneId, int approachId);
     void updatePhaseStatusInDataPointList(vector<DataPointStructure> dataPointList, string jsonString, int throughSignalGroup, int leftTurnSignalGroup);
     void processSpatData(string jsonString);
-    void fillUpDataPointList(int approachId,, int vehicleId, int vehicleType, double vehicleSpeed, double distanceToStopBar, int laneId, bool connectedVehicleStatus);
+    void fillUpDataPointList(int approachId, int vehicleId, int vehicleType, double vehicleSpeed, double distanceToStopBar, int laneId, bool connectedVehicleStatus);
     void processVehicleStatusData(string jsonString);
     void createLogFile(ofstream& logFile, int approachId);
     void writeCsvFile(ofstream& logFile, vector<DataPointStructure> InputDataPointList);
