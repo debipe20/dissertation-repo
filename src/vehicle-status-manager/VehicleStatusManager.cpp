@@ -399,7 +399,7 @@ string VehicleStatusManager::getVehicleStatusList()
 			jsonObject["VehicleStatusList"][i]["speed_MeterPerSecond"] = VehicleStatusList[i].vehicleSpeed_MeterPerSecond;
 			// jsonObject["VehicleStatusList"][i]["heading_Degree"] = VehicleStatusList[i].vehicleHeading_Degree;
 			jsonObject["VehicleStatusList"][i]["inBoundLaneId"] = VehicleStatusList[i].vehicleLaneId;
-			// jsonObject["VehicleStatusList"][i]["inBoundApproachId"] = VehicleStatusList[i].vehicleApproachId;
+			jsonObject["VehicleStatusList"][i]["inBoundApproachId"] = VehicleStatusList[i].vehicleApproachId;
 			// jsonObject["VehicleStatusList"][i]["signalGroup"] = VehicleStatusList[i].vehicleSignalGroup;
 			jsonObject["VehicleStatusList"][i]["distanceFromStopBar"] = VehicleStatusList[i].vehicleDistanceFromStopBar;
 			// jsonObject["VehicleStatusList"][i]["locationOnMap"] = VehicleStatusList[i].vehicleLocationOnMap;

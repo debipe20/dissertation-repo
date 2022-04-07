@@ -54,10 +54,10 @@ int main()
         msgType = vehicleStatusPredictionDataCollector.getMessageType(receivedJsonString);
 
         if (msgType == static_cast<int>(msgType::CurrentState_VehiclePhases))
-            vehicleStatusPredictionDataCollector.updatePhaseStatusInDataPointList(receivedJsonString);
+            vehicleStatusPredictionDataCollector.processSpatData(receivedJsonString);
 
         else if (msgType == static_cast<int>(msgType::VehicleStatus))
-            vehicleStatusPredictionDataCollector.fillUpDataPointList(receivedJsonString);
+            vehicleStatusPredictionDataCollector.processVehicleStatusData(receivedJsonString);
     }
     
     vehicleStatusPredictionDataCollectorSocket.closeSocket();

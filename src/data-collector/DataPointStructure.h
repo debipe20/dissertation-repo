@@ -10,11 +10,9 @@ struct DataPointStructure
     int vehicleType{};
     int signalGroup{};
     int laneId{};
-    // int approachId{};
+    int approachId{};
     int locationOnMap{};
     int phaseStatus{};
-    bool frontCellStatus{};
-    double frontCellVehicleSpeed{};
     double phaseElapsedTime{};
     double phaseUpdateTime{};
     double speed{};
@@ -34,11 +32,9 @@ struct DataPointStructure
         vehicleType = 0;
         signalGroup = 0;
         laneId = 0;
-        // approachId = 0;
+        approachId = 0;
         locationOnMap = 0;
         phaseStatus = 0;
-        frontCellStatus = false;
-        frontCellVehicleSpeed = 0.0;
         phaseElapsedTime = 0.0;
         phaseUpdateTime = 0.0;
         speed = -1.0;
