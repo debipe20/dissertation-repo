@@ -140,7 +140,7 @@ void VehicleStatusPredictionDataCollector::readIntersectionInformationConfig()
 	}
 }
 
-void VehicleStatusPredictionDataCollector::createLogFile(ofstream& logFile, int approachId)
+void VehicleStatusPredictionDataCollector::createLogFile(ofstream &logFile, int approachId)
 {
 	stringstream stream;
 	stream << fixed << setprecision(2) << penetrationRate;
@@ -227,7 +227,6 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure(vector<int> 
 	DataPointStructure dataPointStructure;
 	dataPointStructure.reset();
 
-
 	for (int i = 0; i < dataStructurewidth; i++)
 	{
 		cellStartPoint = 0.0;
@@ -240,11 +239,21 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure(vector<int> 
 			dataPointStructure.nonConnectedVehicleID = 0;
 			dataPointStructure.signalGroup = signalGroup[i];
 			dataPointStructure.laneId = laneId[i];
-			dataPointStructure.approachId = approachId;
-			dataPointStructure.locationOnMap = static_cast<int>(MsgEnum::mapLocType::onInbound);
 			dataPointStructure.cellStartPonit = cellStartPoint;
 			dataPointStructure.cellEndPont = cellStartPoint + cellLength;
-			dataPointStructure.distanceToStopBar = cellStartPoint + (cellLength / 2);
+
+			if (laneId[i] == 0)
+			{
+				dataPointStructure.approachId = 0;
+				dataPointStructure.distanceToStopBar = 0;
+			}
+			else
+			{
+				dataPointStructure.approachId = approachId;
+				dataPointStructure.distanceToStopBar = cellStartPoint + (cellLength / 2);
+			}
+			dataPointStructure.locationOnMap = static_cast<int>(MsgEnum::mapLocType::onInbound);
+
 			dataPointStructure.speed = -1.0;
 			dataPointStructure.cellStatus = false;
 			dataPointStructure.outputSpeed = -1.0;
@@ -256,7 +265,7 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure(vector<int> 
 
 	if (approachId == approachId1)
 		DataPointListApproach1 = dataPointList;
-	
+
 	else if (approachId == approachId2)
 		DataPointListApproach2 = dataPointList;
 
@@ -328,7 +337,7 @@ void VehicleStatusPredictionDataCollector::updatePhaseStatusInDataPointList(vect
 
 	if (approachId == approachId1)
 		DataPointListApproach1 = dataPointList;
-	
+
 	else if (approachId == approachId2)
 		DataPointListApproach2 = dataPointList;
 
@@ -458,7 +467,7 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(vector<DataPointS
 
 	if (approachId == approachId1)
 		InputDataPointListApproach1 = InputDataPointList;
-	
+
 	else if (approachId == approachId2)
 		InputDataPointListApproach2 = InputDataPointList;
 
@@ -469,7 +478,7 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(vector<DataPointS
 		InputDataPointListApproach4 = InputDataPointList;
 }
 
-void VehicleStatusPredictionDataCollector::writeCsvFile(ofstream& logFile, vector<DataPointStructure> InputDataPointList)
+void VehicleStatusPredictionDataCollector::writeCsvFile(ofstream &logFile, vector<DataPointStructure> InputDataPointList)
 {
 	double timeStamp = getPosixTimestamp();
 
