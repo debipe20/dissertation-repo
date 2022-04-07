@@ -177,7 +177,7 @@ void VehicleStatusPredictionDataCollector::createLogFile(ofstream &logFile, int 
 
 	else
 	{
-		logFile.open("data/sample-vehicle-status-data-" + penetrationRateString + ".csv");
+		logFile.open("data/" + intersectionName + "-approach" + std::to_string(approachId) + "sample-vehicle-status-data-" + penetrationRateString + ".csv");
 
 		logFile << "TimeStamp"
 				<< ","

@@ -110,11 +110,17 @@ def getTrajectoryPoint(dataFrame, startTime, approachLength, estimatedData):
                 connectedVehicleDistancePoint.append(
                     approachLength - row['DistanceToStopBar'])
 
-            elif row['CellStatus'] == 1 and row['PredictedCellStatus'] > 0.05 and row['NonConnectedVehicleId'] > 0:
+            elif row['PredictedCellStatus'] > 0.15 and row['NonConnectedVehicleId'] > 0:
                 nonConnectedVehicleTimePoint.append(
                     row['TimeStamp'] - startTime)
                 nonConnectedVehicleDistancePoint.append(
                     approachLength - row['DistanceToStopBar'])
+
+            # elif row['CellStatus'] == 1 and row['PredictedCellStatus'] > 0.3 and row['NonConnectedVehicleId'] > 0:
+            #     nonConnectedVehicleTimePoint.append(
+            #         row['TimeStamp'] - startTime)
+            #     nonConnectedVehicleDistancePoint.append(
+            #         approachLength - row['DistanceToStopBar'])
 
         # For Sample Data
         else:
