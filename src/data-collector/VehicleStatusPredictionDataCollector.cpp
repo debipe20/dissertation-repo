@@ -37,12 +37,17 @@ VehicleStatusPredictionDataCollector::VehicleStatusPredictionDataCollector()
 	readIntersectionInformationConfig();
 	createDataPointStructure(approach1SignalGroup, approach1LaneId, approachId1);
 	createDataPointStructure(approach2SignalGroup, approach2LaneId, approachId2);
-	// createDataPointStructure(approach3SignalGroup, approach3LaneId, approachId3);
-	// createDataPointStructure(approach4SignalGroup, approach4LaneId, approachId4);
+	createDataPointStructure(approach3SignalGroup, approach3LaneId, approachId3);
+	createDataPointStructure(approach4SignalGroup, approach4LaneId, approachId4);
 	createLogFile(logFileApproach1, approachId1);
 	createLogFile(logFileApproach2, approachId2);
-	// createLogFile(logFileApproach3, approachId3);
-	// createLogFile(logFileApproach4, approachId4);
+	createLogFile(logFileApproach3, approachId3);
+	createLogFile(logFileApproach4, approachId4);
+
+	InputDataPointListApproach1 = DataPointListApproach1;
+	InputDataPointListApproach2 = DataPointListApproach2;
+	InputDataPointListApproach3 = DataPointListApproach3;
+	InputDataPointListApproach4 = DataPointListApproach4;
 }
 
 /*
@@ -103,6 +108,7 @@ void VehicleStatusPredictionDataCollector::readIntersectionInformationConfig()
 		approachId2 = jsonObject["ApproachId"][1].asInt();
 		approachId3 = jsonObject["ApproachId"][2].asInt();
 		approachId4 = jsonObject["ApproachId"][3].asInt();
+		totalNoOfCells = dataStructurewidth * dataStructureHeight;
 
 		// totalNoOfCells = (noOfCellsPerLeftTurnPocket * noOfLeftTurnPockets) + (noOfCellsPerThroughLane * noOfThroughLanes);
 
@@ -259,13 +265,12 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure(vector<int> 
 
 	else if (approachId == approachId4)
 		DataPointListApproach4 = dataPointList;
-	// DataPointList.insert(DataPointList.end(), dataPointList.begin(), dataPointList.end());
 }
 
 /*
 	- The following method can update phase status of all the cells based on the received phase status message
 */
-void VehicleStatusPredictionDataCollector::updatePhaseStatusInDataPointList(vector<DataPointStructure> dataPointList, string jsonString, int throughSignalGroup, int leftTurnSignalGroup)
+void VehicleStatusPredictionDataCollector::updatePhaseStatusInDataPointList(vector<DataPointStructure> dataPointList, string jsonString, int approachId, int throughSignalGroup, int leftTurnSignalGroup)
 {
 	vector<int> temporarySignalGroup{};
 	vector<int> temporarySignalGroupStates{};
@@ -320,14 +325,26 @@ void VehicleStatusPredictionDataCollector::updatePhaseStatusInDataPointList(vect
 			dataPointList[i].phaseStatus = temporarySignalGroupStates[throughSignalGroup - 1];
 		}
 	}
+
+	if (approachId == approachId1)
+		DataPointListApproach1 = dataPointList;
+	
+	else if (approachId == approachId2)
+		DataPointListApproach2 = dataPointList;
+
+	else if (approachId == approachId3)
+		DataPointListApproach3 = dataPointList;
+
+	else if (approachId == approachId4)
+		DataPointListApproach4 = dataPointList;
 }
 
 void VehicleStatusPredictionDataCollector::processSpatData(string jsonString)
 {
-	updatePhaseStatusInDataPointList(InputDataPointListApproach1, jsonString, approach1ThroughSignalGroup, approach1LeftTurnSignalGroup);
-	updatePhaseStatusInDataPointList(InputDataPointListApproach2, jsonString, approach2ThroughSignalGroup, approach2LeftTurnSignalGroup);
-	// updatePhaseStatusInDataPointList(InputDataPointListApproach3, jsonString, approach3ThroughSignalGroup, approach3LeftTurnSignalGroup);
-	// updatePhaseStatusInDataPointList(InputDataPointListApproach4, jsonString, approach4ThroughSignalGroup, approach4LeftTurnSignalGroup);
+	updatePhaseStatusInDataPointList(DataPointListApproach1, jsonString, approachId1, approach1ThroughSignalGroup, approach1LeftTurnSignalGroup);
+	updatePhaseStatusInDataPointList(DataPointListApproach2, jsonString, approachId2, approach2ThroughSignalGroup, approach2LeftTurnSignalGroup);
+	updatePhaseStatusInDataPointList(DataPointListApproach3, jsonString, approachId3, approach3ThroughSignalGroup, approach3LeftTurnSignalGroup);
+	updatePhaseStatusInDataPointList(DataPointListApproach4, jsonString, approachId4, approach4ThroughSignalGroup, approach4LeftTurnSignalGroup);
 }
 /*
 	- The following method can fill up the vehicle status information based on the receid vehicle status list
@@ -353,6 +370,11 @@ void VehicleStatusPredictionDataCollector::processVehicleStatusData(string jsonS
 
 	int noOfVehicles = jsonObject["NoOfVehicle"].asInt();
 	const Json::Value values = jsonObject["VehicleStatusList"];
+
+	InputDataPointListApproach1 = DataPointListApproach1;
+	InputDataPointListApproach2 = DataPointListApproach2;
+	InputDataPointListApproach3 = DataPointListApproach3;
+	InputDataPointListApproach4 = DataPointListApproach4;
 
 	if (noOfVehicles > 0)
 	{
@@ -382,43 +404,29 @@ void VehicleStatusPredictionDataCollector::processVehicleStatusData(string jsonS
 					temporaryConnectedVehicleStatus = values[i][values[i].getMemberNames()[j]].asBool();
 			}
 
-			
-				fillUpDataPointList(temporaryApproachId, temporaryVehicleId, temporaryVehicleType, temporarySpeed, temporaryDistanceToStopBar, temporaryLaneId, temporaryConnectedVehicleStatus);
+			if (temporaryApproachId == approachId1)
+				fillUpDataPointList(InputDataPointListApproach1, temporaryApproachId, temporaryVehicleId, temporaryVehicleType, temporarySpeed, temporaryDistanceToStopBar, temporaryLaneId, temporaryConnectedVehicleStatus);
 
-			// else if (temporaryApproachId == approachId2)
-			// 	fillUpDataPointList(InputDataPointListApproach2, temporaryVehicleId, temporaryVehicleType, temporarySpeed, temporaryDistanceToStopBar, temporaryLaneId, temporaryConnectedVehicleStatus);
+			else if (temporaryApproachId == approachId2)
+				fillUpDataPointList(InputDataPointListApproach2, temporaryApproachId, temporaryVehicleId, temporaryVehicleType, temporarySpeed, temporaryDistanceToStopBar, temporaryLaneId, temporaryConnectedVehicleStatus);
 
-			// else if (temporaryApproachId == approachId3)
-			// 	fillUpDataPointList(InputDataPointListApproach1, temporaryVehicleId, temporaryVehicleType, temporarySpeed, temporaryDistanceToStopBar, temporaryLaneId, temporaryConnectedVehicleStatus);
+			else if (temporaryApproachId == approachId3)
+				fillUpDataPointList(InputDataPointListApproach3, temporaryApproachId, temporaryVehicleId, temporaryVehicleType, temporarySpeed, temporaryDistanceToStopBar, temporaryLaneId, temporaryConnectedVehicleStatus);
 
-			// else if (temporaryApproachId == approachId4)
-			// 	fillUpDataPointList(InputDataPointListApproach4, temporaryVehicleId, temporaryVehicleType, temporarySpeed, temporaryDistanceToStopBar, temporaryLaneId, temporaryConnectedVehicleStatus);
+			else if (temporaryApproachId == approachId4)
+				fillUpDataPointList(InputDataPointListApproach4, temporaryApproachId, temporaryVehicleId, temporaryVehicleType, temporarySpeed, temporaryDistanceToStopBar, temporaryLaneId, temporaryConnectedVehicleStatus);
 		}
 	}
 
 	writeCsvFile(logFileApproach1, InputDataPointListApproach1);
 	writeCsvFile(logFileApproach2, InputDataPointListApproach2);
-	// writeCsvFile(logFileApproach3, InputDataPointListApproach3);
-	// writeCsvFile(logFileApproach4, InputDataPointListApproach4);
+	writeCsvFile(logFileApproach3, InputDataPointListApproach3);
+	writeCsvFile(logFileApproach4, InputDataPointListApproach4);
 }
 
-void VehicleStatusPredictionDataCollector::fillUpDataPointList(int approachId, int vehicleId, int vehicleType, double vehicleSpeed,
+void VehicleStatusPredictionDataCollector::fillUpDataPointList(vector<DataPointStructure> InputDataPointList, int approachId, int vehicleId, int vehicleType, double vehicleSpeed,
 															   double distanceToStopBar, int laneId, bool connectedVehicleStatus)
 {
-	vector<DataPointStructure> InputDataPointList{};
-
-	if (approachId == approachId1)
-		InputDataPointList = InputDataPointListApproach1;
-	
-	else if (approachId == approachId2)
-		InputDataPointList = InputDataPointListApproach2;
-
-	else if (approachId == approachId3)
-		InputDataPointList = InputDataPointListApproach3;
-
-	else if (approachId == approachId4)
-		InputDataPointList = InputDataPointListApproach4;
-
 	for (size_t k = 0; k < InputDataPointList.size(); k++)
 	{
 		if ((distanceToStopBar >= InputDataPointList[k].cellStartPonit) &&
@@ -428,12 +436,12 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(int approachId, i
 			InputDataPointList[k].connectedVehicleID = vehicleId;
 			InputDataPointList[k].vehicleType = vehicleType;
 			InputDataPointList[k].speed = vehicleSpeed;
-			// InputDataPointList[k].heading = temporaryHeading;
 			InputDataPointList[k].cellStatus = true;
 			InputDataPointList[k].outputSpeed = vehicleSpeed;
 
 			if (vehicleSpeed >= 0.0 && k > 0)
 				noOfConnectedVehicle++;
+			break;
 		}
 
 		else if ((distanceToStopBar >= InputDataPointList[k].cellStartPonit) &&
@@ -444,6 +452,7 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(int approachId, i
 			InputDataPointList[k].cellStatus = true;
 			InputDataPointList[k].outputSpeed = vehicleSpeed;
 			noOfNonConnectedVehicle++;
+			break;
 		}
 	}
 
@@ -558,6 +567,6 @@ VehicleStatusPredictionDataCollector::~VehicleStatusPredictionDataCollector()
 {
 	logFileApproach1.close();
 	logFileApproach2.close();
-	// logFileApproach3.close();
-	// logFileApproach4.close();
+	logFileApproach3.close();
+	logFileApproach4.close();
 }
