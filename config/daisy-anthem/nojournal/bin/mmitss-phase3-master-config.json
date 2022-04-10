@@ -12,7 +12,7 @@
 	"VehicleType": "Transit",
 	"Logging": true,
 	"ConsoleOutput": true,
-	"TimePhaseDiagram": false,
+	"TimePhaseDiagram": true,
 	"SRMTimedOutTime": 10.0,
 	"ScheduleExecutionBuffer": 1.0,
 	"SystemPerformanceTimeInterval": 300.0,
@@ -53,8 +53,7 @@
 		"MapEngine": 20024,
 		"LightSirenStatusManager": 20025,
 		"PeerToPeerPriority": 20026,
-        "TimePhaseDiagramTool": 20027,
-		"ArrivalDataManager": 20028
+        "TimePhaseDiagramTool": 20027
 	},
 	"psid": {
 		"map": "E0000017",
@@ -136,8 +135,6 @@
 		}
 	},
 	"PriorityParameter": {
-		"OptimizationMethod": "DP",
-	    "DPSolvingFrequency": 5.0,
 		"EmergencyVehicleWeight": 1.0,
 		"EmergencyVehicleSplitPhaseWeight": 0.1,
 		"TransitWeight": 1.0,
