@@ -1,0 +1,16 @@
+#-----------------------------------------------------------------------------#
+#    Dockerfile to build an x86 platform image for a field intersection       #
+#    Image name: mmitssuarizona/mmitss-mrp-x86                                #
+#-----------------------------------------------------------------------------#
+FROM mmitssuarizona/mmitss-x86-base:3.0
+MAINTAINER D Cunningham (donaldcunningham@email.arizona.edu)
+
+COPY build/bin/SnmpEngine/x86/M_SnmpEngine /mmitss
+COPY build/bin/MapSpatBroadcaster/x86/M_MapSpatBroadcaster /mmitss
+COPY build/bin/SystemInterface/x86/M_SystemInterface /mmitss
+COPY build/bin/DataCollector/x86/M_VehicleStatusPredictionDataCollector /mmitss
+COPY build/bin/VehicleStatusManager/x86/M_VehicleStatusManager /mmitss
+
+RUN mkdir -p /mmitss/data
+
+ENTRYPOINT ["/usr/bin/supervisord", "--configuration=/nojournal/bin/supervisord.conf"]

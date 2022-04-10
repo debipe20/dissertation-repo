@@ -1,10 +1,10 @@
 version: "3.8"
 
 x-var: &IMAGE_MRP_SIMULATION
-    mmitssuarizona/mmitss-mrp-$PROCESSOR:3.1
+    mmitssuarizona/debashis-dissertation-mrp-$PROCESSOR:1.0
 
 x-var: &IMAGE_SERVER_TOOLS
-    mmitssuarizona/mmitss-simulation_server-tools-$PROCESSOR:3.1
+    mmitssuarizona/debashis-dissertation-simulation_server-tools-$PROCESSOR:1.0
 
 services:
 
@@ -69,6 +69,19 @@ services:
         networks:    
             mmitss_vlan:
                 ipv4_address: 10.12.6.15
+        image: *IMAGE_MRP_SIMULATION
+        environment: 
+            - TZ=America/Phoenix
+            
+    daisy-anthem:
+        container_name: daisy-anthem
+        volumes:
+          - type: bind
+            source: $MMITSS_ROOT/dissertation-repo/config/daisy-anthem/nojournal
+            target: /nojournal
+        networks:    
+            mmitss_vlan:
+                ipv4_address: 10.12.6.18
         image: *IMAGE_MRP_SIMULATION
         environment: 
             - TZ=America/Phoenix

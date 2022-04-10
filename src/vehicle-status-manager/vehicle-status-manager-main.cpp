@@ -39,7 +39,7 @@ int main()
     BasicVehicle basicVehicle;
 
     //Socket Communication
-    UdpSocket vehicleStatusManagerSocket(static_cast<short unsigned int>(jsonObject["PortNumber"]["MessageDistributor"].asInt()), 1, 0);
+    UdpSocket vehicleStatusManagerSocket(static_cast<short unsigned int>(jsonObject["PortNumber"]["TrajectoryAware"].asInt()), 1, 0);
     const string HostIP = jsonObject["HostIp"].asString();
     const int dataCollectorPortNo = jsonObject["PortNumber"]["DataCollector"].asInt();
 

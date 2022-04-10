@@ -19,7 +19,7 @@ port = config["PortNumber"]["HostBsmDecoder"]
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.bind((hostIp,port))
 
-bsmProcessorPort = config["PortNumber"]["MessageDistributor"]
+bsmProcessorPort = config["PortNumber"]["TrajectoryAware"]
 communicationInfo = (hostIp, bsmProcessorPort)
 
 bsmSendingTime = 0.0
