@@ -54,9 +54,11 @@ int main()
         {
             string receivedJsonString(receiveBuffer);
             reader->parse(receivedJsonString.c_str(), receivedJsonString.c_str() + receivedJsonString.size(), &receivedJsonObject, &errors);
+            
 
             if (receivedJsonObject["MsgType"] == "BSM")
             {
+                // cout << "Received BSM " << receivedJsonString << endl;
                 basicVehicle.json2BasicVehicle(receivedJsonString);
                 vehicleStatusManager.manageVehicleStatusList(basicVehicle);
             }
@@ -64,6 +66,7 @@ int main()
             if (vehicleStatusManager.checkMsgSendingRequirement())
             {
                 vehicleStatusListJsonString = vehicleStatusManager.getVehicleStatusList();
+                cout << "\nSent Vehicle Status \n" << vehicleStatusListJsonString << endl;
                 vehicleStatusManagerSocket.sendData(HostIP, static_cast<short unsigned int>(dataCollectorPortNo), vehicleStatusListJsonString);
             }
 
