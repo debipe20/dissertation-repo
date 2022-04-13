@@ -276,8 +276,8 @@ def main():
     connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint = getTrajectoryPoint(
         dataFrame, startTime, approachLength, estimatedData)
 
-    connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint = getVehicleTrajectoryPoint(
-        dataFrame, startTime, endTime, laneId, approachLength, estimatedData)
+    # connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint = getVehicleTrajectoryPoint(
+    #     dataFrame, startTime, endTime, laneId, approachLength, estimatedData)
 
     greenRectangleStartPoint, greenRectangleTime, clearanceRectangleStartPoint, clearanceRectangleTime = getPhaseStatusPoint(
         dataFrame, startTime, laneId)
