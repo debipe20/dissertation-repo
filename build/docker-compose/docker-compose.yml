@@ -21,6 +21,19 @@ services:
         environment: 
             - TZ=America/Phoenix
 
+    daisy-dedication:
+        container_name: daisy-dedication
+        volumes:
+          - type: bind
+            source: $MMITSS_ROOT/dissertation-repo/config/daisy-dedication/nojournal
+            target: /nojournal
+        networks:    
+            mmitss_vlan:
+                ipv4_address: 10.12.6.6
+        image: *IMAGE_MRP_SIMULATION
+        environment: 
+            - TZ=America/Phoenix
+            
     simulation-server-tools:
         container_name: simulation-server-tools
         volumes:

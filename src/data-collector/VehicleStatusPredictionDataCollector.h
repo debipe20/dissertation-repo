@@ -57,6 +57,7 @@ enum msgType
 class VehicleStatusPredictionDataCollector
 {
 private:
+    int noOfApproach{};
     int approachId1{};
     int approachId2{};
     int approachId3{};
@@ -120,6 +121,7 @@ public:
     void processVehicleStatusData(string jsonString);
     void createLogFile(ofstream& logFile, int approachId);
     void writeCsvFile(ofstream& logFile, vector<DataPointStructure> InputDataPointList);
+    void createDataCollectionDirectory();
     // string getVehicleStatusListRequestMessage();
     // bool checkVehicleStatusListMessageSendingRequirement();
     // vector<int> generateRandomNumber(int noOfVehicle, int noOfInputVehicle);

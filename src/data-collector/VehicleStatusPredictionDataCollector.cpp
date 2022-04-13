@@ -22,6 +22,7 @@
 
 #include <iterator>
 #include <algorithm>
+#include <stdlib.h>
 #include "AsnJ2735Lib.h"
 #include "locAware.h"
 #include "geoUtils.h"
@@ -35,19 +36,33 @@ using namespace MsgEnum;
 VehicleStatusPredictionDataCollector::VehicleStatusPredictionDataCollector()
 {
 	readIntersectionInformationConfig();
+	createDataCollectionDirectory();
 	createDataPointStructure(approach1SignalGroup, approach1LaneId, approachId1);
 	createDataPointStructure(approach2SignalGroup, approach2LaneId, approachId2);
 	createDataPointStructure(approach3SignalGroup, approach3LaneId, approachId3);
-	createDataPointStructure(approach4SignalGroup, approach4LaneId, approachId4);
+	if(noOfApproach>3)
+		createDataPointStructure(approach4SignalGroup, approach4LaneId, approachId4);
+	
 	createLogFile(logFileApproach1, approachId1);
 	createLogFile(logFileApproach2, approachId2);
 	createLogFile(logFileApproach3, approachId3);
-	createLogFile(logFileApproach4, approachId4);
+	if(noOfApproach>3)
+		createLogFile(logFileApproach4, approachId4);
 
 	InputDataPointListApproach1 = DataPointListApproach1;
 	InputDataPointListApproach2 = DataPointListApproach2;
 	InputDataPointListApproach3 = DataPointListApproach3;
-	InputDataPointListApproach4 = DataPointListApproach4;
+	if(noOfApproach>3)
+		InputDataPointListApproach4 = DataPointListApproach4;
+}
+
+void VehicleStatusPredictionDataCollector::createDataCollectionDirectory()
+{
+	// system("cls");
+	// char* dirname = "/nojournal/bin/dissertation-data";
+	// system("clear");
+	// mkdir(dirname,0777);
+	 system("mkdir -p /nojournal/bin/dissertation-data");
 }
 
 /*
@@ -96,6 +111,7 @@ void VehicleStatusPredictionDataCollector::readIntersectionInformationConfig()
 		penetrationRate = jsonObject["CoonectedVehiclePenetrationRate"].asDouble();
 		dataStructurewidth = jsonObject["DataStructureWidth"].asInt();
 		dataStructureHeight = jsonObject["DataStructureHeight"].asInt();
+		noOfApproach = jsonObject["NoOfApproach"].asInt();
 		approach1ThroughSignalGroup = jsonObject["Approach1ThroughSignalGroup"].asInt();
 		approach1LeftTurnSignalGroup = jsonObject["Approach1LeftTurnSignalGroup"].asInt();
 		approach2ThroughSignalGroup = jsonObject["Approach2ThroughSignalGroup"].asInt();
@@ -147,7 +163,7 @@ void VehicleStatusPredictionDataCollector::createLogFile(ofstream &logFile, int 
 	string penetrationRateString = stream.str();
 	if (trainingData)
 	{
-		logFile.open("data/" + intersectionName + "-approach" + std::to_string(approachId) + "-vehicle-status-data-" + penetrationRateString + ".csv");
+		logFile.open("/nojournal/bin/dissertation-data/" + intersectionName + "-approach" + std::to_string(approachId) + "-vehicle-status-data-" + penetrationRateString + ".csv");
 
 		logFile << "TimeStamp"
 				<< ","
@@ -177,7 +193,7 @@ void VehicleStatusPredictionDataCollector::createLogFile(ofstream &logFile, int 
 
 	else
 	{
-		logFile.open("data/" + intersectionName + "-approach" + std::to_string(approachId) + "sample-vehicle-status-data-" + penetrationRateString + ".csv");
+		logFile.open("/nojournal/bin/dissertation-data/" + intersectionName + "-approach" + std::to_string(approachId) + "sample-vehicle-status-data-" + penetrationRateString + ".csv");
 
 		logFile << "TimeStamp"
 				<< ","
@@ -353,7 +369,8 @@ void VehicleStatusPredictionDataCollector::processSpatData(string jsonString)
 	updatePhaseStatusInDataPointList(DataPointListApproach1, jsonString, approachId1, approach1ThroughSignalGroup, approach1LeftTurnSignalGroup);
 	updatePhaseStatusInDataPointList(DataPointListApproach2, jsonString, approachId2, approach2ThroughSignalGroup, approach2LeftTurnSignalGroup);
 	updatePhaseStatusInDataPointList(DataPointListApproach3, jsonString, approachId3, approach3ThroughSignalGroup, approach3LeftTurnSignalGroup);
-	updatePhaseStatusInDataPointList(DataPointListApproach4, jsonString, approachId4, approach4ThroughSignalGroup, approach4LeftTurnSignalGroup);
+	if(noOfApproach>3)
+		updatePhaseStatusInDataPointList(DataPointListApproach4, jsonString, approachId4, approach4ThroughSignalGroup, approach4LeftTurnSignalGroup);
 }
 /*
 	- The following method can fill up the vehicle status information based on the receid vehicle status list
@@ -430,7 +447,8 @@ void VehicleStatusPredictionDataCollector::processVehicleStatusData(string jsonS
 	writeCsvFile(logFileApproach1, InputDataPointListApproach1);
 	writeCsvFile(logFileApproach2, InputDataPointListApproach2);
 	writeCsvFile(logFileApproach3, InputDataPointListApproach3);
-	writeCsvFile(logFileApproach4, InputDataPointListApproach4);
+	if(noOfApproach>3)
+		writeCsvFile(logFileApproach4, InputDataPointListApproach4);
 }
 
 void VehicleStatusPredictionDataCollector::fillUpDataPointList(vector<DataPointStructure> InputDataPointList, int approachId, int vehicleId, int vehicleType, double vehicleSpeed,

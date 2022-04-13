@@ -1,6 +1,6 @@
 {
     "IntersectionName" : "daisy-gavilan",
-    "TrainingData": true,
+    "TrainingData": false,
     "CoonectedVehiclePenetrationRate": 0.20,
     "DataStructureWidth": 5,
     "DataStructureHeight": 50,

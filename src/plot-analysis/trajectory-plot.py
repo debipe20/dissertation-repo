@@ -110,7 +110,7 @@ def getTrajectoryPoint(dataFrame, startTime, approachLength, estimatedData):
                 connectedVehicleDistancePoint.append(
                     approachLength - row['DistanceToStopBar'])
 
-            elif row['PredictedCellStatus'] > 0.15 and row['NonConnectedVehicleId'] > 0:
+            elif row['PredictedCellStatus'] > 0.095:
                 nonConnectedVehicleTimePoint.append(
                     row['TimeStamp'] - startTime)
                 nonConnectedVehicleDistancePoint.append(
@@ -282,8 +282,8 @@ def main():
     connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint = getTrajectoryPoint(
         dataFrame, startTime, approachLength, estimatedData)
 
-    connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint = getVehicleTrajectoryPoint(
-        dataFrame, startTime, endTime, laneId, approachLength, estimatedData)
+    # connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint = getVehicleTrajectoryPoint(
+    #     dataFrame, startTime, endTime, laneId, approachLength, estimatedData)
 
     greenRectangleStartPoint, greenRectangleTime, clearanceRectangleStartPoint, clearanceRectangleTime = getPhaseStatusPoint(
         dataFrame, startTime, laneId)
