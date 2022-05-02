@@ -1,7 +1,7 @@
 {
     "IntersectionName" : "daisy-gavilan",
-    "TrainingData": false,
-    "CoonectedVehiclePenetrationRate": 0.5,
+    "TrainingData": true,
+    "CoonectedVehiclePenetrationRate": 0.1,
     "FrequencyOfRequest": 0.5,    
     "ApproachId": 1,
     "ApproachSpeedLimit": 35.0,

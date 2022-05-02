@@ -8,14 +8,14 @@
 
     VehicleStatusPredictionDataCollector.h
     Created by: Debashis Das
-    University of Arizona   
+    University of Arizona
     College of Engineering
 
     This code was developed under the supervision of Professor Larry Head
     in the Systems and Industrial Engineering Department.
 
     Description:
-    
+
     1. This script is the header file for VehicleStatusPredictionDataCollector.cpp
 
 */
@@ -29,7 +29,6 @@
 #include "DataPointStructure.h"
 #include "BasicVehicle.h"
 #include <json/json.h>
-
 
 using std::cout;
 using std::endl;
@@ -62,14 +61,22 @@ private:
     int totalNoOfCells{};
     int noOfThroughLanes{};
     int throughLanesLength{};
+    int noOfCellsPerThroughLane{};
+    int throughLaneSignalGroup{};
+    int throughLanePhaseStatus{};
+
     int noOfLeftTurnPockets{};
     int leftTurnPocketsLength{};
-    int noOfCellsPerThroughLane{};
     int noOfCellsPerLeftTurnPocket{};
-    int throughLaneSignalGroup{};
     int leftTurnPocketSignalGroup{};
-    int throughLanePhaseStatus{};
     int leftTurnPocketPhaseStatus{};
+
+    int noOfRightTurnPockets{};
+    int rightTurnPocketsLength{};
+    int noOfCellsPerRightTurnPocket{};    
+    int rightTurnPocketSignalGroup{};    
+    int rightTurnPocketPhaseStatus{};
+
     int noOfConnectedVehicle{};
     int noOfNonConnectedVehicle{};
     double cellLength{};
@@ -83,8 +90,10 @@ private:
     vector<DataPointStructure> DataPointList{};
     vector<DataPointStructure> InputDataPointList{};
     vector<DataPointStructure> OutputDataPointList{};
-    vector<int>leftTurnPocketsId{};
-    vector<int>throughLanesId{};
+    
+    vector<int> throughLanesId{};
+    vector<int> leftTurnPocketsId{};
+    vector<int> rightTurnPocketsId{};
 
 public:
     VehicleStatusPredictionDataCollector();
@@ -95,10 +104,10 @@ public:
     void createDataPointStructure();
     void updatePhaseStatusInDataPointList(string jsonString);
     void fillUpDataPointList(string jsonString);
-    void fillUpFrontCellInformation();
+    // void fillUpFrontCellInformation();
     void createLogFile();
     void writeCsvFile();
     string getVehicleStatusListRequestMessage();
     bool checkVehicleStatusListMessageSendingRequirement();
-    vector <int> generateRandomNumber(int noOfVehicle, int noOfInputVehicle);
+    vector<int> generateRandomNumber(int noOfVehicle, int noOfInputVehicle);
 };
