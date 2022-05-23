@@ -1,20 +1,21 @@
 {
     "IntersectionName" : "daisy-gavilan",
-    "TrainingData": false,
-    "CoonectedVehiclePenetrationRate": 0.5,
+    "TrainingData": true,
+    "CoonectedVehiclePenetrationRate": 1.0,
     "FrequencyOfRequest": 0.5,    
-    "ApproachId": 1,
+    "ApproachId": 7,
     "ApproachSpeedLimit": 35.0,
-    "NoOfThroughLanes":3,
+    "NoOfThroughLanes":2,
     "ThroughLanesLength": 352,
-    "ThroughLanesId": [2,3,4],
-    "ThoughLanesSignalGroup": 6,
+    "ThroughLanesId": [23,24],
+    "ThoughLanesSignalGroup": 4,
     "NoOfLeftTurnPocket":1,
     "LeftTurnPocketLength": 352,
-    "LeftTurnPocketsId": [5],
-    "LeftTurnPocketsSignalGroup": 1,
-    "NoOfRightTurnPocket":1,
-    "RightTurnPocketLength": 352,
-    "RightTurnPocketsId": [1],
-    "RightTurnPocketsSignalGroup": 6
+    "LeftTurnPocketsId": [25],
+    "LeftTurnPocketsSignalGroup": 7,
+    "NoOfRightTurnPocket":0,
+    "RightTurnPocketLength": 0,
+    "RightTurnPocketsId": [],
+    "RightTurnPocketsSignalGroup": 0
 }
+
