@@ -1,8 +1,8 @@
 {
-    "FileName":"sample-vehicle-status-data-0.20.csv",
+    "FileName":"processed-results-gavilan-approach5-0.20.csv",
     "ApproachLength": 350,
-    "LaneId": 13,
+    "LaneId": 17,
     "EstimatedData": true,
-    "StartTimeOfDiagram": 1643057500,
-	"EndTimeOfDiagram": 1643057800
+    "StartTimeOfDiagram": 1650626400,
+	"EndTimeOfDiagram": 1650626700
 }

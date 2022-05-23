@@ -13,8 +13,8 @@ struct DataPointStructure
     // int approachId{};
     int locationOnMap{};
     int phaseStatus{};
-    bool frontCellStatus{};
-    double frontCellVehicleSpeed{};
+    // bool frontCellStatus{};
+    // double frontCellVehicleSpeed{};
     double phaseElapsedTime{};
     double phaseUpdateTime{};
     double speed{};
@@ -37,8 +37,8 @@ struct DataPointStructure
         // approachId = 0;
         locationOnMap = 0;
         phaseStatus = 0;
-        frontCellStatus = false;
-        frontCellVehicleSpeed = 0.0;
+        // frontCellStatus = false;
+        // frontCellVehicleSpeed = 0.0;
         phaseElapsedTime = 0.0;
         phaseUpdateTime = 0.0;
         speed = -1.0;

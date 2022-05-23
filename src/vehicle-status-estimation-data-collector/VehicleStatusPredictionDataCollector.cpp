@@ -2,21 +2,21 @@
 **********************************************************************************
 
  © 2019 Arizona Board of Regents on behalf of the University of Arizona with rights
-       granted for USDOT OSADP distribution with the Apache 2.0 open source license.
+	   granted for USDOT OSADP distribution with the Apache 2.0 open source license.
 
 **********************************************************************************
 
-    VehicleStatusPredictionDataCollector.cpp
-    Created by: Debashis Das
-    University of Arizona   
-    College of Engineering
+	VehicleStatusPredictionDataCollector.cpp
+	Created by: Debashis Das
+	University of Arizona
+	College of Engineering
 
-    This code was developed under the supervision of Professor Larry Head
-    in the Systems and Industrial Engineering Department.
+	This code was developed under the supervision of Professor Larry Head
+	in the Systems and Industrial Engineering Department.
 
-    Description:
-    
-    1. 
+	Description:
+
+	1.
 
 */
 
@@ -41,7 +41,7 @@ VehicleStatusPredictionDataCollector::VehicleStatusPredictionDataCollector()
 }
 
 /*
-	-Get the message type based on the received json string 
+	-Get the message type based on the received json string
 */
 int VehicleStatusPredictionDataCollector::getMessageType(string jsonString)
 {
@@ -85,21 +85,33 @@ void VehicleStatusPredictionDataCollector::readIntersectionInformationConfig()
 		msgSendingFrequency = jsonObject["FrequencyOfRequest"].asDouble();
 		penetrationRate = jsonObject["CoonectedVehiclePenetrationRate"].asDouble();
 		approachId = jsonObject["ApproachId"].asInt();
+
 		noOfThroughLanes = jsonObject["NoOfThroughLanes"].asInt();
 		throughLanesLength = jsonObject["ThroughLanesLength"].asInt();
+		noOfCellsPerThroughLane = static_cast<int>(throughLanesLength / cellLength);
+		throughLaneSignalGroup = jsonObject["ThoughLanesSignalGroup"].asInt();
+
 		noOfLeftTurnPockets = jsonObject["NoOfLeftTurnPocket"].asInt();
 		leftTurnPocketsLength = jsonObject["LeftTurnPocketLength"].asInt();
-		noOfCellsPerThroughLane = static_cast<int>(throughLanesLength / cellLength);
 		noOfCellsPerLeftTurnPocket = static_cast<int>(leftTurnPocketsLength / cellLength);
-		throughLaneSignalGroup = jsonObject["ThoughLanesSignalGroup"].asInt();
 		leftTurnPocketSignalGroup = jsonObject["LeftTurnPocketsSignalGroup"].asInt();
-		totalNoOfCells = (noOfCellsPerLeftTurnPocket * noOfLeftTurnPockets) + (noOfCellsPerThroughLane * noOfThroughLanes);
+
+		noOfRightTurnPockets = jsonObject["NoOfRightTurnPocket"].asInt();
+		rightTurnPocketsLength = jsonObject["RightTurnPocketLength"].asInt();
+		noOfCellsPerRightTurnPocket = static_cast<int>(rightTurnPocketsLength / cellLength);
+		rightTurnPocketSignalGroup = jsonObject["RightTurnPocketsSignalGroup"].asInt();
+
+		totalNoOfCells = (noOfCellsPerThroughLane * noOfThroughLanes) + (noOfCellsPerLeftTurnPocket * noOfLeftTurnPockets) +
+						 (noOfCellsPerRightTurnPocket * noOfRightTurnPockets);
 
 		for (int i = 0; i < noOfThroughLanes; i++)
 			throughLanesId.push_back(jsonObject["ThroughLanesId"][i].asInt());
 
 		for (int i = 0; i < noOfLeftTurnPockets; i++)
 			leftTurnPocketsId.push_back(jsonObject["LeftTurnPocketsId"][i].asInt());
+
+		for (int i = 0; i < noOfRightTurnPockets; i++)
+			rightTurnPocketsId.push_back(jsonObject["RightTurnPocketsId"][i].asInt());
 	}
 }
 
@@ -193,18 +205,18 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure()
 	DataPointStructure dataPointStructure;
 	dataPointStructure.reset();
 
-	for (int i = 0; i < noOfLeftTurnPockets; i++)
+	for (int i = 0; i < noOfRightTurnPockets; i++)
 	{
 		cellStartPoint = 0.0;
 		cellNumber = 0;
 
-		for (int j = 0; j < noOfCellsPerLeftTurnPocket; j++)
+		for (int j = 0; j < noOfCellsPerRightTurnPocket; j++)
 		{
 			dataPointStructure.cellNo = cellNumber++;
 			dataPointStructure.connectedVehicleID = 0;
 			dataPointStructure.nonConnectedVehicleID = 0;
-			dataPointStructure.signalGroup = leftTurnPocketSignalGroup;
-			dataPointStructure.laneId = leftTurnPocketsId.at(i);
+			dataPointStructure.signalGroup = rightTurnPocketSignalGroup;
+			dataPointStructure.laneId = rightTurnPocketsId.at(i);
 			// dataPointStructure.approachId = approachId;
 			dataPointStructure.locationOnMap = static_cast<int>(MsgEnum::mapLocType::onInbound);
 			dataPointStructure.cellStartPonit = cellStartPoint;
@@ -212,8 +224,8 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure()
 			dataPointStructure.distanceToStopBar = cellStartPoint + (cellLength / 2);
 			dataPointStructure.speed = -1.0;
 			dataPointStructure.cellStatus = false;
-			dataPointStructure.frontCellStatus = false;
-			dataPointStructure.frontCellVehicleSpeed = -1.0;
+			// dataPointStructure.frontCellStatus = false;
+			// dataPointStructure.frontCellVehicleSpeed = -1.0;
 			dataPointStructure.outputSpeed = -1.0;
 
 			DataPointList.push_back(dataPointStructure);
@@ -240,8 +252,36 @@ void VehicleStatusPredictionDataCollector::createDataPointStructure()
 			dataPointStructure.distanceToStopBar = cellStartPoint + (cellLength / 2);
 			dataPointStructure.speed = -1.0;
 			dataPointStructure.cellStatus = false;
-			dataPointStructure.frontCellStatus = false;
-			dataPointStructure.frontCellVehicleSpeed = -1.0;
+			// dataPointStructure.frontCellStatus = false;
+			// dataPointStructure.frontCellVehicleSpeed = -1.0;
+			dataPointStructure.outputSpeed = -1.0;
+
+			DataPointList.push_back(dataPointStructure);
+			cellStartPoint = cellStartPoint + cellLength;
+		}
+	}
+
+	for (int i = 0; i < noOfLeftTurnPockets; i++)
+	{
+		cellStartPoint = 0.0;
+		cellNumber = 0;
+
+		for (int j = 0; j < noOfCellsPerLeftTurnPocket; j++)
+		{
+			dataPointStructure.cellNo = cellNumber++;
+			dataPointStructure.connectedVehicleID = 0;
+			dataPointStructure.nonConnectedVehicleID = 0;
+			dataPointStructure.signalGroup = leftTurnPocketSignalGroup;
+			dataPointStructure.laneId = leftTurnPocketsId.at(i);
+			// dataPointStructure.approachId = approachId;
+			dataPointStructure.locationOnMap = static_cast<int>(MsgEnum::mapLocType::onInbound);
+			dataPointStructure.cellStartPonit = cellStartPoint;
+			dataPointStructure.cellEndPont = cellStartPoint + cellLength;
+			dataPointStructure.distanceToStopBar = cellStartPoint + (cellLength / 2);
+			dataPointStructure.speed = -1.0;
+			dataPointStructure.cellStatus = false;
+			// dataPointStructure.frontCellStatus = false;
+			// dataPointStructure.frontCellVehicleSpeed = -1.0;
 			dataPointStructure.outputSpeed = -1.0;
 
 			DataPointList.push_back(dataPointStructure);
@@ -267,19 +307,19 @@ void VehicleStatusPredictionDataCollector::updatePhaseStatusInDataPointList(stri
 	{
 		temporarySignalGroup = i + 1;
 
-		if (temporarySignalGroup == leftTurnPocketSignalGroup)
+		if (temporarySignalGroup == rightTurnPocketSignalGroup)
 		{
 			if (jsonObject["States"][i].asString() == "green")
-				leftTurnPocketPhaseStatus = green;
+				rightTurnPocketPhaseStatus = green;
 
 			else if (jsonObject["States"][i].asString() == "yellow")
-				leftTurnPocketPhaseStatus = yellow;
+				rightTurnPocketPhaseStatus = yellow;
 
 			else if (jsonObject["States"][i].asString() == "permissive_yellow")
-				leftTurnPocketPhaseStatus = permissive_yellow;
+				rightTurnPocketPhaseStatus = permissive_yellow;
 
 			else if (jsonObject["States"][i].asString() == "red")
-				leftTurnPocketPhaseStatus = red;
+				rightTurnPocketPhaseStatus = red;
 		}
 
 		else if (temporarySignalGroup == throughLaneSignalGroup)
@@ -296,18 +336,33 @@ void VehicleStatusPredictionDataCollector::updatePhaseStatusInDataPointList(stri
 			else if (jsonObject["States"][i].asString() == "red")
 				throughLanePhaseStatus = red;
 		}
+
+		else if (temporarySignalGroup == leftTurnPocketSignalGroup)
+		{
+			if (jsonObject["States"][i].asString() == "green")
+				leftTurnPocketPhaseStatus = green;
+
+			else if (jsonObject["States"][i].asString() == "yellow")
+				leftTurnPocketPhaseStatus = yellow;
+
+			else if (jsonObject["States"][i].asString() == "permissive_yellow")
+				leftTurnPocketPhaseStatus = permissive_yellow;
+
+			else if (jsonObject["States"][i].asString() == "red")
+				leftTurnPocketPhaseStatus = red;
+		}
 	}
 
 	for (size_t i = 0; i < DataPointList.size(); i++)
 	{
-		if ((DataPointList[i].signalGroup == leftTurnPocketSignalGroup) && (DataPointList[i].phaseStatus == leftTurnPocketPhaseStatus))
+		if ((DataPointList[i].signalGroup == rightTurnPocketSignalGroup) && (DataPointList[i].phaseStatus == rightTurnPocketPhaseStatus))
 			DataPointList[i].phaseElapsedTime = getPosixTimestamp() - DataPointList[i].phaseUpdateTime;
 
-		else if ((DataPointList[i].signalGroup == leftTurnPocketSignalGroup) && (DataPointList[i].phaseStatus != leftTurnPocketPhaseStatus))
+		else if ((DataPointList[i].signalGroup == rightTurnPocketSignalGroup) && (DataPointList[i].phaseStatus != rightTurnPocketPhaseStatus))
 		{
 			DataPointList[i].phaseElapsedTime = 0.0;
 			DataPointList[i].phaseUpdateTime = getPosixTimestamp();
-			DataPointList[i].phaseStatus = leftTurnPocketPhaseStatus;
+			DataPointList[i].phaseStatus = rightTurnPocketPhaseStatus;
 		}
 
 		else if ((DataPointList[i].signalGroup == throughLaneSignalGroup) && (DataPointList[i].phaseStatus == throughLanePhaseStatus))
@@ -318,6 +373,16 @@ void VehicleStatusPredictionDataCollector::updatePhaseStatusInDataPointList(stri
 			DataPointList[i].phaseElapsedTime = 0.0;
 			DataPointList[i].phaseUpdateTime = getPosixTimestamp();
 			DataPointList[i].phaseStatus = throughLanePhaseStatus;
+		}
+
+		else if ((DataPointList[i].signalGroup == leftTurnPocketSignalGroup) && (DataPointList[i].phaseStatus == leftTurnPocketPhaseStatus))
+			DataPointList[i].phaseElapsedTime = getPosixTimestamp() - DataPointList[i].phaseUpdateTime;
+
+		else if ((DataPointList[i].signalGroup == leftTurnPocketSignalGroup) && (DataPointList[i].phaseStatus != leftTurnPocketPhaseStatus))
+		{
+			DataPointList[i].phaseElapsedTime = 0.0;
+			DataPointList[i].phaseUpdateTime = getPosixTimestamp();
+			DataPointList[i].phaseStatus = leftTurnPocketPhaseStatus;
 		}
 	}
 }
@@ -418,17 +483,17 @@ void VehicleStatusPredictionDataCollector::fillUpDataPointList(string jsonString
 	writeCsvFile();
 }
 
-void VehicleStatusPredictionDataCollector::fillUpFrontCellInformation()
-{
-	for (size_t k = 1; k < InputDataPointList.size(); k++)
-	{
-		if (InputDataPointList[k - 1].speed >= 0.0)
-		{
-			InputDataPointList[k].frontCellStatus = true;
-			InputDataPointList[k].frontCellVehicleSpeed = InputDataPointList[k - 1].speed;
-		}
-	}
-}
+// void VehicleStatusPredictionDataCollector::fillUpFrontCellInformation()
+// {
+// 	for (size_t k = 1; k < InputDataPointList.size(); k++)
+// 	{
+// 		if (InputDataPointList[k - 1].speed >= 0.0)
+// 		{
+// 			InputDataPointList[k].frontCellStatus = true;
+// 			InputDataPointList[k].frontCellVehicleSpeed = InputDataPointList[k - 1].speed;
+// 		}
+// 	}
+// }
 
 vector<int> VehicleStatusPredictionDataCollector::generateRandomNumber(int noOfVehicle, int noOfInputVehicle)
 {

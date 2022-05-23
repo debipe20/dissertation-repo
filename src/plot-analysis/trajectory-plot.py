@@ -39,10 +39,11 @@ def timeSpaceDiagram(connectedVehicleTimePoint, nonConnectedVehicleTimePoint, co
 
     if len(nonConnectedVehicleTimePoint) > 0:
         ax1.scatter(nonConnectedVehicleTimePoint, nonConnectedVehicleDistancePoint, c="gray",  linewidths=4,
-                    marker=".",  edgecolor="none",  s=20, label='Non-Connected Vehicles Trajectory', zorder=2)
+                    marker="o",  edgecolor="none",  s=10, label='Non-Connected Vehicles Trajectory', zorder=2)
 
     ax1.legend(loc='upper right', prop={"size": 14})
-    ax1.set_title("Time-Space-Trajectory Diagram [" + str(startTime) + ", " + str(endTime) + "]", fontsize=20, fontweight='bold')
+    ax1.set_title("Time-Space-Trajectory Diagram [" + str(
+        startTime) + ", " + str(endTime) + "]", fontsize=20, fontweight='bold')
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
     plt.grid(color='black', linestyle='-', linewidth=0.5)
     plt.show()
@@ -60,7 +61,6 @@ def getPhaseStatusPoint(dataFrame, startTime, laneId):
     dataFrame = dataFrame.reset_index(drop=True)
     dataFrame["PhaseStatus"].replace({2: 4, 3: 4}, inplace=True)
     currentPhaseStatus = dataFrame['PhaseStatus'][0]
-
 
     if currentPhaseStatus == 1:
         greenRectangleStartPoint.append(0.0)
@@ -95,8 +95,10 @@ def getPhaseStatusPoint(dataFrame, startTime, laneId):
 
     return greenRectangleStartPoint, greenRectangleTime, clearanceRectangleStartPoint, clearanceRectangleTime
 
-#Method 1
-def getTrajectoryPoint(dataFrame, startTime, approachLength, estimatedData):
+# Method 1
+
+
+def getTrajectoryPoint(dataFrame, startTime, endTime, approachLength, estimatedData):
     connectedVehicleTimePoint = []
     nonConnectedVehicleTimePoint = []
     connectedVehicleDistancePoint = []
@@ -105,25 +107,50 @@ def getTrajectoryPoint(dataFrame, startTime, approachLength, estimatedData):
     for idx, row in dataFrame.loc[:].iterrows():
         # For Estimated Data
         if bool(estimatedData):
-            if row['CellStatus'] == 1 and row['ConnectedVehicleId'] > 0:
+            if row['CellStatus'] == 1 and row['ConnectedVehicleId'] > 0 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
                 connectedVehicleTimePoint.append(row['TimeStamp'] - startTime)
                 connectedVehicleDistancePoint.append(
                     approachLength - row['DistanceToStopBar'])
 
-            elif row['CellStatus'] == 1 and row['PredictedCellStatus'] > 0.05 and row['NonConnectedVehicleId'] > 0:
-                nonConnectedVehicleTimePoint.append(
-                    row['TimeStamp'] - startTime)
-                nonConnectedVehicleDistancePoint.append(
-                    approachLength - row['DistanceToStopBar'])
+            # elif row['CellStatus'] == 1 and row['PredictedCellStatus'] > 0.05 and row['NonConnectedVehicleId'] > 0:
+            #     nonConnectedVehicleTimePoint.append(
+            #         row['TimeStamp'] - startTime)
+            #     nonConnectedVehicleDistancePoint.append(
+            #         approachLength - row['DistanceToStopBar'])
+            # elif row['CellStatus'] == 1 and row['PredictedCellStatus'] < 0.15 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
+            #     print(row['TimeStamp'], ' ', row['DistanceToStopBar'], ' ', row['PredictedCellStatus'])
+
+            if row['ConnectedVehicleId'] == 0 and row['DistanceToStopBar'] < 10.0 and row['PredictedCellStatus'] > 0.5 and \
+                    row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
+                nonConnectedVehicleTimePoint.append(row['TimeStamp'] - startTime)
+                nonConnectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
+
+            if row['ConnectedVehicleId'] == 0 and row['DistanceToStopBar'] >= 10.0 and row['DistanceToStopBar'] < 40.0 and \
+                    row['PredictedCellStatus'] > 0.3 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
+                nonConnectedVehicleTimePoint.append(row['TimeStamp'] - startTime)
+                nonConnectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
+
+            if row['ConnectedVehicleId'] == 0 and row['DistanceToStopBar'] >= 40.0 and row['DistanceToStopBar'] < 50.0 and \
+                    row['PredictedCellStatus'] > 0.07 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
+                nonConnectedVehicleTimePoint.append(row['TimeStamp'] - startTime)
+                nonConnectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
+
+            if row['ConnectedVehicleId'] == 0 and row['DistanceToStopBar'] >= 50.0 and row['PredictedCellStatus'] > 0.039 and \
+                    row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
+                nonConnectedVehicleTimePoint.append(row['TimeStamp'] - startTime)
+                nonConnectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
+                # if row['DistanceToStopBar'] > 100:
+                #     print(row['DistanceToStopBar'])
 
         # For Sample Data
         else:
-            if row['CellStatus'] == 1 and row['ConnectedVehicleId'] > 0:
+            if row['CellStatus'] == 1 and row['ConnectedVehicleId'] > 0 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
                 connectedVehicleTimePoint.append(row['TimeStamp'] - startTime)
                 connectedVehicleDistancePoint.append(
                     approachLength - row['DistanceToStopBar'])
+                # print(row['TimeStamp'])
 
-            elif row['CellStatus'] == 1 and row['NonConnectedVehicleId'] > 0:
+            elif row['CellStatus'] == 1 and row['NonConnectedVehicleId'] > 0 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
                 nonConnectedVehicleTimePoint.append(
                     row['TimeStamp'] - startTime)
                 nonConnectedVehicleDistancePoint.append(
@@ -131,7 +158,9 @@ def getTrajectoryPoint(dataFrame, startTime, approachLength, estimatedData):
 
     return connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint
 
-#Method 2
+# Method 2
+
+
 def getVehicleTrajectoryPoint(dataFrame, startTime, endTime, laneId, approachLength, estimatedData):
 
     connectedVehicleTimePoint = []
@@ -141,10 +170,10 @@ def getVehicleTrajectoryPoint(dataFrame, startTime, endTime, laneId, approachLen
 
     uniqueConnectedVehicleId = findUniqueConnectedVehicleIdInDataFrame(
         dataFrame, startTime, endTime, laneId)
-    
+
     print("Connected Vehicles Id: ", uniqueConnectedVehicleId)
     print("No of Connected Vehicles: ", len(uniqueConnectedVehicleId))
-    
+
     uniqueNonConnectedVehicleId = findUniqueNonConnectedVehicleIdInDataFrame(
         dataFrame, startTime, endTime, laneId)
 
@@ -264,20 +293,23 @@ def main():
     approachLength = config["ApproachLength"]
     estimatedData = config["EstimatedData"]
 
-    startTime = dataFrame['TimeStamp'][0]
-    endTime = dataFrame['TimeStamp'].iloc[-1]
-    
+    # startTime = dataFrame['TimeStamp'][0]
+    # endTime = dataFrame['TimeStamp'].iloc[-1]
+
     startTime = config["StartTimeOfDiagram"]
     endTime = config["EndTimeOfDiagram"]
 
     timeLength = endTime - startTime
     print("Start Time is:", startTime)
 
-    connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint = getTrajectoryPoint(
-        dataFrame, startTime, approachLength, estimatedData)
+    dataFrame = dataFrame.loc[dataFrame["LaneId"] == laneId]
+    print(dataFrame.head(5))
 
-    connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint = getVehicleTrajectoryPoint(
-        dataFrame, startTime, endTime, laneId, approachLength, estimatedData)
+    connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint = getTrajectoryPoint(
+        dataFrame, startTime, endTime, approachLength, estimatedData)
+
+    # connectedVehicleTimePoint, nonConnectedVehicleTimePoint, connectedVehicleDistancePoint, nonConnectedVehicleDistancePoint = getVehicleTrajectoryPoint(
+    #     dataFrame, startTime, endTime, laneId, approachLength, estimatedData)
 
     greenRectangleStartPoint, greenRectangleTime, clearanceRectangleStartPoint, clearanceRectangleTime = getPhaseStatusPoint(
         dataFrame, startTime, laneId)
