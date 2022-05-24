@@ -163,8 +163,8 @@ public:
     void processVehicleStatusData(string jsonString);
     void fillUpDataPointList(vector<DataPointStructure> InputDataPointList, int approachId, int vehicleId, int vehicleType, double vehicleSpeed,
 															   double distanceToStopBar, int laneId, bool connectedVehicleStatus);
-    void createLogFile(ofstream &logFile);
-    void writeCsvFile(ofstream &logFile, vector<DataPointStructure> InputDataPointList);
+    void createLogFile(ofstream &logFile, int approachId);
+    void writeCsvFile(ofstream &logFile, vector<DataPointStructure> InputDataPointList, int noOfCell);
     // string getVehicleStatusListRequestMessage();
     bool checkVehicleStatusListMessageSendingRequirement();
     vector<int> generateRandomNumber(int noOfVehicle, int noOfInputVehicle);

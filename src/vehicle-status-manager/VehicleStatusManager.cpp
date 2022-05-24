@@ -160,7 +160,7 @@ void VehicleStatusManager::getVehicleInformationFromMAP(BasicVehicle basicVehicl
 
 		findVehicleIdInVehicleStatusList->vehicleDistanceFromStopBar = vehicleDistanceFromStopBar;
 		findVehicleIdInVehicleStatusList->vehicleLaneId = vehicleLaneId;
-		// findVehicleIdInVehicleStatusList->vehicleApproachId = vehicleApproachId;
+		findVehicleIdInVehicleStatusList->vehicleApproachId = vehicleApproachId;
 		// findVehicleIdInVehicleStatusList->vehicleSignalGroup = vehicleSignalGroup;
 		findVehicleIdInVehicleStatusList->vehicleLocationOnMap = unsigned(vehicleTracking_t_1.intsectionTrackingState.vehicleIntersectionStatus);
 		findVehicleIdInVehicleStatusList->updateTime = getPosixTimestamp();

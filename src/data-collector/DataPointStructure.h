@@ -5,8 +5,8 @@
 struct DataPointStructure
 {
     int cellNo{};
-    int connectedVehicleID{};
-    int nonConnectedVehicleID{};
+    int connectedVehicleId{};
+    int nonconnectedVehicleId{};
     int vehicleType{};
     int signalGroup{};
     int laneId{};
@@ -29,8 +29,8 @@ struct DataPointStructure
     void reset()
     {
         cellNo = 0;
-        connectedVehicleID = 0;
-        nonConnectedVehicleID = 0; 
+        connectedVehicleId = 0;
+        nonconnectedVehicleId = 0; 
         vehicleType = 0;
         signalGroup = 0;
         laneId = 0;

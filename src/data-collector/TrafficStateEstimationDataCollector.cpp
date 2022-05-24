@@ -44,11 +44,11 @@ TrafficStateEstimationDataCollector::TrafficStateEstimationDataCollector()
 	if (noOfApproach > 3)
 		createDataPointStructure(approach4SignalGroup, approach4LaneId, approachId4, approach4NoOfLanes);
 
-	createLogFile(logFileApproach1);
-	createLogFile(logFileApproach2);
-	createLogFile(logFileApproach3);
+	createLogFile(logFileApproach1, approachId1);
+	createLogFile(logFileApproach2, approachId2);
+	createLogFile(logFileApproach3, approachId3);
 	if (noOfApproach > 3)
-		createLogFile(logFileApproach4);
+		createLogFile(logFileApproach4, approachId4);
 
 	InputDataPointListApproach1 = DataPointListApproach1;
 	InputDataPointListApproach2 = DataPointListApproach2;
@@ -161,14 +161,14 @@ void TrafficStateEstimationDataCollector::readIntersectionInformationConfig()
 	}
 }
 
-void TrafficStateEstimationDataCollector::createLogFile(ofstream &logFile)
+void TrafficStateEstimationDataCollector::createLogFile(ofstream &logFile, int approachId)
 {
 	stringstream stream;
 	stream << fixed << setprecision(2) << penetrationRate;
 	string penetrationRateString = stream.str();
 	if (trainingData)
 	{
-		logFile.open("data/vehicle-status-data-" + penetrationRateString + ".csv");
+		logFile.open("/nojournal/bin/dissertation-data/" + intersectionName + "-approach" + std::to_string(approachId) + "-vehicle-status-data-" + penetrationRateString + ".csv");
 
 		logFile << "TimeStamp"
 				<< ","
@@ -202,7 +202,7 @@ void TrafficStateEstimationDataCollector::createLogFile(ofstream &logFile)
 
 	else
 	{
-		logFile.open("data/sample-vehicle-status-data-" + penetrationRateString + ".csv");
+		logFile.open("/nojournal/bin/dissertation-data/" + intersectionName + "-approach" + std::to_string(approachId) + "sample-vehicle-status-data-" + penetrationRateString + ".csv");
 
 		logFile << "TimeStamp"
 				<< ","
@@ -264,8 +264,8 @@ void TrafficStateEstimationDataCollector::createDataPointStructure(vector<int> s
 		for (int j = 0; j < noOfCellsPerLane; j++)
 		{
 			dataPointStructure.cellNo = cellNumber++;
-			dataPointStructure.connectedVehicleID = 0;
-			dataPointStructure.nonConnectedVehicleID = 0;
+			dataPointStructure.connectedVehicleId = 0;
+			dataPointStructure.nonconnectedVehicleId = 0;
 			dataPointStructure.signalGroup = signalGroup[i];
 			dataPointStructure.laneId = laneId[i];
 			dataPointStructure.approachId = approachId;
@@ -475,11 +475,11 @@ void TrafficStateEstimationDataCollector::processVehicleStatusData(string jsonSt
 		}
 	}
 
-	writeCsvFile(logFileApproach1, InputDataPointListApproach1);
-	writeCsvFile(logFileApproach2, InputDataPointListApproach2);
-	writeCsvFile(logFileApproach3, InputDataPointListApproach3);
+	writeCsvFile(logFileApproach1, InputDataPointListApproach1, approach1TotalNoOfCells);
+	writeCsvFile(logFileApproach2, InputDataPointListApproach2, approach2TotalNoOfCells);
+	writeCsvFile(logFileApproach3, InputDataPointListApproach3, approach3TotalNoOfCells);
 	if (noOfApproach > 3)
-		writeCsvFile(logFileApproach4, InputDataPointListApproach4);
+		writeCsvFile(logFileApproach4, InputDataPointListApproach4, approach4TotalNoOfCells);
 }
 
 void TrafficStateEstimationDataCollector::fillUpDataPointList(vector<DataPointStructure> InputDataPointList, int approachId, int vehicleId, int vehicleType, double vehicleSpeed,
@@ -491,7 +491,7 @@ void TrafficStateEstimationDataCollector::fillUpDataPointList(vector<DataPointSt
 			(distanceToStopBar <= InputDataPointList[k].cellEndPont) && (laneId == InputDataPointList[k].laneId) &&
 			(connectedVehicleStatus))
 		{
-			InputDataPointList[k].connectedVehicleID = vehicleId;
+			InputDataPointList[k].connectedVehicleId = vehicleId;
 			InputDataPointList[k].vehicleType = vehicleType;
 			InputDataPointList[k].speed = vehicleSpeed;
 			InputDataPointList[k].cellStatus = true;
@@ -506,7 +506,7 @@ void TrafficStateEstimationDataCollector::fillUpDataPointList(vector<DataPointSt
 				 (distanceToStopBar <= InputDataPointList[k].cellEndPont) && (laneId == InputDataPointList[k].laneId) &&
 				 (!connectedVehicleStatus))
 		{
-			InputDataPointList[k].nonConnectedVehicleID = vehicleId;
+			InputDataPointList[k].nonconnectedVehicleId = vehicleId;
 			InputDataPointList[k].cellStatus = true;
 			InputDataPointList[k].outputSpeed = vehicleSpeed;
 			noOfNonConnectedVehicle++;
@@ -552,7 +552,7 @@ vector<int> TrafficStateEstimationDataCollector::generateRandomNumber(int noOfVe
 	return randomIndex;
 }
 
-void TrafficStateEstimationDataCollector::writeCsvFile(ofstream &logFile, vector<DataPointStructure> InputDataPointList)
+void TrafficStateEstimationDataCollector::writeCsvFile(ofstream &logFile, vector<DataPointStructure> InputDataPointList, int noOfCell)
 {
 	double timeStamp = getPosixTimestamp();
 
@@ -560,7 +560,7 @@ void TrafficStateEstimationDataCollector::writeCsvFile(ofstream &logFile, vector
 	{
 		for (size_t i = 0; i < InputDataPointList.size(); i++)
 		{
-			logFile << fixed << showpoint << setprecision(4) << timeStamp << "," << totalNoOfCells << ",";
+			logFile << fixed << showpoint << setprecision(4) << timeStamp << "," << noOfCell << ",";
 			logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].vehicleType << ","
 					<< InputDataPointList[i].signalGroup << "," << InputDataPointList[i].phaseStatus << ","
 					<< InputDataPointList[i].phaseElapsedTime << "," << InputDataPointList[i].speed << ","
@@ -574,10 +574,10 @@ void TrafficStateEstimationDataCollector::writeCsvFile(ofstream &logFile, vector
 	{
 		for (size_t i = 0; i < InputDataPointList.size(); i++)
 		{
-			logFile << fixed << showpoint << setprecision(4) << timeStamp << "," << totalNoOfCells << ",";
+			logFile << fixed << showpoint << setprecision(4) << timeStamp << "," << noOfCell << ",";
 			logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].cellNo << ",";
 			logFile << fixed << showpoint << setprecision(2) << noOfConnectedVehicle << "," << noOfNonConnectedVehicle << ",";
-			logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].connectedVehicleID << "," << InputDataPointList[i].nonConnectedVehicleID << ","
+			logFile << fixed << showpoint << setprecision(2) << InputDataPointList[i].connectedVehicleId << "," << InputDataPointList[i].nonconnectedVehicleId << ","
 					<< InputDataPointList[i].vehicleType << "," << InputDataPointList[i].signalGroup << "," << InputDataPointList[i].phaseStatus << ","
 					<< InputDataPointList[i].phaseElapsedTime << "," << InputDataPointList[i].speed << ","
 					<< InputDataPointList[i].distanceToStopBar << "," << InputDataPointList[i].approachId << ","
