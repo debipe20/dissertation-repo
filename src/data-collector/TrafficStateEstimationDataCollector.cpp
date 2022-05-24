@@ -44,17 +44,11 @@ TrafficStateEstimationDataCollector::TrafficStateEstimationDataCollector()
 	if (noOfApproach > 3)
 		createDataPointStructure(approach4SignalGroup, approach4LaneId, approachId4, approach4NoOfLanes);
 
-	createLogFile(logFileApproach1, approachId1);
-	createLogFile(logFileApproach2, approachId2);
-	createLogFile(logFileApproach3, approachId3);
+	createLogFile(logFileApproach1);
+	createLogFile(logFileApproach2);
+	createLogFile(logFileApproach3);
 	if (noOfApproach > 3)
-		createLogFile(logFileApproach4, approachId4);
-
-	createLogFile(logFileApproach1, approachId1);
-	createLogFile(logFileApproach2, approachId2);
-	createLogFile(logFileApproach3, approachId3);
-	if (noOfApproach > 3)
-		createLogFile(logFileApproach4, approachId4);
+		createLogFile(logFileApproach4);
 
 	InputDataPointListApproach1 = DataPointListApproach1;
 	InputDataPointListApproach2 = DataPointListApproach2;
@@ -93,7 +87,6 @@ int TrafficStateEstimationDataCollector::getMessageType(string jsonString)
 
 void TrafficStateEstimationDataCollector::readIntersectionInformationConfig()
 {
-	
 
 	Json::Value jsonObject;
 	Json::CharReaderBuilder builder;
@@ -168,7 +161,7 @@ void TrafficStateEstimationDataCollector::readIntersectionInformationConfig()
 	}
 }
 
-void TrafficStateEstimationDataCollector::createLogFile(ofstream &logFile, int approachId)
+void TrafficStateEstimationDataCollector::createLogFile(ofstream &logFile)
 {
 	stringstream stream;
 	stream << fixed << setprecision(2) << penetrationRate;
@@ -307,10 +300,12 @@ void TrafficStateEstimationDataCollector::createDataPointStructure(vector<int> s
 */
 void TrafficStateEstimationDataCollector::updatePhaseStatusInDataPointList(string jsonString)
 {
-	// vector<int> temporarySignalGroup{};
-	// vector<int> temporarySignalGroupStates{};
-	int temporarySignalGroup{};
-	int temporarySignalGroupStates{};
+	vector<int> temporarySignalGroup{};
+	vector<int> temporarySignalGroupStates{};
+	int dataPointSignalGroup{};
+	// int temporarySignalGroup{};
+	// int temporarySignalGroupStates{};
+	double currentTime = getPosixTimestamp();
 	Json::Value jsonObject;
 	Json::CharReaderBuilder builder;
 	Json::CharReader *reader = builder.newCharReader();
@@ -320,86 +315,85 @@ void TrafficStateEstimationDataCollector::updatePhaseStatusInDataPointList(strin
 
 	for (int i = 0; i < 8; i++)
 	{
-		// temporarySignalGroup.push_back(i + 1);
-		temporarySignalGroup = i + 1;
+		temporarySignalGroup.push_back(i + 1);
+		// temporarySignalGroup = i + 1;
 
 		if (jsonObject["States"][i].asString() == "green")
-			temporarySignalGroupStates = green;
-		// temporarySignalGroupStates.push_back(green);
+			// temporarySignalGroupStates = green;
+			temporarySignalGroupStates.push_back(green);
 
 		else if (jsonObject["States"][i].asString() == "yellow")
-			temporarySignalGroupStates = yellow;
-		// temporarySignalGroupStates.push_back(yellow);
+			// temporarySignalGroupStates = yellow;
+			temporarySignalGroupStates.push_back(yellow);
 
 		else if (jsonObject["States"][i].asString() == "permissive_yellow")
-			temporarySignalGroupStates = permissive_yellow;
-		// temporarySignalGroupStates.push_back(permissive_yellow);
+			// temporarySignalGroupStates = permissive_yellow;
+			temporarySignalGroupStates.push_back(permissive_yellow);
 
 		else if (jsonObject["States"][i].asString() == "red")
-			temporarySignalGroupStates = red;
-		// temporarySignalGroupStates.push_back(red);
+			// temporarySignalGroupStates = red;
+			temporarySignalGroupStates.push_back(red);
+	}
 
-		if (find(DataPointListApproach1.begin(), DataPointListApproach1.end(), temporarySignalGroup) != DataPointListApproach1.end())
+	for (size_t j = 0; j < DataPointListApproach1.size(); j++)
+	{
+		dataPointSignalGroup = DataPointListApproach1[j].signalGroup;
+
+		if (DataPointListApproach1[j].phaseStatus == temporarySignalGroupStates[dataPointSignalGroup - 1])
+			DataPointListApproach1[j].phaseElapsedTime = currentTime - DataPointListApproach1[j].phaseUpdateTime;
+
+		else if (DataPointListApproach1[j].phaseStatus != temporarySignalGroupStates[dataPointSignalGroup - 1])
 		{
-			for (size_t j = 0; j < DataPointListApproach1.size(); j++)
-			{
-				if ((DataPointListApproach1[i].signalGroup == temporarySignalGroup) && (DataPointListApproach1[i].phaseStatus == temporarySignalGroupStates))
-					DataPointListApproach1[i].phaseElapsedTime = getPosixTimestamp() - DataPointListApproach1[i].phaseUpdateTime;
-
-				else if ((DataPointListApproach1[i].signalGroup == temporarySignalGroup) && (DataPointListApproach1[i].phaseStatus != temporarySignalGroupStates))
-				{
-					DataPointListApproach1[i].phaseElapsedTime = 0.0;
-					DataPointListApproach1[i].phaseUpdateTime = getPosixTimestamp();
-					DataPointListApproach1[i].phaseStatus = temporarySignalGroupStates;
-				}
-			}
+			DataPointListApproach1[j].phaseElapsedTime = 0.0;
+			DataPointListApproach1[j].phaseUpdateTime = currentTime;
+			DataPointListApproach1[j].phaseStatus = temporarySignalGroupStates[dataPointSignalGroup - 1];
 		}
+	}
 
-		else if (find(DataPointListApproach2.begin(), DataPointListApproach2.end(), temporarySignalGroup) != DataPointListApproach2.end())
+	for (size_t j = 0; j < DataPointListApproach2.size(); j++)
+	{
+		dataPointSignalGroup = DataPointListApproach2[j].signalGroup;
+
+		if (DataPointListApproach2[j].phaseStatus == temporarySignalGroupStates[dataPointSignalGroup - 1])
+			DataPointListApproach2[j].phaseElapsedTime = currentTime - DataPointListApproach2[j].phaseUpdateTime;
+
+		else if (DataPointListApproach2[j].phaseStatus != temporarySignalGroupStates[dataPointSignalGroup - 1])
 		{
-			for (size_t j = 0; j < DataPointListApproach1.size(); j++)
-			{
-				if ((DataPointListApproach2[i].signalGroup == temporarySignalGroup) && (DataPointListApproach2[i].phaseStatus == temporarySignalGroupStates))
-					DataPointListApproach2[i].phaseElapsedTime = getPosixTimestamp() - DataPointListApproach2[i].phaseUpdateTime;
-
-				else if ((DataPointListApproach2[i].signalGroup == temporarySignalGroup) && (DataPointListApproach2[i].phaseStatus != temporarySignalGroupStates))
-				{
-					DataPointListApproach2[i].phaseElapsedTime = 0.0;
-					DataPointListApproach2[i].phaseUpdateTime = getPosixTimestamp();
-					DataPointListApproach2[i].phaseStatus = temporarySignalGroupStates;
-				}
-			}
+			DataPointListApproach2[j].phaseElapsedTime = 0.0;
+			DataPointListApproach2[j].phaseUpdateTime = currentTime;
+			DataPointListApproach2[j].phaseStatus = temporarySignalGroupStates[dataPointSignalGroup - 1];
 		}
+	}
 
-		else if (find(DataPointListApproach3.begin(), DataPointListApproach3.end(), temporarySignalGroup) != DataPointListApproach3.end())
+	for (size_t j = 0; j < DataPointListApproach3.size(); j++)
+	{
+		dataPointSignalGroup = DataPointListApproach3[j].signalGroup;
+
+		if (DataPointListApproach3[j].phaseStatus == temporarySignalGroupStates[dataPointSignalGroup - 1])
+			DataPointListApproach3[j].phaseElapsedTime = currentTime - DataPointListApproach3[j].phaseUpdateTime;
+
+		else if (DataPointListApproach3[j].phaseStatus != temporarySignalGroupStates[dataPointSignalGroup - 1])
 		{
-			for (size_t j = 0; j < DataPointListApproach1.size(); j++)
-			{
-				if ((DataPointListApproach3[i].signalGroup == temporarySignalGroup) && (DataPointListApproach3[i].phaseStatus == temporarySignalGroupStates))
-					DataPointListApproach3[i].phaseElapsedTime = getPosixTimestamp() - DataPointListApproach3[i].phaseUpdateTime;
-
-				else if ((DataPointListApproach3[i].signalGroup == temporarySignalGroup) && (DataPointListApproach3[i].phaseStatus != temporarySignalGroupStates))
-				{
-					DataPointListApproach3[i].phaseElapsedTime = 0.0;
-					DataPointListApproach3[i].phaseUpdateTime = getPosixTimestamp();
-					DataPointListApproach3[i].phaseStatus = temporarySignalGroupStates;
-				}
-			}
+			DataPointListApproach3[j].phaseElapsedTime = 0.0;
+			DataPointListApproach3[j].phaseUpdateTime = currentTime;
+			DataPointListApproach3[j].phaseStatus = temporarySignalGroupStates[dataPointSignalGroup - 1];
 		}
+	}
 
-		else if (find(DataPointListApproach4.begin(), DataPointListApproach4.end(), temporarySignalGroup) != DataPointListApproach4.end())
+	if (noOfApproach > 3)
+	{
+		for (size_t j = 0; j < DataPointListApproach4.size(); j++)
 		{
-			for (size_t j = 0; j < DataPointListApproach1.size(); j++)
-			{
-				if ((DataPointListApproach4[i].signalGroup == temporarySignalGroup) && (DataPointListApproach4[i].phaseStatus == temporarySignalGroupStates))
-					DataPointListApproach4[i].phaseElapsedTime = getPosixTimestamp() - DataPointListApproach4[i].phaseUpdateTime;
+			dataPointSignalGroup = DataPointListApproach4[j].signalGroup;
 
-				else if ((DataPointListApproach4[i].signalGroup == temporarySignalGroup) && (DataPointListApproach4[i].phaseStatus != temporarySignalGroupStates))
-				{
-					DataPointListApproach4[i].phaseElapsedTime = 0.0;
-					DataPointListApproach4[i].phaseUpdateTime = getPosixTimestamp();
-					DataPointListApproach4[i].phaseStatus = temporarySignalGroupStates;
-				}
+			if (DataPointListApproach4[j].phaseStatus == temporarySignalGroupStates[dataPointSignalGroup - 1])
+				DataPointListApproach4[j].phaseElapsedTime = currentTime - DataPointListApproach4[j].phaseUpdateTime;
+
+			else if (DataPointListApproach4[j].phaseStatus != temporarySignalGroupStates[dataPointSignalGroup - 1])
+			{
+				DataPointListApproach4[j].phaseElapsedTime = 0.0;
+				DataPointListApproach4[j].phaseUpdateTime = currentTime;
+				DataPointListApproach4[j].phaseStatus = temporarySignalGroupStates[dataPointSignalGroup - 1];
 			}
 		}
 	}
@@ -610,24 +604,28 @@ bool TrafficStateEstimationDataCollector::checkVehicleStatusListMessageSendingRe
 /*
 	- The following method formulates the vehicle status list request message.
 */
-string TrafficStateEstimationDataCollector::getVehicleStatusListRequestMessage()
-{
-	string vehicleStatusRequestJsonString{};
-	Json::Value jsonObject;
-	Json::StreamWriterBuilder builder;
-	builder["commentStyle"] = "None";
-	builder["indentation"] = "";
+// string TrafficStateEstimationDataCollector::getVehicleStatusListRequestMessage()
+// {
+// 	string vehicleStatusRequestJsonString{};
+// 	Json::Value jsonObject;
+// 	Json::StreamWriterBuilder builder;
+// 	builder["commentStyle"] = "None";
+// 	builder["indentation"] = "";
 
-	jsonObject["MsgType"] = "VehicleStatusListRequest";
-	jsonObject["ApproachId"] = approachId;
+// 	jsonObject["MsgType"] = "VehicleStatusListRequest";
+// 	jsonObject["ApproachId"] = approachId;
 
-	vehicleStatusRequestJsonString = Json::writeString(builder, jsonObject);
-	msgSendingTime = getPosixTimestamp();
+// 	vehicleStatusRequestJsonString = Json::writeString(builder, jsonObject);
+// 	msgSendingTime = getPosixTimestamp();
 
-	return vehicleStatusRequestJsonString;
-}
+// 	return vehicleStatusRequestJsonString;
+// }
 
 TrafficStateEstimationDataCollector::~TrafficStateEstimationDataCollector()
 {
-	logFile.close();
+	// logFile.close();
+	logFileApproach1.close();
+	logFileApproach2.close();
+	logFileApproach3.close();
+	logFileApproach4.close();
 }

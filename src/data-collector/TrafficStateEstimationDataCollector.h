@@ -82,7 +82,7 @@ private:
     // double cellLength{};
     // double penetrationRate{};
     // double msgSendingTime{};
-    // double msgSendingFrequency{};
+    double msgSendingFrequency{};
     // bool trainingData{};
 
     int noOfApproach{};
@@ -163,9 +163,9 @@ public:
     void processVehicleStatusData(string jsonString);
     void fillUpDataPointList(vector<DataPointStructure> InputDataPointList, int approachId, int vehicleId, int vehicleType, double vehicleSpeed,
 															   double distanceToStopBar, int laneId, bool connectedVehicleStatus);
-    void createLogFile(ofstream &logFile, int approachId);
+    void createLogFile(ofstream &logFile);
     void writeCsvFile(ofstream &logFile, vector<DataPointStructure> InputDataPointList);
-    string getVehicleStatusListRequestMessage();
+    // string getVehicleStatusListRequestMessage();
     bool checkVehicleStatusListMessageSendingRequirement();
     vector<int> generateRandomNumber(int noOfVehicle, int noOfInputVehicle);
 };

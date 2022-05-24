@@ -40,7 +40,7 @@ int main()
     BasicVehicle basicVehicle;
 
     //Socket Communication
-    UdpSocket vehicleStatusPredictionDataCollectorSocket(static_cast<short unsigned int>(jsonObject["PortNumber"]["DataCollector"].asInt()));
+    UdpSocket trafficSateEstimationDataCollectorSocket(static_cast<short unsigned int>(jsonObject["PortNumber"]["DataCollector"].asInt()));
     // const int vehicleStatusManagerPortNo = jsonObject["PortNumber"]["MessageDistributor"].asInt();
     const string HostIp = jsonObject["HostIp"].asString();
     char receiveBuffer[163840];
@@ -49,7 +49,7 @@ int main()
 
     while (true)
     {
-        vehicleStatusPredictionDataCollectorSocket.receiveData(receiveBuffer, sizeof(receiveBuffer));
+        trafficSateEstimationDataCollectorSocket.receiveData(receiveBuffer, sizeof(receiveBuffer));
         string receivedJsonString(receiveBuffer);
         msgType = trafficStateEstimationDataCollector.getMessageType(receivedJsonString);
 
@@ -58,10 +58,10 @@ int main()
             trafficStateEstimationDataCollector.updatePhaseStatusInDataPointList(receivedJsonString);
 
         else if (msgType == static_cast<int>(msgType::VehicleStatus))
-            vehicleStatusPredictionDataCollector.processVehicleStatusData(receivedJsonString);
+            trafficStateEstimationDataCollector.processVehicleStatusData(receivedJsonString);
             // trafficStateEstimationDataCollector.fillUpDataPointList(receivedJsonString);
     }
     
-    vehicleStatusPredictionDataCollectorSocket.closeSocket();
+    trafficSateEstimationDataCollectorSocket.closeSocket();
     return 0;
 }
