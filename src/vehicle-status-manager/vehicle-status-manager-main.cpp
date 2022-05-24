@@ -39,7 +39,8 @@ int main()
     BasicVehicle basicVehicle;
 
     //Socket Communication
-    UdpSocket vehicleStatusManagerSocket(static_cast<short unsigned int>(jsonObject["PortNumber"]["MessageDistributor"].asInt()), 1, 0);
+    // UdpSocket vehicleStatusManagerSocket(static_cast<short unsigned int>(jsonObject["PortNumber"]["MessageDistributor"].asInt()), 1, 0);
+    UdpSocket vehicleStatusManagerSocket(static_cast<short unsigned int>(jsonObject["PortNumber"]["TrajectoryAware"].asInt()), 1, 0);
     const string HostIP = jsonObject["HostIp"].asString();
     const int dataCollectorPortNo = jsonObject["PortNumber"]["DataCollector"].asInt();
 
@@ -64,16 +65,8 @@ int main()
             if (vehicleStatusManager.checkMsgSendingRequirement())
             {
                 vehicleStatusListJsonString = vehicleStatusManager.getVehicleStatusList();
-                // cout << "Vehicle status string: \n" << vehicleStatusListJsonString << endl;
                 vehicleStatusManagerSocket.sendData(HostIP, static_cast<short unsigned int>(dataCollectorPortNo), vehicleStatusListJsonString);
             }
-
-            //     else if (receivedJsonObject["MsgType"] == "VehicleStatusListRequest")
-            //     {
-            //         vehicleStatusListJsonString = vehicleStatusManager.getVehicleStatusList(receivedJsonObject["ApproachId"].asInt());
-            //         vehicleStatusManagerSocket.sendData(HostIP, static_cast<short unsigned int>(dataCollectorPortNo), vehicleStatusListJsonString);
-            //     }
-            // }
 
             else
                 vehicleStatusManager.deleteTimedOutVehicleIdFromVehicleStatusList();
