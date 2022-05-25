@@ -8,7 +8,7 @@ MAINTAINER D Cunningham (donaldcunningham@email.arizona.edu)
 COPY build/bin/SnmpEngine/x86/M_SnmpEngine /mmitss
 COPY build/bin/MapSpatBroadcaster/x86/M_MapSpatBroadcaster /mmitss
 COPY build/bin/SystemInterface/x86/M_SystemInterface /mmitss
-COPY build/bin/DataCollector/x86/M_VehicleStatusPredictionDataCollector /mmitss
+COPY build/bin/DataCollector/x86/M_TrafficStateEstimationDataCollector /mmitss
 COPY build/bin/VehicleStatusManager/x86/M_VehicleStatusManager /mmitss
 
 ENTRYPOINT ["/usr/bin/supervisord", "--configuration=/nojournal/bin/supervisord.conf"]

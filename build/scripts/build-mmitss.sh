@@ -175,7 +175,7 @@ else
 
 	    # Indicate Success/Failure of the build
 	    if [ "$?" -eq "0" ]; then
-		    mv M_VehicleStatusPredictionDataCollector ../../build/bin/DataCollector/$PROCESSOR/M_VehicleStatusPredictionDataCollector
+		    mv M_TrafficStateEstimationDataCollector ../../build/bin/DataCollector/$PROCESSOR/M_TrafficStateEstimationDataCollector
 		    echo -e "${green}Successful${nocolor}"
 	    else
 		    echo -e "${red}Failed${nocolor}"
