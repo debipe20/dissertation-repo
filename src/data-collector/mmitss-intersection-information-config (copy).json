@@ -1,7 +1,7 @@
 {
     "IntersectionName" : "daisy-meridian",
     "TrainingData": true,
-    "CoonectedVehiclePenetrationRate": 0.8,
+    "CoonectedVehiclePenetrationRate": 0.5,
     "ApproachLength": 352.0,
     "NoOfApproach": 3,
     "ApproachId":[1,3,5],

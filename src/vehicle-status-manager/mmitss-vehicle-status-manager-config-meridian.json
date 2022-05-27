@@ -1,6 +1,6 @@
 {
     "IntersectionName" : "daisy-meridian",
-    "ConnectedVehiclePenetrationRate": 0.8,
+    "ConnectedVehiclePenetrationRate": 0.5,
     "FrequencyOfRequest": 0.5
 }
 

@@ -2,8 +2,6 @@
     "IntersectionName" : "daisy-gavilan",
     "TrainingData": true,
     "CoonectedVehiclePenetrationRate": 1.0,
-    "DataStructureWidth": 5,
-    "DataStructureHeight": 50,
     "ApproachLength": 352.0,
     "NoOfApproach": 4,
     "ApproachId":[1,3,5,7],
@@ -18,14 +16,5 @@
     "Approach1SignalGroup":[6,6,6,6,1],
     "Approach2SignalGroup":[8,8,8,3],
     "Approach3SignalGroup":[2,2,2,2,5],
-    "Approach4SignalGroup":[4,4,7],
-    "Approach1ThroughSignalGroup": 6,
-    "Approach1LeftTurnSignalGroup": 2,
-    "Approach2ThroughSignalGroup": 8,
-    "Approach2LeftTurnSignalGroup": 3,
-    "Approach3ThroughSignalGroup": 2,
-    "Approach3LeftTurnSignalGroup": 5,
-    "Approach4ThroughSignalGroup": 4,
-    "Approach4LeftTurnSignalGroup": 7
+    "Approach4SignalGroup":[4,4,7]
 }
-

@@ -367,7 +367,7 @@ string VehicleStatusManager::getVehicleStatusList()
 	jsonObject["NoOfVehicle"] = noOfVehicle;
 	vehicleStatusListJsonString = Json::writeString(builder, jsonObject);
 	msgSendingTime = getPosixTimestamp();
-	cout << "Sent following Vehicle Status Data:\n" << vehicleStatusListJsonString << endl;
+	// cout << "Sent following Vehicle Status Data:\n" << vehicleStatusListJsonString << endl;
 
 	return vehicleStatusListJsonString;
 }

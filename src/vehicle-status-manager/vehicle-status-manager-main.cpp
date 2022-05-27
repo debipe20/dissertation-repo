@@ -59,7 +59,7 @@ int main()
             if (receivedJsonObject["MsgType"] == "BSM")
             {
                 basicVehicle.json2BasicVehicle(receivedJsonString);
-                cout << "Received follwing BSM:\n" << receivedJsonString << endl;
+                // cout << "Received follwing BSM:\n" << receivedJsonString << endl;
                 vehicleStatusManager.manageVehicleStatusList(basicVehicle);
             }
 

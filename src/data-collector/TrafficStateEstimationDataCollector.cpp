@@ -102,7 +102,7 @@ void TrafficStateEstimationDataCollector::readIntersectionInformationConfig()
 	if (parsingSuccessful)
 	{
 		intersectionName = jsonObject["IntersectionName"].asString();
-		cout << "Intersection Name is " << intersectionName << endl;
+		// cout << "Intersection Name is " << intersectionName << endl;
 		trainingData = jsonObject["TrainingData"].asBool();
 		penetrationRate = jsonObject["CoonectedVehiclePenetrationRate"].asDouble();
 		// dataStructurewidth = jsonObject["DataStructureWidth"].asInt();
@@ -171,9 +171,9 @@ void TrafficStateEstimationDataCollector::createLogFile(ofstream &logFile, int a
 	if (trainingData)
 	{
 		fileName = "/nojournal/bin/dissertation-data/" + intersectionName + "-approach" + std::to_string(approachId) + "-vehicle-status-data-" + penetrationRateString + ".csv";
-		cout << "Inside Logfile creation, intersection name is " << intersectionName << endl;
-		cout << "Inside Logfile creation, approach Id is " << approachId << endl;
-		cout << "Log File Name is:" << fileName;
+		// cout << "Inside Logfile creation, intersection name is " << intersectionName << endl;
+		// cout << "Inside Logfile creation, approach Id is " << approachId << endl;
+		// cout << "Log File Name is:" << fileName;
 		logFile.open(fileName);
 
 		logFile << "TimeStamp"
@@ -208,7 +208,7 @@ void TrafficStateEstimationDataCollector::createLogFile(ofstream &logFile, int a
 
 	else
 	{
-		logFile.open("/nojournal/bin/dissertation-data/" + intersectionName + "-approach" + std::to_string(approachId) + "sample-vehicle-status-data-" + penetrationRateString + ".csv");
+		logFile.open("/nojournal/bin/dissertation-data/" + intersectionName + "-approach" + std::to_string(approachId) + "-sample-vehicle-status-data-" + penetrationRateString + ".csv");
 
 		logFile << "TimeStamp"
 				<< ","
@@ -319,7 +319,7 @@ void TrafficStateEstimationDataCollector::updatePhaseStatusInDataPointList(strin
 	reader->parse(jsonString.c_str(), jsonString.c_str() + jsonString.size(), &jsonObject, &errors);
 	delete reader;
 
-	cout << "Received following Phase Data:\n" << jsonString << endl;
+	// cout << "Received following Phase Data:\n" << jsonString << endl;
 	for (int i = 0; i < 8; i++)
 	{
 		temporarySignalGroup.push_back(i + 1);
@@ -435,7 +435,7 @@ void TrafficStateEstimationDataCollector::processVehicleStatusData(string jsonSt
 	reader->parse(jsonString.c_str(), jsonString.c_str() + jsonString.size(), &jsonObject, &errors);
 	delete reader;
 
-	cout << "Received following Vehicle Status Data:\n" << jsonString << endl;
+	// cout << "Received following Vehicle Status Data:\n" << jsonString << endl;
 	int noOfVehicles = jsonObject["NoOfVehicle"].asInt();
 	// int noOfInputVehicles = static_cast<int>(noOfVehicles * penetrationRate);
 

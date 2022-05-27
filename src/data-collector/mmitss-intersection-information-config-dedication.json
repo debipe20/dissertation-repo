@@ -1,0 +1,20 @@
+{
+    "IntersectionName" : "daisy-dedication",
+    "TrainingData": true,
+    "CoonectedVehiclePenetrationRate": 1.0,
+    "ApproachLength": 352.0,
+    "NoOfApproach": 3,
+    "ApproachId":[1,3,5],
+    "Approach1NoOfLanes": 3,
+    "Approach2NoOfLanes": 4,
+    "Approach3NoOfLanes": 2,
+    "Approach4NoOfLanes": 0,    
+    "Approach1LaneId":[1,2,3,4],
+    "Approach2LaneId":[7,8,9,10],
+    "Approach3LaneId":[14,15],
+    "Approach4LaneId":[],
+    "Approach1SignalGroup":[6,6,6],
+    "Approach2SignalGroup":[2,2,2,5],
+    "Approach3SignalGroup":[4,4],
+    "Approach4SignalGroup":[]
+}
