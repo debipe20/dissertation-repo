@@ -1,0 +1,22 @@
+{
+    "MsgType": "EstimatedArrivalTable",
+    "msgCount": 1,
+    "noOfEstimatedVehicle": 3,
+    "minuteOfYear": 185878,
+    "msOfMinute": 27000,
+    "EstimatedVehicleType": [
+        5,
+        5,
+        5
+    ],
+    "EstimatedVehicleDistanceToStopbar": [
+        255.2700000000001,
+        278.1300000000001,
+        179.07000000000005
+    ],
+    "EstimatedVehicleSignalGroup": [
+        6.0,
+        6.0,
+        6.0
+    ]
+}
