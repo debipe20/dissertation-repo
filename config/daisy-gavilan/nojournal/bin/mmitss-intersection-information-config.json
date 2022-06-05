@@ -1,21 +1,48 @@
 {
-    "IntersectionName" : "daisy-gavilan",
-    "TrainingData": true,
-    "CoonectedVehiclePenetrationRate": 1.0,
-    "ApproachLength": 352.0,
+    "IntersectionName": "daisy-gavilan",
+    "MaximumNoOfData": 50,
+    "DataLookBack": 25.0,
     "NoOfApproach": 4,
-    "ApproachId":[1,3,5,7],
-    "Approach1NoOfLanes": 5,
-    "Approach2NoOfLanes": 4,
-    "Approach3NoOfLanes": 5,
-    "Approach4NoOfLanes": 3,    
-    "Approach1LaneId":[1,2,3,4,5],
-    "Approach2LaneId":[9,10,11,12],
-    "Approach3LaneId":[15,16,17,18,19],
-    "Approach4LaneId":[23,24,25],
-    "Approach1SignalGroup":[6,6,6,6,1],
-    "Approach2SignalGroup":[8,8,8,3],
-    "Approach3SignalGroup":[2,2,2,2,5],
-    "Approach4SignalGroup":[4,4,7]
+    "ApproachInformation": [
+        {
+            "ApproachNo": 1,
+            "ApproachId": 1,
+            "NoOfLanes": 5,
+            "CellsPerLane": 46,
+            "LaneId": [1,2,3,4,5],
+            "SignalGroup": [6,6,6,6,1],
+            "EstimationModel": "/nojournal/bin/trained-model/trained-model-approach1.h5",
+            "SampleY": "/nojournal/bin/trained-model/trainY-approach1.npy"
+        },
+        {
+            "ApproachNo": 2,
+            "ApproachId": 3,
+            "NoOfLanes": 4,
+            "CellsPerLane": 46,
+            "LaneId": [9,10,11,12],
+            "SignalGroup": [8,8,8,3],
+            "EstimationModel": "/nojournal/bin/trained-model/trained-model-approach3.h5",
+            "SampleY": "/nojournal/bin/trained-model/trainY-approach3.npy"
+        },
+        {
+            "ApproachNo": 3,
+            "ApproachId": 5,
+            "NoOfLanes": 5,
+            "CellsPerLane": 46,
+            "LaneId": [15,16,17,18,19],
+            "SignalGroup": [2,2,2,2,5],
+            "EstimationModel": "/nojournal/bin/trained-model/trained-model-approach5.h5",
+            "SampleY": "/nojournal/bin/trained-model/trainY-approach5.npy"
+        },
+        {
+            "ApproachNo": 4,
+            "ApproachId": 7,
+            "NoOfLanes": 3,
+            "CellsPerLane": 46,
+            "LaneId": [23,24,25],
+            "SignalGroup": [4,4,7],
+            "EstimationModel": "/nojournal/bin/trained-model/trained-model-approach7.h5",
+            "SampleY": "/nojournal/bin/trained-model/trainY-approach7.npy"
+        }
+    ]
 }
-

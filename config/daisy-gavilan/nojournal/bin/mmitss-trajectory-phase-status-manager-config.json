@@ -1,0 +1,14 @@
+{
+    "IntersectionName" : "daisy-gavilan",
+    "ConnectedVehiclePenetrationRate": 1.0,
+    "TrajectoryUpdateTimeGap": 0.5,
+    "MessageSendingTimeGap": 5.0,
+    "MaximumNoOfData": 50,
+    "DataLookBack": 25.0,
+    "NoOfApproach": 4,
+    "ApproachId": [ 1,3,5,7],
+    "SignalGroupInApproach1": [1,6],
+    "SignalGroupInApproach2": [3,8],
+    "SignalGroupInApproach3": [2,5],
+    "SignalGroupInApproach4": [4,7]
+}
