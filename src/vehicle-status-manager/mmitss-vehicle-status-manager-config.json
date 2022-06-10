@@ -1,6 +1,6 @@
 {
-    "IntersectionName" : "daisy-dedication",
-    "ConnectedVehiclePenetrationRate": 0.5,
+    "IntersectionName" : "daisy-memorial",
+    "ConnectedVehiclePenetrationRate": 1.0,
     "FrequencyOfRequest": 0.5
 }
 
