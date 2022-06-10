@@ -9,7 +9,7 @@
     "Approach2NoOfLanes": 4,
     "Approach3NoOfLanes": 2,
     "Approach4NoOfLanes": 0,    
-    "Approach1LaneId":[1,2,3,4],
+    "Approach1LaneId":[1,2,3],
     "Approach2LaneId":[7,8,9,10],
     "Approach3LaneId":[14,15],
     "Approach4LaneId":[],
