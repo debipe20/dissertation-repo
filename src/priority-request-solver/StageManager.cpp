@@ -209,7 +209,7 @@ void StageManager::removeInactivePhases()
     int temporaryPhase{};
 
     vector<int> Original_P11 = P11;
-    vector<int> Original_P12 = P21;
+    vector<int> Original_P12 = P12;
     vector<int> Original_P13 = P13;
     vector<int> Original_P14 = P14;
     vector<int> Original_P21 = P21;
@@ -270,6 +270,20 @@ void StageManager::removeInactivePhases()
 
     else if (!P24.empty() && P14.empty())
         P14.push_back(Original_P14.back());
+
+    // To handle a scenario for T-intersection when there are no phase calls on the minor street.
+    // TCI fails to translate schedule to SPaT when there are no schedule for conflicting ring-barrier.
+    if (!P11.empty() && P12.empty() && P13.empty() && P14.empty())
+        P12.push_back(Original_P12.back());
+
+    else if (!P12.empty() && P11.empty() && P13.empty() && P14.empty())
+        P11.push_back(Original_P11.back());
+
+    if (!P21.empty() && P22.empty() && P23.empty() && P24.empty())
+        P22.push_back(Original_P22.back());
+
+    else if (!P22.empty() && P21.empty() && P23.empty() && P24.empty())
+        P21.push_back(Original_P21.back());
 }
 
 vector<COP::StagePlan> StageManager::getPlannedStages()

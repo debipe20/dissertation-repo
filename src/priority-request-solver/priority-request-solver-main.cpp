@@ -116,12 +116,6 @@ int main()
                 if (priorityRequestSolver.getOptimalSolutionValidationStatus())
                     priorityRequestSolverSocket.sendData(LOCALHOST, static_cast<short unsigned int>(trafficControllerPortNo), tciJsonString);
                 
-                // if (priorityRequestSolver.getOptimizationMethod() == "MILP")
-                //     timePhaseDiagramJsonString = priorityRequestSolver.getTimePhaseDiagramMessageString();
-                
-                // else if(priorityRequestSolver.getOptimizationMethod() == "DP")
-                //     timePhaseDiagramJsonString = priorityRequestSolver.getTimePhaseDiagramMessageStringForDP ();
-                
                 timePhaseDiagramJsonString = priorityRequestSolver.getTimePhaseDiagramMessageString();
                 priorityRequestSolverSocket.sendData(LOCALHOST, static_cast<short unsigned int>(timePhaseDiagramToolPortNo), timePhaseDiagramJsonString);
                 

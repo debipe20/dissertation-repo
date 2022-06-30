@@ -60,6 +60,7 @@ private:
   int truck{};
   int connectedPassengerVehicle{};
   int nonConnectedVehicle{};
+  int timeHorizonForDP{120};
   bool emergencyVehicleStatus{};
   bool signalCoordinationRequestStatus{};
   bool transitOrTruckRequestStatus{};
@@ -86,6 +87,7 @@ private:
   // string timePhaseDiagramJsonStringForDP{};
   string logFileName{};
   string optimizationMethod{};
+  string objectiveFunction{};
   ofstream logFile;
 
   vector<RequestList> priorityRequestList{};
@@ -96,7 +98,7 @@ private:
   vector<TrafficControllerData::TrafficSignalPlan> trafficSignalPlan_SignalCoordination{};
   vector<COP::OptimalPlan> optimalSignalTiming{};
   vector<ArrivalTable> vehicleArrivalTable{};
-  vector<int> arrivalePhaseCallList{};
+  vector<int> arrivalPhaseCallList{};
   vector<int> PhaseNumber{};
   vector<double> PedWalk{};
   vector<double> PedClear{};
@@ -134,6 +136,7 @@ public:
   void modifySignalTimingPlan();
   void modifyCoordinationSignalTimingPlan();
   void managePriorityRequestListForEV();
+  void setSignalBarrierGroup();
   void GLPKSolver();
   void setCurrentSignalTimingPlan(string jsonString);
   void setSignalCoordinationTimingPlan(string jsonString);

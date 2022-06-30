@@ -618,10 +618,9 @@ void PriorityRequestSolver::setOptimizationInput()
 
     else if (getOptimizationMethod() == "DP")
     {
-        SignalControl signalControl(trafficSignalPlan, trafficControllerStatus, phaseCallList, vehicleArrivalTable, arrivalePhaseCallList, P11, P12, P13, P14, P21, P22, P23, P24);
+        SignalControl signalControl(objectiveFunction, timeHorizonForDP, trafficSignalPlan, trafficControllerStatus, phaseCallList, vehicleArrivalTable, arrivalPhaseCallList, P11, P12, P13, P14, P21, P22, P23, P24);
         signalControl.signalControlAlgorithmForwardRecursion();
         optimalSignalTiming = signalControl.getOptimalSignalTiming();
-        // timePhaseDiagramJsonStringForDP = signalControl.getTimePhaseDiagramMessageString();
     }
 }
 
@@ -1138,6 +1137,9 @@ void PriorityRequestSolver::setCurrentSignalTimingPlan(string jsonString)
     optimizationModelManager.generateModFile(noOfPhase, PhaseNumber, P11, P12, P21, P22);
     getDummyPhases();
     modifySignalTimingPlan();
+
+    if(getOptimizationMethod() == "DP")
+        setSignalBarrierGroup();
 }
 
 /*
@@ -1299,6 +1301,32 @@ void PriorityRequestSolver::modifyCoordinationSignalTimingPlan()
 }
 
 /*
+    - This method sets the ring-barrier group values (phases) when optimization method is DP.
+*/
+void PriorityRequestSolver::setSignalBarrierGroup()
+{
+    P11.clear();
+    P12.clear();
+    P21.clear();
+    P22.clear();
+  
+    for (int i = 0; i < noOfPhase; i++)
+    {
+        if (trafficSignalPlan[i].phaseNumber < 3 && trafficSignalPlan[i].phaseRing == 1 && trafficSignalPlan[i].minGreen > 0.0)
+            P11.push_back(trafficSignalPlan[i].phaseNumber);
+
+        else if (trafficSignalPlan[i].phaseNumber > 2 && trafficSignalPlan[i].phaseNumber < 5 && trafficSignalPlan[i].phaseRing == 1 && trafficSignalPlan[i].minGreen > 0.0)
+            P12.push_back(trafficSignalPlan[i].phaseNumber);
+
+        else if (trafficSignalPlan[i].phaseNumber > 4 && trafficSignalPlan[i].phaseNumber < 7 && trafficSignalPlan[i].phaseRing == 2 && trafficSignalPlan[i].minGreen > 0.0)
+            P21.push_back(trafficSignalPlan[i].phaseNumber);
+
+        else if (trafficSignalPlan[i].phaseNumber > 6 && trafficSignalPlan[i].phaseRing == 2 && trafficSignalPlan[i].minGreen > 0.0)
+            P22.push_back(trafficSignalPlan[i].phaseNumber);
+    }
+}
+
+/*
     - This method checks whether emergency vehicle priority request is in the list or not
 */
 bool PriorityRequestSolver::findEmergencyVehicleRequestInList()
@@ -1419,6 +1447,8 @@ void PriorityRequestSolver::getPriorityWeightsAndMethod()
     connectedPassengerVehicleWeight = jsonObject["PriorityParameter"]["ConnectedPassengerVehicleWeight"].asDouble();
     nonConnectedVehicleWeight = jsonObject["PriorityParameter"]["NonConnectedVehicleWeight"].asDouble();
     optimizationMethod = jsonObject["PriorityParameter"]["OptimizationMethod"].asString();
+    objectiveFunction = jsonObject["PriorityParameter"]["ObjectiveFunction"].asString();
+    timeHorizonForDP = jsonObject["PriorityParameter"]["TimeHorizonForDP"].asInt();
 
     if (optimizationMethod.empty())
     {
@@ -1770,7 +1800,7 @@ void PriorityRequestSolver::setArrivalTable(string jsonString)
     int noOfVehicles{};
     ArrivalTable arrivableTable;
     vehicleArrivalTable.clear();
-    arrivalePhaseCallList.clear();
+    arrivalPhaseCallList.clear();
 
     Json::Value jsonObject;
     Json::CharReaderBuilder builder;
@@ -1806,9 +1836,12 @@ void PriorityRequestSolver::setArrivalTable(string jsonString)
 
         vehicleArrivalTable.push_back(arrivableTable);
 
-        if ((find(arrivalePhaseCallList.begin(), arrivalePhaseCallList.end(), arrivableTable.signalGroup) == arrivalePhaseCallList.end()) &&
-            jsonObject["ArrivalTable"]["VehicleType"][i].asInt() != nonConnectedVehicle)
-            arrivalePhaseCallList.push_back(arrivableTable.signalGroup);
+        // if ((find(arrivalPhaseCallList.begin(), arrivalPhaseCallList.end(), arrivableTable.signalGroup) == arrivalPhaseCallList.end()) &&
+        //     jsonObject["ArrivalTable"]["VehicleType"][i].asInt() != nonConnectedVehicle)
+        //     arrivalPhaseCallList.push_back(arrivableTable.signalGroup);
+
+        if (find(arrivalPhaseCallList.begin(), arrivalPhaseCallList.end(), arrivableTable.signalGroup) == arrivalPhaseCallList.end())
+            arrivalPhaseCallList.push_back(arrivableTable.signalGroup);
     }
 }
 

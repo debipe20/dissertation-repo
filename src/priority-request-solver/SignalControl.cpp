@@ -16,12 +16,14 @@
 
 #include "SignalControl.h"
 
-SignalControl::SignalControl(vector<TrafficControllerData::TrafficSignalPlan> signalPlan, vector<TrafficControllerData::TrafficConrtollerStatus> signalStatus, vector<int> phase_Call_List,
+SignalControl::SignalControl(string objective_Function, int time_Horizon,
+                             vector<TrafficControllerData::TrafficSignalPlan> signalPlan, vector<TrafficControllerData::TrafficConrtollerStatus> signalStatus, vector<int> phase_Call_List,
                              vector<ArrivalTable> vehicle_Arrival_Table, vector<int> arrival_PhaseCall_List,
                              vector<int> P_11, vector<int> P_12, vector<int> P_13, vector<int> P_14,
                              vector<int> P_21, vector<int> P_22, vector<int> P_23, vector<int> P_24)
 {
-    // getArrivalTable();
+    objectiveFunction = objective_Function;
+    timeHorizon = time_Horizon;
 
     if (!signalPlan.empty())
         trafficSignalPlan = signalPlan;
@@ -65,10 +67,10 @@ void SignalControl::getActiveSignalGroup()
     }
 
     if (find(phaseCallList.begin(), phaseCallList.end(), trafficControllerStatus[0].startingPhase1) == phaseCallList.end())
-            phaseCallList.push_back(trafficControllerStatus[0].startingPhase1);
+        phaseCallList.push_back(trafficControllerStatus[0].startingPhase1);
 
     if (find(phaseCallList.begin(), phaseCallList.end(), trafficControllerStatus[0].startingPhase2) == phaseCallList.end())
-            phaseCallList.push_back(trafficControllerStatus[0].startingPhase2);
+        phaseCallList.push_back(trafficControllerStatus[0].startingPhase2);
 
     for (size_t i = 0; i < arrivalPhaseCallList.size(); i++)
     {
@@ -90,44 +92,20 @@ void SignalControl::getActiveSignalGroup()
 }
 
 /*
-    - This method creates that Arrival Table data request string.
-*/
-string SignalControl::getArrivalTableDataRequestString()
-{
-    std::string jsonString{};
-    Json::Value jsonObject;
-    Json::StreamWriterBuilder builder;
-    builder["commentStyle"] = "None";
-    builder["indentation"] = "";
-
-    jsonObject["MsgType"] = "ArrivalTableDataRequest";
-    jsonString = Json::writeString(builder, jsonObject);
-
-    return jsonString;
-}
-
-/*
-    - The following method compute gmin, clearance interval and minimum barrier length per stage
+    - The following method compute gmin, clearance interval and minimum barrier length per ring for each stage (ring-barrier group)
+    - The methods considers the elapsed green green time and init time for the first stage while calculating the minimum barrier length
 */
 int SignalControl::getMinimumBarrierLength(int stageIndex)
 {
     int minimumBarrierGrouplengthInRing1{};
     int minimumBarrierGrouplengthInRing2{};
-    // int maximumBarrierGroupLengthInRing1{};
-    // int maximumBarrierGroupLengthInRing2{};
     int currentStageMinimumBarrierLength{};
-
     vector<int> minimumBarrierLengthList{};
-    // vector<int> maximumBarrierLengthList{};
 
     gminSignalGroup1InRing1 = 0;
     gminSignalGroup2InRing1 = 0;
     gminSignalGroup1InRing2 = 0;
     gminSignalGroup2InRing2 = 0;
-    // gmaxSignalGroup1InRing1 = 0;
-    // gmaxSignalGroup2InRing1 = 0;
-    // gmaxSignalGroup1InRing2 = 0;
-    // gmaxSignalGroup2InRing2 = 0;
     clearanceIntervalSignalGroup1InRing1 = 0;
     clearanceIntervalSignalGroup2InRing1 = 0;
     clearanceIntervalSignalGroup1InRing2 = 0;
@@ -135,11 +113,11 @@ int SignalControl::getMinimumBarrierLength(int stageIndex)
 
     if (plannedStages[stageIndex].signalGroup1InRing1 > 0)
     {
-        vector<TrafficControllerData::TrafficSignalPlan>::iterator findSignalGroup1InRing1 = std::find_if(std::begin(trafficSignalPlan), std::end(trafficSignalPlan), [&](TrafficControllerData::TrafficSignalPlan const &p)
-                                                                                                          { return p.phaseNumber == plannedStages[stageIndex].signalGroup1InRing1; });
+        vector<TrafficControllerData::TrafficSignalPlan>::iterator findSignalGroup1InRing1 =
+            std::find_if(std::begin(trafficSignalPlan), std::end(trafficSignalPlan), [&](TrafficControllerData::TrafficSignalPlan const &p)
+                         { return p.phaseNumber == plannedStages[stageIndex].signalGroup1InRing1; });
 
         gminSignalGroup1InRing1 = static_cast<int>(findSignalGroup1InRing1->minGreen);
-        // gmaxSignalGroup1InRing1 = static_cast<int>(findSignalGroup1InRing1->maxGreen);
         clearanceIntervalSignalGroup1InRing1 = static_cast<int>(findSignalGroup1InRing1->yellowChange) + static_cast<int>(findSignalGroup1InRing1->redClear);
     }
 
@@ -149,7 +127,6 @@ int SignalControl::getMinimumBarrierLength(int stageIndex)
                                                                                                           { return p.phaseNumber == plannedStages[stageIndex].signalGroup2InRing1; });
 
         gminSignalGroup2InRing1 = static_cast<int>(findSignalGroup2InRing1->minGreen);
-        // gmaxSignalGroup2InRing1 = static_cast<int>(findSignalGroup2InRing1->maxGreen);
         clearanceIntervalSignalGroup2InRing1 = static_cast<int>(findSignalGroup2InRing1->yellowChange) + static_cast<int>(findSignalGroup2InRing1->redClear);
     }
 
@@ -159,7 +136,6 @@ int SignalControl::getMinimumBarrierLength(int stageIndex)
                                                                                                           { return p.phaseNumber == plannedStages[stageIndex].signalGroup1InRing2; });
 
         gminSignalGroup1InRing2 = static_cast<int>(findSignalGroup1InRing2->minGreen);
-        // gmaxSignalGroup1InRing2 = static_cast<int>(findSignalGroup1InRing2->maxGreen);
         clearanceIntervalSignalGroup1InRing2 = static_cast<int>(findSignalGroup1InRing2->yellowChange) + static_cast<int>(findSignalGroup1InRing2->redClear);
     }
 
@@ -169,43 +145,52 @@ int SignalControl::getMinimumBarrierLength(int stageIndex)
                                                                                                           { return p.phaseNumber == plannedStages[stageIndex].signalGroup2InRing2; });
 
         gminSignalGroup2InRing2 = static_cast<int>(findSignalGroup2InRing2->minGreen);
-        // gmaxSignalGroup2InRing2 = static_cast<int>(findSignalGroup2InRing2->maxGreen);
         clearanceIntervalSignalGroup2InRing2 = static_cast<int>(findSignalGroup2InRing2->yellowChange) + static_cast<int>(findSignalGroup2InRing2->redClear);
     }
 
     if (stageIndex == 0)
     {
         if ((gminSignalGroup1InRing1 + gminSignalGroup2InRing1 - static_cast<int>(trafficControllerStatus[0].elapsedGreen1)) > 0)
-            minimumBarrierGrouplengthInRing1 = gminSignalGroup1InRing1 + clearanceIntervalSignalGroup1InRing1 + gminSignalGroup2InRing1 + clearanceIntervalSignalGroup2InRing1 - static_cast<int>(trafficControllerStatus[0].elapsedGreen1);
+            minimumBarrierGrouplengthInRing1 = gminSignalGroup1InRing1 + clearanceIntervalSignalGroup1InRing1 +
+                                               gminSignalGroup2InRing1 + clearanceIntervalSignalGroup2InRing1 -
+                                               static_cast<int>(trafficControllerStatus[0].elapsedGreen1) +
+                                               static_cast<int>(trafficControllerStatus[0].initPhase1);
 
         else
             minimumBarrierGrouplengthInRing1 = clearanceIntervalSignalGroup1InRing1 + clearanceIntervalSignalGroup2InRing1;
 
         if ((gminSignalGroup1InRing2 + gminSignalGroup2InRing2 - static_cast<int>(trafficControllerStatus[0].elapsedGreen2)) > 0)
-            minimumBarrierGrouplengthInRing2 = gminSignalGroup1InRing2 + clearanceIntervalSignalGroup1InRing2 + gminSignalGroup2InRing2 + clearanceIntervalSignalGroup2InRing2 - static_cast<int>(trafficControllerStatus[0].elapsedGreen2);
+            minimumBarrierGrouplengthInRing2 = gminSignalGroup1InRing2 + clearanceIntervalSignalGroup1InRing2 +
+                                               gminSignalGroup2InRing2 + clearanceIntervalSignalGroup2InRing2 -
+                                               static_cast<int>(trafficControllerStatus[0].elapsedGreen2) +
+                                               static_cast<int>(trafficControllerStatus[0].initPhase2);
 
         else
             minimumBarrierGrouplengthInRing2 = clearanceIntervalSignalGroup1InRing2 + clearanceIntervalSignalGroup2InRing2;
     }
+
     else
     {
         minimumBarrierGrouplengthInRing1 = gminSignalGroup1InRing1 + clearanceIntervalSignalGroup1InRing1 + gminSignalGroup2InRing1 + clearanceIntervalSignalGroup2InRing1;
         minimumBarrierGrouplengthInRing2 = gminSignalGroup1InRing2 + clearanceIntervalSignalGroup1InRing2 + gminSignalGroup2InRing2 + clearanceIntervalSignalGroup2InRing2;
     }
-    // maximumBarrierGroupLengthInRing1 = gmaxSignalGroup1InRing1 + clearanceIntervalSignalGroup1InRing1 + gmaxSignalGroup2InRing1 + clearanceIntervalSignalGroup2InRing1;
-    // maximumBarrierGroupLengthInRing2 = gmaxSignalGroup1InRing2 + clearanceIntervalSignalGroup1InRing2 + gmaxSignalGroup2InRing2 + clearanceIntervalSignalGroup2InRing2;
 
     minimumBarrierLengthList.push_back(minimumBarrierGrouplengthInRing1);
     minimumBarrierLengthList.push_back(minimumBarrierGrouplengthInRing2);
-    // maximumBarrierLengthList.push_back(maximumBarrierGroupLengthInRing1);
-    // maximumBarrierLengthList.push_back(maximumBarrierGroupLengthInRing2);
-
     currentStageMinimumBarrierLength = *max_element(minimumBarrierLengthList.begin(), minimumBarrierLengthList.end());
-    // currentStageMaximumBarrierLength = *min_element(maximumBarrierLengthList.begin(), maximumBarrierLengthList.end());
 
     return currentStageMinimumBarrierLength;
 }
 
+/*
+    - Following method performs the forward recurrsion of the DP. It computes performance measurement (delay) for each stage
+        - The method calls getActiveSignalGroup() method to compute active signal groupu list
+        - The method creats an instance for StageManager class to compute planned stages.
+        - The method identifies inactive signal group each stage
+        - The method follows dual-ring eight-phase controller logic and performs recurssion logic for each stage
+        - The method checks for stopping criteria while performing recurssion logic
+        - At final step, method calls signalControlAlgorithmBackwardRecursion() method to execute backward recurssion
+*/
 void SignalControl::signalControlAlgorithmForwardRecursion()
 {
     int timeStep{};
@@ -218,11 +203,9 @@ void SignalControl::signalControlAlgorithmForwardRecursion()
     double temporaryTotalPerformanceMeasurement{};
     double previousPerformanceMeasurement{};
     double minPerformanceMeasurement{};
-
     vector<int> signalGroup1AllocatedTimeStepList{};
     vector<int> inactiveSignalgroupInCurrentStage{};
     vector<int> previousStageTimeStepList{};
-
     vector<int> temporaryAllocatedTimeToCurrentStageSignalGroup1InRing1List{};
     vector<int> temporaryAllocatedTimeToCurrentStageSignalGroup2InRing1List{};
     vector<int> temporaryAllocatedTimeToCurrentStageSignalGroup1InRing2List{};
@@ -266,6 +249,7 @@ void SignalControl::signalControlAlgorithmForwardRecursion()
                 allocatedTimeToCurrentStage = timeStep;
                 allocatedTimeToPreviousStage = 0;
 
+                // Following logic ensures a phase is served for minimum green time
                 if (timeStep < currentStageMinimumBarrierLength)
                     continue;
 
@@ -363,14 +347,6 @@ void SignalControl::signalControlAlgorithmForwardRecursion()
                         temporaryInactivePhasesPerformancemeasurementList.push_back(inactivePhasesPerformanceMeasurementValue);
                         temporaryPreviousStagePerformanceMeasurementList.push_back(previousStageValueFunction);
                         temporaryTotalPerformanceMeasurement = temporaryActivePhasesPerformancemeasurementValue + inactivePhasesPerformanceMeasurementValue + previousStageValueFunction;
-                        // if (temporaryActivePhasesPerformancemeasurementValue == 0 && inactivePhasesPerformanceMeasurementValue == 0)
-                        // {
-                        //     previousStageValueFunction = 0;
-                        //     temporaryPreviousStagePerformanceMeasurementList.push_back(previousStageValueFunction);
-                        // }
-
-                        // else
-                        //     temporaryPreviousStagePerformanceMeasurementList.push_back(previousStageValueFunction);
 
                         temporaryTotalPerformmanceMeasurementList.push_back(temporaryTotalPerformanceMeasurement);
 
@@ -417,32 +393,34 @@ void SignalControl::signalControlAlgorithmForwardRecursion()
 
     // logData();
     signalControlAlgorithmBackwardRecursion();
-
-    // ScheduleManager scheduleManager(optimalSignalTiming, trafficControllerStatus);
-    // scheduleManager.createEventListForDp();
-    // scheduleJsonString = scheduleManager.createScheduleJsonString();
 }
 
+/*
+    - Following method performs the backward recurrsion of the DP. It computes optimal policy based on the performance table computes in forward recurssion
+    - The recurssion starts with the final stage.
+    - At each stage it computes the ploicy that results minimum delay and corresponding allocted time to the previous stage
+*/
 void SignalControl::signalControlAlgorithmBackwardRecursion()
 {
-    COP::OptimalPlan optimalPlan;
-
     int currentStage{};
     int allocatedTimeToPreviousStage{};
     double minPerformanceMeasurement{};
-    vector<double> startingStagePerformanceMeasurement{};
-
-    currentStage = performanceMeasurementTable[performanceMeasurementTable.size() - 1].stageNo;
+    vector<double> finalStagePerformanceMeasurement{};
+    COP::OptimalPlan optimalPlan;
     optimalPlan.reset();
 
+    currentStage = performanceMeasurementTable[performanceMeasurementTable.size() - 1].stageNo;
+
+    // Append all the possible perfomance measurement value in a list for the final stage
     for (int i = static_cast<int>(performanceMeasurementTable.size() - 1); i >= 0; --i)
     {
         if (performanceMeasurementTable[i].stageNo == currentStage)
-            startingStagePerformanceMeasurement.insert(startingStagePerformanceMeasurement.begin(), performanceMeasurementTable[i].totalPerformmanceMeasurement);
+            finalStagePerformanceMeasurement.insert(finalStagePerformanceMeasurement.begin(), performanceMeasurementTable[i].totalPerformmanceMeasurement);
     }
 
-    minPerformanceMeasurement = *min_element(startingStagePerformanceMeasurement.begin(), startingStagePerformanceMeasurement.end());
+    minPerformanceMeasurement = *min_element(finalStagePerformanceMeasurement.begin(), finalStagePerformanceMeasurement.end());
 
+    // Append optimal policy for the final stage and calculates corresponding allocted time to the previous stage
     for (size_t i = 0; i < performanceMeasurementTable.size(); i++)
     {
         if (performanceMeasurementTable[i].stageNo == currentStage && performanceMeasurementTable[i].totalPerformmanceMeasurement == minPerformanceMeasurement)
@@ -465,12 +443,12 @@ void SignalControl::signalControlAlgorithmBackwardRecursion()
 
             optimalSignalTiming.push_back(optimalPlan);
             allocatedTimeToPreviousStage = performanceMeasurementTable[i].allocatedTimeToPreviousStage;
-
             currentStage--;
             break;
         }
     }
 
+    // Performs recurssion for the rest of the stages and obtains optimal policy
     for (int i = static_cast<int>(performanceMeasurementTable.size() - 1); i >= 0; --i)
     {
         if (performanceMeasurementTable[i].stageNo == currentStage && performanceMeasurementTable[i].timeStep == allocatedTimeToPreviousStage)
@@ -492,10 +470,8 @@ void SignalControl::signalControlAlgorithmBackwardRecursion()
             optimalPlan.clearanceIntervalSignalGroup2Ring2 = performanceMeasurementTable[i].clearanceIntervalSignalGroup2Ring2;
             optimalPlan.optimalPerformmanceMeasurement = performanceMeasurementTable[i].totalPerformmanceMeasurement;
 
-            // optimalSignalTiming.push_back(optimalPlan);
             optimalSignalTiming.insert(optimalSignalTiming.begin(), optimalPlan);
             allocatedTimeToPreviousStage = performanceMeasurementTable[i].allocatedTimeToPreviousStage;
-
             currentStage--;
         }
 
@@ -506,6 +482,9 @@ void SignalControl::signalControlAlgorithmBackwardRecursion()
     printOptimalPan();
 }
 
+/*
+    - Method to perform recurssion logic for signalControlAlgorithmForwardRecursion() method
+*/
 void SignalControl::currentStageRecurssion(int stageIndex, int timeStep, int allocatedTimeToCurrentStage, int currentStageMinimumBarrierLength, int allocatedTimeToPreviousStage, vector<int> inactiveSignalgroupInCurrentStage, int ringNo)
 {
     vector<int> signalGroup1AllocatedTimeStepList{};
@@ -517,8 +496,14 @@ void SignalControl::currentStageRecurssion(int stageIndex, int timeStep, int all
     {
         if (plannedStages[stageIndex].signalGroup1InRing1 == 0)
         {
-            allocatedTimeToCurrentStageSignalGroup2InRing1 = allocatedTimeToCurrentStage;
-            allocatedGreenTimeToCurrentStageSignalGroup2InRing1 = allocatedTimeToCurrentStage - clearanceIntervalSignalGroup2InRing1;
+            // If signalGroup1InRing1 value is zero for a stage all the allocated time to current stage will be assigned to signalGroup2InRing1
+            if (stageIndex == 0)
+                allocatedTimeToCurrentStageSignalGroup2InRing1 = allocatedTimeToCurrentStage - static_cast<int>(trafficControllerStatus[0].initPhase1);
+
+            else
+                allocatedTimeToCurrentStageSignalGroup2InRing1 = allocatedTimeToCurrentStage;
+
+            allocatedGreenTimeToCurrentStageSignalGroup2InRing1 = allocatedTimeToCurrentStageSignalGroup2InRing1 - clearanceIntervalSignalGroup2InRing1;
 
             availableOption.signalGroup1 = 0;
             availableOption.allocatedTimeStepSignalGroup1 = 0;
@@ -536,8 +521,14 @@ void SignalControl::currentStageRecurssion(int stageIndex, int timeStep, int all
 
         else if (plannedStages[stageIndex].signalGroup2InRing1 == 0)
         {
-            allocatedTimeToCurrentStageSignalGroup1InRing1 = allocatedTimeToCurrentStage;
-            allocatedGreenTimeToCurrentStageSignalGroup1InRing1 = allocatedTimeToCurrentStage - clearanceIntervalSignalGroup1InRing1;
+            // If signalGroup2InRing1 value is zero for a stage all the allocated time to current stage will be assigned to signalGroup1InRing1
+            if (stageIndex == 0)
+                allocatedTimeToCurrentStageSignalGroup1InRing1 = allocatedTimeToCurrentStage - static_cast<int>(trafficControllerStatus[0].initPhase1);
+
+            else
+                allocatedTimeToCurrentStageSignalGroup1InRing1 = allocatedTimeToCurrentStage;
+
+            allocatedGreenTimeToCurrentStageSignalGroup1InRing1 = allocatedTimeToCurrentStageSignalGroup1InRing1 - clearanceIntervalSignalGroup1InRing1;
 
             availableOption.signalGroup1 = plannedStages[stageIndex].signalGroup1InRing1;
             availableOption.allocatedTimeStepSignalGroup1 = allocatedTimeToCurrentStageSignalGroup1InRing1;
@@ -560,8 +551,19 @@ void SignalControl::currentStageRecurssion(int stageIndex, int timeStep, int all
             for (size_t i = 0; i < signalGroup1AllocatedTimeStepList.size(); i++)
             {
                 availableOption.reset();
-                allocatedTimeToCurrentStageSignalGroup1InRing1 = signalGroup1AllocatedTimeStepList.at(i);
-                allocatedTimeToCurrentStageSignalGroup2InRing1 = allocatedTimeToCurrentStage - allocatedTimeToCurrentStageSignalGroup1InRing1;
+
+                if (stageIndex == 0)
+                {
+                    allocatedTimeToCurrentStageSignalGroup1InRing1 = signalGroup1AllocatedTimeStepList.at(i) - static_cast<int>(trafficControllerStatus[0].initPhase1);
+                    allocatedTimeToCurrentStageSignalGroup2InRing1 = allocatedTimeToCurrentStage - allocatedTimeToCurrentStageSignalGroup1InRing1 - static_cast<int>(trafficControllerStatus[0].initPhase1);
+                }
+
+                else
+                {
+                    allocatedTimeToCurrentStageSignalGroup1InRing1 = signalGroup1AllocatedTimeStepList.at(i);
+                    allocatedTimeToCurrentStageSignalGroup2InRing1 = allocatedTimeToCurrentStage - allocatedTimeToCurrentStageSignalGroup1InRing1;
+                }
+
                 allocatedGreenTimeToCurrentStageSignalGroup1InRing1 = allocatedTimeToCurrentStageSignalGroup1InRing1 - clearanceIntervalSignalGroup1InRing1;
                 allocatedGreenTimeToCurrentStageSignalGroup2InRing1 = allocatedTimeToCurrentStageSignalGroup2InRing1 - clearanceIntervalSignalGroup2InRing1;
 
@@ -591,8 +593,13 @@ void SignalControl::currentStageRecurssion(int stageIndex, int timeStep, int all
     {
         if (plannedStages[stageIndex].signalGroup1InRing2 == 0)
         {
-            allocatedTimeToCurrentStageSignalGroup2InRing2 = allocatedTimeToCurrentStage;
-            allocatedGreenTimeToCurrentStageSignalGroup2InRing2 = allocatedTimeToCurrentStage - clearanceIntervalSignalGroup2InRing2;
+            if (stageIndex == 0)
+                allocatedTimeToCurrentStageSignalGroup2InRing2 = allocatedTimeToCurrentStage - static_cast<int>(trafficControllerStatus[0].initPhase2);
+
+            else
+                allocatedTimeToCurrentStageSignalGroup2InRing2 = allocatedTimeToCurrentStage;
+
+            allocatedGreenTimeToCurrentStageSignalGroup2InRing2 = allocatedTimeToCurrentStageSignalGroup2InRing2 - clearanceIntervalSignalGroup2InRing2;
 
             availableOption.signalGroup1 = 0;
             availableOption.allocatedTimeStepSignalGroup1 = 0;
@@ -608,10 +615,15 @@ void SignalControl::currentStageRecurssion(int stageIndex, int timeStep, int all
             availableOptionListForForwardStage.push_back(availableOption);
         }
 
-        else if (plannedStages[stageIndex].signalGroup2InRing2 == 0 && ringNo == Ring2)
+        else if (plannedStages[stageIndex].signalGroup2InRing2 == 0)
         {
-            allocatedTimeToCurrentStageSignalGroup1InRing2 = allocatedTimeToCurrentStage;
-            allocatedGreenTimeToCurrentStageSignalGroup1InRing2 = allocatedTimeToCurrentStage - clearanceIntervalSignalGroup1InRing2;
+            if (stageIndex == 0)
+                allocatedTimeToCurrentStageSignalGroup1InRing2 = allocatedTimeToCurrentStage - static_cast<int>(trafficControllerStatus[0].initPhase2);
+
+            else
+                allocatedTimeToCurrentStageSignalGroup1InRing2 = allocatedTimeToCurrentStage;
+
+            allocatedGreenTimeToCurrentStageSignalGroup1InRing2 = allocatedTimeToCurrentStageSignalGroup1InRing2 - clearanceIntervalSignalGroup1InRing2;
 
             availableOption.signalGroup1 = plannedStages[stageIndex].signalGroup1InRing2;
             availableOption.allocatedTimeStepSignalGroup1 = allocatedTimeToCurrentStageSignalGroup1InRing2;
@@ -627,15 +639,26 @@ void SignalControl::currentStageRecurssion(int stageIndex, int timeStep, int all
             availableOptionListForForwardStage.push_back(availableOption);
         }
 
-        else if (ringNo == Ring2)
+        else
         {
             signalGroup1AllocatedTimeStepList = getAllocatedTimeStepListToSignalGroup1(allocatedTimeToCurrentStage, currentStageMinimumBarrierLength, gminSignalGroup2InRing2, clearanceIntervalSignalGroup2InRing2);
 
             for (size_t i = 0; i < signalGroup1AllocatedTimeStepList.size(); i++)
             {
                 availableOption.reset();
-                allocatedTimeToCurrentStageSignalGroup1InRing2 = signalGroup1AllocatedTimeStepList.at(i);
-                allocatedTimeToCurrentStageSignalGroup2InRing2 = allocatedTimeToCurrentStage - allocatedTimeToCurrentStageSignalGroup1InRing2;
+
+                if (stageIndex == 0)
+                {
+                    allocatedTimeToCurrentStageSignalGroup1InRing2 = signalGroup1AllocatedTimeStepList.at(i) - static_cast<int>(trafficControllerStatus[0].initPhase2);
+                    allocatedTimeToCurrentStageSignalGroup2InRing2 = allocatedTimeToCurrentStage - allocatedTimeToCurrentStageSignalGroup1InRing2 - static_cast<int>(trafficControllerStatus[0].initPhase2);
+                }
+
+                else
+                {
+                    allocatedTimeToCurrentStageSignalGroup1InRing2 = signalGroup1AllocatedTimeStepList.at(i);
+                    allocatedTimeToCurrentStageSignalGroup2InRing2 = allocatedTimeToCurrentStage - allocatedTimeToCurrentStageSignalGroup1InRing2;
+                }
+
                 allocatedGreenTimeToCurrentStageSignalGroup1InRing2 = allocatedTimeToCurrentStageSignalGroup1InRing2 - clearanceIntervalSignalGroup1InRing2;
                 allocatedGreenTimeToCurrentStageSignalGroup2InRing2 = allocatedTimeToCurrentStageSignalGroup2InRing2 - clearanceIntervalSignalGroup2InRing2;
 
@@ -673,44 +696,48 @@ void SignalControl::currentStageRecurssion(int stageIndex, int timeStep, int all
 */
 double SignalControl::getPerformaceMeasurementListForActivePhasesInFirstStage(int currentStageTimeStep)
 {
-    double performanceMeasurement{};
-    double unservedVehiclesPerformanceMeasurement{};
+    double performanceMeasurementForSignalGroup1{};
+    double performanceMeasurementForSignalGroup2{};
     double minPerformanceMeasurement{};
     int temporarySignalGroup1{};
     int temporarySignalGroup2{};
+    int noOfVehicleInSignalGroup1{};
+    int noOfVehicleInSignalGroup2{};
 
     vector<double> performanceMeasurementList{};
 
     for (size_t i = 0; i < availableOptionListForForwardStage.size(); i++)
     {
-        performanceMeasurement = 0;
+        performanceMeasurementForSignalGroup1 = 0;
+        performanceMeasurementForSignalGroup2 = 0;
         temporarySignalGroup1 = availableOptionListForForwardStage[i].signalGroup1;
         temporarySignalGroup2 = availableOptionListForForwardStage[i].signalGroup2;
 
         for (size_t j = 0; j < vehicleArrivalTable.size(); j++)
         {
-            // if (vehicleArrivalTable[j].signalGroup == temporarySignalGroup1 && vehicleArrivalTable[j].ETA <= availableOptionListForForwardStage[i].allocatedGreenTimeSignalGroup1)
-            //     performanceMeasurement = performanceMeasurement + 0;
-
+            // Delay occurs when vehicle's ETA is less than current stage time step and greater than the allocated green time its desired service phase
             if (vehicleArrivalTable[j].signalGroup == temporarySignalGroup1 && vehicleArrivalTable[j].ETA <= currentStageTimeStep &&
                 vehicleArrivalTable[j].ETA > availableOptionListForForwardStage[i].allocatedGreenTimeSignalGroup1)
-                performanceMeasurement = performanceMeasurement + (currentStageTimeStep - vehicleArrivalTable[j].ETA) * vehicleArrivalTable[j].priorityWeight;
-
-            // else if (vehicleArrivalTable[j].signalGroup == temporarySignalGroup2 && vehicleArrivalTable[j].ETA <= availableOptionListForForwardStage[i].allocatedGreenTimeSignalGroup2)
-            //     performanceMeasurement = performanceMeasurement + 0;
+            {
+                performanceMeasurementForSignalGroup1 = performanceMeasurementForSignalGroup1 + (currentStageTimeStep - vehicleArrivalTable[j].ETA) * vehicleArrivalTable[j].priorityWeight;
+                noOfVehicleInSignalGroup1++;
+            }
 
             else if (vehicleArrivalTable[j].signalGroup == temporarySignalGroup2 && vehicleArrivalTable[j].ETA <= currentStageTimeStep &&
                      vehicleArrivalTable[j].ETA > availableOptionListForForwardStage[i].allocatedGreenTimeSignalGroup2)
-                performanceMeasurement = performanceMeasurement + (currentStageTimeStep - vehicleArrivalTable[j].ETA) * vehicleArrivalTable[j].priorityWeight;
-            /* logic to calculate unserved vehicles delay */
-            // if (vehicleArrivalTable[j].signalGroup == temporarySignalGroup1 && vehicleArrivalTable[j].ETA>availableOptionListForForwardStage[i].allocatedGreenTimeSignalGroup1)
-            //     unservedVehiclesPerformanceMeasurement = unservedVehiclesPerformanceMeasurement + (vehicleArrivalTable[j].ETA - availableOptionListForForwardStage[i].allocatedGreenTimeSignalGroup1)*5;
-
-            // else if (vehicleArrivalTable[j].signalGroup == temporarySignalGroup2 && vehicleArrivalTable[j].ETA>availableOptionListForForwardStage[i].allocatedGreenTimeSignalGroup2)
-            //     unservedVehiclesPerformanceMeasurement = unservedVehiclesPerformanceMeasurement + (vehicleArrivalTable[j].ETA - availableOptionListForForwardStage[i].allocatedGreenTimeSignalGroup2)*5;
+            {
+                performanceMeasurementForSignalGroup2 = performanceMeasurementForSignalGroup2 + (currentStageTimeStep - vehicleArrivalTable[j].ETA) * vehicleArrivalTable[j].priorityWeight;
+                noOfVehicleInSignalGroup2++;
+            }
         }
-        performanceMeasurement = performanceMeasurement + unservedVehiclesPerformanceMeasurement;
-        performanceMeasurementList.push_back(performanceMeasurement);
+
+        if (noOfVehicleInSignalGroup1 > 0 && objectiveFunction == "AverageDelayPerMovement")
+            performanceMeasurementForSignalGroup1 = performanceMeasurementForSignalGroup1 / noOfVehicleInSignalGroup1;
+
+        if (noOfVehicleInSignalGroup2 > 0 && objectiveFunction == "AverageDelayPerMovement")
+            performanceMeasurementForSignalGroup2 = performanceMeasurementForSignalGroup2 / noOfVehicleInSignalGroup2;
+
+        performanceMeasurementList.push_back(performanceMeasurementForSignalGroup1 + performanceMeasurementForSignalGroup2);
     }
 
     minPerformanceMeasurement = *min_element(performanceMeasurementList.begin(), performanceMeasurementList.end());
@@ -721,10 +748,14 @@ double SignalControl::getPerformaceMeasurementListForActivePhasesInFirstStage(in
     return minPerformanceMeasurement;
 }
 
+/*
+    - Method to calculate delay for the inactive phases in first stage
+*/
 double SignalControl::getPerformaceMeasurementListForInactivePhasesInFirstStage(int currentStageTimeStep, vector<int> inactiveSignalGroupIncurrentStage)
 {
     double performanceMeasurement{};
     int temporarySignalGroup{};
+    int noOfVehicle{};
 
     for (size_t i = 0; i < inactiveSignalGroupIncurrentStage.size(); i++)
     {
@@ -733,9 +764,15 @@ double SignalControl::getPerformaceMeasurementListForInactivePhasesInFirstStage(
         for (size_t j = 0; j < vehicleArrivalTable.size(); j++)
         {
             if (vehicleArrivalTable[j].signalGroup == temporarySignalGroup && vehicleArrivalTable[j].ETA <= currentStageTimeStep)
+            {
                 performanceMeasurement = performanceMeasurement + (currentStageTimeStep - vehicleArrivalTable[j].ETA) * vehicleArrivalTable[j].priorityWeight;
+                noOfVehicle++;
+            }
         }
     }
+
+    if (noOfVehicle > 0 && objectiveFunction == "AverageDelayPerMovement")
+        performanceMeasurement = performanceMeasurement / noOfVehicle;
 
     return performanceMeasurement;
 }
@@ -746,19 +783,21 @@ double SignalControl::getPerformaceMeasurementListForInactivePhasesInFirstStage(
         - performanceMeasurementTable's signal group doesn't macth with the current stage's sigal group break the loop.
         - performanceMeasurementTable's signal group macthes with the current stage's signal group it is required to consider allocated time and allocated green time while estimating delay
 */
-
 double SignalControl::getPerformaceMeasurementListForActivePhasesInLaterStage(int stageIndex, int currentStageTimeStep, int allocatedTimeToPreviousStage, int ringNo)
 {
-    double performanceMeasurement{};
+    double performanceMeasurementForSignalGroup1{};
+    double performanceMeasurementForSignalGroup2{};
     double minPerformanceMeasurement{};
+    int noOfVehicleInSignalGroup1{};
+    int noOfVehicleInSignalGroup2{};
     int temporarySignalGroup1{};
     int temporarySignalGroup2{};
     int allocatedTimeToSignalGroup1{};
     int allocatedTimeToSignalGroup2{};
-    int allocatedGreenTimeToSignalGroup1{};
-    int allocatedGreenTimeToSignalGroup2{};
-    int allocatedTimeToPreviousStageSignalGroup1 = allocatedTimeToPreviousStage;
-    int allocatedTimeToPreviousStageSignalGroup2 = allocatedTimeToPreviousStage;
+    int allocatedGreenTimeToSignalGroup1InPreviousStage{};
+    int allocatedGreenTimeToSignalGroup2InPreviousStage{};
+    int allocatedTimeToSignalGroup1InPreviousStage = allocatedTimeToPreviousStage;
+    int allocatedTimeToSignalGroup2InPreviousStage = allocatedTimeToPreviousStage;
 
     vector<double> performanceMeasurementList{};
 
@@ -767,65 +806,67 @@ double SignalControl::getPerformaceMeasurementListForActivePhasesInLaterStage(in
         temporarySignalGroup1 = plannedStages[stageIndex].signalGroup1InRing1;
         temporarySignalGroup2 = plannedStages[stageIndex].signalGroup2InRing1;
 
+        // Compute the allocated phase duration and allocated green time of signalGroup1InRing1 in previous stages
         for (int index = stageIndex - 1; index >= 0; --index)
         {
             for (size_t j = 0; j < performanceMeasurementTable.size(); j++)
             {
                 /*
                     - If starting phase is phase 2 & 6, for leading left turn stages will be {{2,6},{3,4,7,8},{1,2,5,6},{3,4,7,8}}
-                    - At stage 3, while calculating served green time in the previous stages for phase 2 it will match signalGroup1InRing1 at stage1 not signalGroup2InRing1
+                    - At stage 3, while calculating served green time in the previous stages for phase 2, it requires to match signalGroup1InRing1 at stage1 not signalGroup2InRing1
                 */
                 if (performanceMeasurementTable[j].stageNo == (index + 1) &&
                     ((performanceMeasurementTable[j].signalGroup1InRing1 == temporarySignalGroup1) || (performanceMeasurementTable[j].signalGroup2InRing1 == temporarySignalGroup1)) &&
-                    performanceMeasurementTable[j].timeStep == allocatedTimeToPreviousStageSignalGroup1)
+                    performanceMeasurementTable[j].timeStep == allocatedTimeToSignalGroup1InPreviousStage)
                 {
                     if (performanceMeasurementTable[j].signalGroup1InRing1 == temporarySignalGroup1)
                     {
                         allocatedTimeToSignalGroup1 = allocatedTimeToSignalGroup1 + performanceMeasurementTable[j].allocatedTimeStepSignalGroup1Ring1;
-                        allocatedGreenTimeToSignalGroup1 = allocatedGreenTimeToSignalGroup1 + performanceMeasurementTable[j].allocatedGreenTimeSignalGroup1Ring1;
+                        allocatedGreenTimeToSignalGroup1InPreviousStage = allocatedGreenTimeToSignalGroup1InPreviousStage + performanceMeasurementTable[j].allocatedGreenTimeSignalGroup1Ring1;
                     }
 
                     else if (performanceMeasurementTable[j].signalGroup2InRing1 == temporarySignalGroup1)
                     {
                         allocatedTimeToSignalGroup1 = allocatedTimeToSignalGroup1 + performanceMeasurementTable[j].allocatedTimeStepSignalGroup2Ring1;
-                        allocatedGreenTimeToSignalGroup1 = allocatedGreenTimeToSignalGroup1 + performanceMeasurementTable[j].allocatedGreenTimeSignalGroup2Ring1;
+                        allocatedGreenTimeToSignalGroup1InPreviousStage = allocatedGreenTimeToSignalGroup1InPreviousStage + performanceMeasurementTable[j].allocatedGreenTimeSignalGroup2Ring1;
                     }
-
-                    allocatedTimeToPreviousStageSignalGroup1 = performanceMeasurementTable[j].allocatedTimeToPreviousStage;
+                    // If solving for 6stage then allocatedTimeToPreviousStage at stage 4 will be required for the calculation of stage 2
+                    allocatedTimeToSignalGroup1InPreviousStage = performanceMeasurementTable[j].allocatedTimeToPreviousStage;
                     break;
                 }
 
                 else if (performanceMeasurementTable[j].stageNo == (index + 1) && performanceMeasurementTable[j].signalGroup1InRing1 != temporarySignalGroup1 &&
-                         performanceMeasurementTable[j].signalGroup2InRing1 != temporarySignalGroup1 && performanceMeasurementTable[j].timeStep == allocatedTimeToPreviousStageSignalGroup1)
-                    allocatedTimeToPreviousStageSignalGroup1 = performanceMeasurementTable[j].allocatedTimeToPreviousStage;
+                         performanceMeasurementTable[j].signalGroup2InRing1 != temporarySignalGroup1 && performanceMeasurementTable[j].timeStep == allocatedTimeToSignalGroup1InPreviousStage)
+                    allocatedTimeToSignalGroup1InPreviousStage = performanceMeasurementTable[j].allocatedTimeToPreviousStage;
             }
 
+            // Compute the allocated phase duration and allocated green time of signalGroup1InRing1 in previous stages
             for (size_t k = 0; k < performanceMeasurementTable.size(); k++)
             {
                 if (performanceMeasurementTable[k].stageNo == (index + 1) &&
                     ((performanceMeasurementTable[k].signalGroup1InRing1 == temporarySignalGroup2) || (performanceMeasurementTable[k].signalGroup2InRing1 == temporarySignalGroup2)) &&
-                    performanceMeasurementTable[k].timeStep == allocatedTimeToPreviousStageSignalGroup2)
+                    performanceMeasurementTable[k].timeStep == allocatedTimeToSignalGroup2InPreviousStage)
                 {
                     if (performanceMeasurementTable[k].signalGroup1InRing1 == temporarySignalGroup2)
                     {
                         allocatedTimeToSignalGroup2 = allocatedTimeToSignalGroup2 + performanceMeasurementTable[k].allocatedTimeStepSignalGroup1Ring1;
-                        allocatedGreenTimeToSignalGroup2 = allocatedGreenTimeToSignalGroup2 + performanceMeasurementTable[k].allocatedGreenTimeSignalGroup1Ring1;
+                        allocatedGreenTimeToSignalGroup2InPreviousStage = allocatedGreenTimeToSignalGroup2InPreviousStage + performanceMeasurementTable[k].allocatedGreenTimeSignalGroup1Ring1;
                     }
 
                     else if (performanceMeasurementTable[k].signalGroup2InRing1 == temporarySignalGroup2)
                     {
                         allocatedTimeToSignalGroup2 = allocatedTimeToSignalGroup2 + performanceMeasurementTable[k].allocatedTimeStepSignalGroup2Ring1;
-                        allocatedGreenTimeToSignalGroup2 = allocatedGreenTimeToSignalGroup2 + performanceMeasurementTable[k].allocatedGreenTimeSignalGroup2Ring1;
+                        allocatedGreenTimeToSignalGroup2InPreviousStage = allocatedGreenTimeToSignalGroup2InPreviousStage + performanceMeasurementTable[k].allocatedGreenTimeSignalGroup2Ring1;
                     }
 
-                    allocatedTimeToPreviousStageSignalGroup2 = performanceMeasurementTable[k].allocatedTimeToPreviousStage;
+                    allocatedTimeToSignalGroup2InPreviousStage = performanceMeasurementTable[k].allocatedTimeToPreviousStage;
                     break;
                 }
 
                 else if (performanceMeasurementTable[k].stageNo == (index + 1) && performanceMeasurementTable[k].signalGroup1InRing1 != temporarySignalGroup2 &&
                          performanceMeasurementTable[k].signalGroup2InRing1 != temporarySignalGroup2 &&
-                         performanceMeasurementTable[k].timeStep == allocatedTimeToPreviousStageSignalGroup2)
-                    allocatedTimeToPreviousStageSignalGroup2 = performanceMeasurementTable[k].allocatedTimeToPreviousStage;
+                         performanceMeasurementTable[k].timeStep == allocatedTimeToSignalGroup2InPreviousStage)
+                    allocatedTimeToSignalGroup2InPreviousStage = performanceMeasurementTable[k].allocatedTimeToPreviousStage;
             }
         }
     }
@@ -841,56 +882,56 @@ double SignalControl::getPerformaceMeasurementListForActivePhasesInLaterStage(in
             {
                 if (performanceMeasurementTable[j].stageNo == (index + 1) &&
                     ((performanceMeasurementTable[j].signalGroup1InRing2 == temporarySignalGroup1) || (performanceMeasurementTable[j].signalGroup2InRing2 == temporarySignalGroup1)) &&
-                    performanceMeasurementTable[j].timeStep == allocatedTimeToPreviousStageSignalGroup1)
+                    performanceMeasurementTable[j].timeStep == allocatedTimeToSignalGroup1InPreviousStage)
                 {
                     if (performanceMeasurementTable[j].signalGroup1InRing2 == temporarySignalGroup1)
                     {
                         allocatedTimeToSignalGroup1 = allocatedTimeToSignalGroup1 + performanceMeasurementTable[j].allocatedTimeStepSignalGroup1Ring2;
-                        allocatedGreenTimeToSignalGroup1 = allocatedGreenTimeToSignalGroup1 + performanceMeasurementTable[j].allocatedGreenTimeSignalGroup1Ring2;
+                        allocatedGreenTimeToSignalGroup1InPreviousStage = allocatedGreenTimeToSignalGroup1InPreviousStage + performanceMeasurementTable[j].allocatedGreenTimeSignalGroup1Ring2;
                     }
 
                     else if (performanceMeasurementTable[j].signalGroup2InRing2 == temporarySignalGroup1)
                     {
                         allocatedTimeToSignalGroup1 = allocatedTimeToSignalGroup1 + performanceMeasurementTable[j].allocatedTimeStepSignalGroup2Ring2;
-                        allocatedGreenTimeToSignalGroup1 = allocatedGreenTimeToSignalGroup1 + performanceMeasurementTable[j].allocatedGreenTimeSignalGroup2Ring2;
+                        allocatedGreenTimeToSignalGroup1InPreviousStage = allocatedGreenTimeToSignalGroup1InPreviousStage + performanceMeasurementTable[j].allocatedGreenTimeSignalGroup2Ring2;
                     }
 
-                    allocatedTimeToPreviousStageSignalGroup1 = performanceMeasurementTable[j].allocatedTimeToPreviousStage;
+                    allocatedTimeToSignalGroup1InPreviousStage = performanceMeasurementTable[j].allocatedTimeToPreviousStage;
                     break;
                 }
 
                 else if (performanceMeasurementTable[j].stageNo == (index + 1) && performanceMeasurementTable[j].signalGroup1InRing2 != temporarySignalGroup1 &&
                          performanceMeasurementTable[j].signalGroup2InRing2 != temporarySignalGroup1 &&
-                         performanceMeasurementTable[j].timeStep == allocatedTimeToPreviousStageSignalGroup1)
-                    allocatedTimeToPreviousStageSignalGroup1 = performanceMeasurementTable[j].allocatedTimeToPreviousStage;
+                         performanceMeasurementTable[j].timeStep == allocatedTimeToSignalGroup1InPreviousStage)
+                    allocatedTimeToSignalGroup1InPreviousStage = performanceMeasurementTable[j].allocatedTimeToPreviousStage;
             }
 
             for (size_t k = 0; k < performanceMeasurementTable.size(); k++)
             {
                 if (performanceMeasurementTable[k].stageNo == (index + 1) &&
                     ((performanceMeasurementTable[k].signalGroup1InRing2 == temporarySignalGroup2) || (performanceMeasurementTable[k].signalGroup2InRing2 == temporarySignalGroup2)) &&
-                    performanceMeasurementTable[k].timeStep == allocatedTimeToPreviousStageSignalGroup2)
+                    performanceMeasurementTable[k].timeStep == allocatedTimeToSignalGroup2InPreviousStage)
                 {
                     if (performanceMeasurementTable[k].signalGroup1InRing2 == temporarySignalGroup2)
                     {
                         allocatedTimeToSignalGroup2 = allocatedTimeToSignalGroup2 + performanceMeasurementTable[k].allocatedTimeStepSignalGroup1Ring2;
-                        allocatedGreenTimeToSignalGroup2 = allocatedGreenTimeToSignalGroup2 + performanceMeasurementTable[k].allocatedGreenTimeSignalGroup1Ring2;
+                        allocatedGreenTimeToSignalGroup2InPreviousStage = allocatedGreenTimeToSignalGroup2InPreviousStage + performanceMeasurementTable[k].allocatedGreenTimeSignalGroup1Ring2;
                     }
 
                     else if (performanceMeasurementTable[k].signalGroup2InRing2 == temporarySignalGroup2)
                     {
                         allocatedTimeToSignalGroup2 = allocatedTimeToSignalGroup2 + performanceMeasurementTable[k].allocatedTimeStepSignalGroup2Ring2;
-                        allocatedGreenTimeToSignalGroup2 = allocatedGreenTimeToSignalGroup2 + performanceMeasurementTable[k].allocatedGreenTimeSignalGroup2Ring2;
+                        allocatedGreenTimeToSignalGroup2InPreviousStage = allocatedGreenTimeToSignalGroup2InPreviousStage + performanceMeasurementTable[k].allocatedGreenTimeSignalGroup2Ring2;
                     }
 
-                    allocatedTimeToPreviousStageSignalGroup2 = performanceMeasurementTable[k].allocatedTimeToPreviousStage;
+                    allocatedTimeToSignalGroup2InPreviousStage = performanceMeasurementTable[k].allocatedTimeToPreviousStage;
                     break;
                 }
 
                 else if (performanceMeasurementTable[k].stageNo == (index + 1) && performanceMeasurementTable[k].signalGroup1InRing2 != temporarySignalGroup2 &&
                          performanceMeasurementTable[k].signalGroup2InRing2 != temporarySignalGroup2 &&
-                         performanceMeasurementTable[k].timeStep == allocatedTimeToPreviousStageSignalGroup2)
-                    allocatedTimeToPreviousStageSignalGroup2 = performanceMeasurementTable[k].allocatedTimeToPreviousStage;
+                         performanceMeasurementTable[k].timeStep == allocatedTimeToSignalGroup2InPreviousStage)
+                    allocatedTimeToSignalGroup2InPreviousStage = performanceMeasurementTable[k].allocatedTimeToPreviousStage;
             }
         }
     }
@@ -898,32 +939,39 @@ double SignalControl::getPerformaceMeasurementListForActivePhasesInLaterStage(in
     // Calculate Performance Measurement for active phases in current stage
     for (size_t i = 0; i < availableOptionListForForwardStage.size(); i++)
     {
-        performanceMeasurement = 0;
+        performanceMeasurementForSignalGroup1 = 0.0;
+        performanceMeasurementForSignalGroup2 = 0.0;
         temporarySignalGroup1 = availableOptionListForForwardStage[i].signalGroup1;
         temporarySignalGroup2 = availableOptionListForForwardStage[i].signalGroup2;
 
         for (size_t j = 0; j < vehicleArrivalTable.size(); j++)
         {
-            // if (vehicleArrivalTable[j].signalGroup == temporarySignalGroup1 &&
-            //     vehicleArrivalTable[j].ETA <= (availableOptionListForForwardStage[i].allocatedGreenTimeSignalGroup1 + allocatedGreenTimeToSignalGroup1))
-            //     performanceMeasurement = performanceMeasurement + 0;
-
             if (vehicleArrivalTable[j].signalGroup == temporarySignalGroup1 && vehicleArrivalTable[j].ETA <= currentStageTimeStep &&
-                vehicleArrivalTable[j].ETA > (availableOptionListForForwardStage[i].allocatedGreenTimeSignalGroup1 + allocatedGreenTimeToSignalGroup1))
-                performanceMeasurement = performanceMeasurement + (currentStageTimeStep - vehicleArrivalTable[j].ETA) * vehicleArrivalTable[j].priorityWeight;
-
-            // else if (vehicleArrivalTable[j].signalGroup == temporarySignalGroup2 &&
-            //          vehicleArrivalTable[j].ETA <= (availableOptionListForForwardStage[i].allocatedGreenTimeSignalGroup2 + allocatedGreenTimeToSignalGroup2))
-            //     performanceMeasurement = performanceMeasurement + 0;
+                vehicleArrivalTable[j].ETA > (availableOptionListForForwardStage[i].allocatedGreenTimeSignalGroup1 + allocatedGreenTimeToSignalGroup1InPreviousStage))
+            {
+                performanceMeasurementForSignalGroup1 = performanceMeasurementForSignalGroup1 + (currentStageTimeStep - vehicleArrivalTable[j].ETA) * vehicleArrivalTable[j].priorityWeight;
+                noOfVehicleInSignalGroup1++;
+            }
 
             else if (vehicleArrivalTable[j].signalGroup == temporarySignalGroup2 && vehicleArrivalTable[j].ETA <= currentStageTimeStep &&
-                     vehicleArrivalTable[j].ETA > (availableOptionListForForwardStage[i].allocatedGreenTimeSignalGroup2 + allocatedGreenTimeToSignalGroup2))
-                performanceMeasurement = performanceMeasurement + (currentStageTimeStep - vehicleArrivalTable[j].ETA) * vehicleArrivalTable[j].priorityWeight;
+                     vehicleArrivalTable[j].ETA > (availableOptionListForForwardStage[i].allocatedGreenTimeSignalGroup2 + allocatedGreenTimeToSignalGroup2InPreviousStage))
+            {
+                performanceMeasurementForSignalGroup2 = performanceMeasurementForSignalGroup2 + (currentStageTimeStep - vehicleArrivalTable[j].ETA) * vehicleArrivalTable[j].priorityWeight;
+                noOfVehicleInSignalGroup2++;
+            }
         }
-        performanceMeasurementList.push_back(performanceMeasurement);
+
+        if (noOfVehicleInSignalGroup1 > 0 && objectiveFunction == "AverageDelayPerMovement")
+            performanceMeasurementForSignalGroup1 = performanceMeasurementForSignalGroup1 / noOfVehicleInSignalGroup1;
+
+        if (noOfVehicleInSignalGroup2 > 0 && objectiveFunction == "AverageDelayPerMovement")
+            performanceMeasurementForSignalGroup2 = performanceMeasurementForSignalGroup2 / noOfVehicleInSignalGroup2;
+
+        performanceMeasurementList.push_back(performanceMeasurementForSignalGroup1 + performanceMeasurementForSignalGroup2);
     }
 
     minPerformanceMeasurement = *min_element(performanceMeasurementList.begin(), performanceMeasurementList.end());
+    
     auto it = find(performanceMeasurementList.begin(), performanceMeasurementList.end(), minPerformanceMeasurement);
     if (it != performanceMeasurementList.end())
         indexOfMinPerformanceMeasurement = static_cast<int>(it - performanceMeasurementList.begin());
@@ -931,6 +979,9 @@ double SignalControl::getPerformaceMeasurementListForActivePhasesInLaterStage(in
     return minPerformanceMeasurement;
 }
 
+/*
+    - Method to calculates delay for the inactive phases in later stage
+*/
 double SignalControl::getPerformaceMeasurementListForInactivePhasesInLaterStage(int stageIndex, int currentStageTimeStep, int allocatedTimeToPreviousStage, vector<int> inactiveSignalGroupIncurrentStage)
 {
     double performanceMeasurement{};
@@ -938,6 +989,7 @@ double SignalControl::getPerformaceMeasurementListForInactivePhasesInLaterStage(
     int temporaryAllocatedTimeToPreviousStage{};
     int allocatedTime{};
     int allocatedGreenTime{};
+    int noOfVehicle{};
 
     for (size_t i = 0; i < inactiveSignalGroupIncurrentStage.size(); i++)
     {
@@ -946,6 +998,7 @@ double SignalControl::getPerformaceMeasurementListForInactivePhasesInLaterStage(
         allocatedTime = 0;
         allocatedGreenTime = 0;
 
+        // Compute the total amount of time (phase duration and green time) allocated to a phase which is inactive in current stage
         for (int index = stageIndex - 1; index >= 0; --index)
         {
             for (size_t j = 0; j < performanceMeasurementTable.size(); j++)
@@ -996,13 +1049,23 @@ double SignalControl::getPerformaceMeasurementListForInactivePhasesInLaterStage(
         {
             if (vehicleArrivalTable[j].signalGroup == temporarySignalGroup && vehicleArrivalTable[j].ETA > allocatedGreenTime &&
                 vehicleArrivalTable[j].ETA <= currentStageTimeStep)
+            {
                 performanceMeasurement = performanceMeasurement + (currentStageTimeStep - vehicleArrivalTable[j].ETA) * vehicleArrivalTable[j].priorityWeight;
+                noOfVehicle++;
+            }
         }
     }
+
+    if (noOfVehicle > 0 && objectiveFunction == "AverageDelayPerMovement")
+        performanceMeasurement = performanceMeasurement / noOfVehicle;
 
     return performanceMeasurement;
 }
 
+/*
+    - Following method calculates all the possible options to serve signalgroup1 on current stage.
+    - The method also ensures a phase will be served at least for its minimum green time.
+*/
 vector<int> SignalControl::getAllocatedTimeStepListToSignalGroup1(int allocatedTotalTimeStep, int currentStageMinimumBarrierLength, int minimumGreenTimeSignalGroup2, int clearanceIntervalSignalGroup2)
 {
     vector<int> signalGroup1AllocatedTimeStepList{};
@@ -1016,6 +1079,10 @@ vector<int> SignalControl::getAllocatedTimeStepListToSignalGroup1(int allocatedT
     return signalGroup1AllocatedTimeStepList;
 }
 
+/*
+    - Follwing method calculates all the possible options (time) to allocate time in previous stage
+    - The method ensures previous stages are served minimum green time
+*/
 vector<int> SignalControl::getPreviousStageTimeStep(int currentStageTimeStep, int currentStageMinimumBarrierLength)
 {
     vector<int> previousStageTimeStepList{};
@@ -1036,6 +1103,9 @@ vector<int> SignalControl::getPreviousStageTimeStep(int currentStageTimeStep, in
     return previousStageTimeStepList;
 }
 
+/*
+    - Method to calculate value function for previous stage
+*/
 double SignalControl::getCummulativeValueFunction(int currentStageNo, int allocatedTimeToPreviousStage)
 {
     double previousStageValueFunction{};
@@ -1064,106 +1134,10 @@ bool SignalControl::checkStoppingCrietria(double previousPerformanceMeasurement,
 
     return stopIteration;
 }
-string SignalControl::getScheduleforTCI()
-{
-    return scheduleJsonString;
-}
 
-string SignalControl::getTimePhaseDiagramMessageString()
-{
-    std::string jsonString{};
-    Json::Value jsonObject;
-    Json::StreamWriterBuilder builder;
-    builder["commentStyle"] = "None";
-    builder["indentation"] = "";
-
-    jsonObject["MsgType"] = "TimePhaseDiagramForDP";
-    vector<int> phasesInRing1{};
-    vector<int> phasesInRing2{};
-    vector<int> phaseHeightInRing1{};
-    vector<int> phaseHeightInRing2{};
-    vector<int> criticalPointsInRing1{};
-    vector<int> criticalPointsInRing2{};
-
-    for (unsigned int i = 0; i < optimalSignalTiming.size(); i++)
-    {
-        phasesInRing1.push_back(optimalSignalTiming[i].signalGroup1InRing1);
-        criticalPointsInRing1.push_back(optimalSignalTiming[i].allocatedGreenTimeSignalGroup1Ring1 + optimalSignalTiming[i].clearanceIntervalSignalGroup1Ring1);
-
-        if (optimalSignalTiming[i].signalGroup2InRing1 > 0)
-        {
-            phasesInRing1.push_back(optimalSignalTiming[i].signalGroup2InRing1);
-            criticalPointsInRing1.push_back(optimalSignalTiming[i].allocatedGreenTimeSignalGroup2Ring1 + optimalSignalTiming[i].clearanceIntervalSignalGroup2Ring1);
-        }
-
-        phasesInRing2.push_back(optimalSignalTiming[i].signalGroup1InRing2);
-        criticalPointsInRing2.push_back(optimalSignalTiming[i].allocatedGreenTimeSignalGroup1Ring2 + optimalSignalTiming[i].clearanceIntervalSignalGroup1Ring2);
-
-        if (optimalSignalTiming[i].signalGroup2InRing2 > 0)
-        {
-            phasesInRing2.push_back(optimalSignalTiming[i].signalGroup2InRing2);
-            criticalPointsInRing2.push_back(optimalSignalTiming[i].allocatedGreenTimeSignalGroup2Ring2 + optimalSignalTiming[i].clearanceIntervalSignalGroup2Ring2);
-        }
-
-        if (optimalSignalTiming[i].signalGroup2InRing1 > 0 && optimalSignalTiming[i].signalGroup2InRing2 > 0)
-        {
-            phaseHeightInRing1.push_back(10);
-            phaseHeightInRing1.push_back(10);
-            phaseHeightInRing2.push_back(10);
-            phaseHeightInRing2.push_back(10);
-        }
-
-        else if (optimalSignalTiming[i].signalGroup2InRing1 > 0 && optimalSignalTiming[i].signalGroup2InRing2 == 0)
-        {
-            phaseHeightInRing1.push_back(10);
-            phaseHeightInRing1.push_back(10);
-            phaseHeightInRing2.push_back(20);
-        }
-
-        else if (optimalSignalTiming[i].signalGroup2InRing1 == 0 && optimalSignalTiming[i].signalGroup2InRing2 > 0)
-        {
-            phaseHeightInRing1.push_back(20);
-            phaseHeightInRing2.push_back(10);
-            phaseHeightInRing2.push_back(10);
-        }
-
-        else if (optimalSignalTiming[i].signalGroup2InRing1 == 0 && optimalSignalTiming[i].signalGroup2InRing2 == 0)
-        {
-            phaseHeightInRing1.push_back(10);
-            phaseHeightInRing2.push_back(10);
-        }
-    }
-
-    for (unsigned int i = 0; i < phasesInRing1.size(); i++)
-        jsonObject["PhasesInRing1"][i] = phasesInRing1[i];
-
-    for (unsigned int i = 0; i < phasesInRing2.size(); i++)
-        jsonObject["PhasesInRing2"][i] = phasesInRing2[i];
-
-    for (unsigned int i = 0; i < criticalPointsInRing1.size(); i++)
-        jsonObject["CriticalPointsInRing1"][i] = criticalPointsInRing1[i];
-
-    for (unsigned int i = 0; i < criticalPointsInRing2.size(); i++)
-        jsonObject["CriticalPointsInRing2"][i] = criticalPointsInRing2[i];
-
-    for (unsigned int i = 0; i < phaseHeightInRing1.size(); i++)
-        jsonObject["PhaseHeightInRing1"][i] = phaseHeightInRing1[i];
-
-    for (unsigned int i = 0; i < phaseHeightInRing2.size(); i++)
-        jsonObject["PhaseHeightInRing2"][i] = phaseHeightInRing2[i];
-
-    for (unsigned int i = 0; i < vehicleArrivalTable.size(); i++)
-    {
-        jsonObject["VehicleType"][i] = vehicleArrivalTable[i].vehicleType;
-        jsonObject["ETA"][i] = vehicleArrivalTable[i].ETA;
-        jsonObject["SignalGroup"][i] = vehicleArrivalTable[i].signalGroup;
-    }
-
-    jsonString = Json::writeString(builder, jsonObject);
-    // cout << jsonString << endl;
-
-    return jsonString;
-}
+/*
+    - Method to print optimal plan
+*/
 void SignalControl::printOptimalPan()
 {
     cout << "StageNo"
@@ -1197,6 +1171,9 @@ void SignalControl::printOptimalPan()
              << optimalSignalTiming[i].optimalPerformmanceMeasurement << endl;
 }
 
+/*
+    - Method to store forward recurssion results in a csv file.
+*/
 void SignalControl::logData()
 {
     string logFileName{};
@@ -1206,12 +1183,10 @@ void SignalControl::logData()
     char logFileOpenningTime[80];
     tstruct = *localtime(&now);
     strftime(logFileOpenningTime, sizeof(logFileOpenningTime), "%m%d%Y_%H%M%S", &tstruct);
-    // double timeStamp = getPosixTimestamp();
+
     logFileName = "/nojournal/bin/log/PerformanceMeasurementTable.csv";
-
     logFile.open(logFileName);
-    // logFile << "\n[" << fixed << showpoint << setprecision(4) << timeStamp << "] [" << getVerboseTimestamp() << "] ";
-
+    
     logFile << "Stage No"
             << ","
             << "Time Step"

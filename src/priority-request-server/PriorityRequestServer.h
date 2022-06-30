@@ -18,7 +18,6 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include "ArrivalTable.h"
 #include "SignalRequest.h"
 #include "SignalStatus.h"
 #include "ActiveRequest.h"
@@ -55,15 +54,10 @@ using std::vector;
 #define ALLOWED_ETA_DIFFERENCE 6.0
 #define SRM_TIME_GAP_VALUE 8.0
 #define ART_UPDATE_FREQUENCY 0.5
-#define FeetToMeterConversion 0.3048
-#define StandardQueueLengthPerVehicle 25.0
 
 enum msgType
 {
     coordinationRequest = 1,
-    connectedPassengerVehicleData = 2,
-    estimatedArrivalTable = 3
-    
 };
 
 class PriorityRequestServer
@@ -82,31 +76,28 @@ private:
     int msgReceived{};
     int msgServed{};
     int msgRejected{};
+    int currentMinuteOfYear{};
+    int currentMsOfMinute{};
+    int previousMinuteOfYear{};
+    int previousMsOfMinute{};
     double msgSentTime{};
-    double arrivalTableSendingTimeToSolver{};
-    double arrivalTableReceivedTime{};
     double expectedTimeOfArrivalToStopBar{};
     double requestTimedOutValue{};
     double etaUpdateTime{};
     double vehicleETA{};
-    double systemPerformanceSendingTimeInterval{};
-    double optimizationProblemSolvingTimegap{2.0};
-    double cellLength{};
+    double timeInterval{};
     bool logging{false};
     bool consoleOutput{false};
     bool emergencyVehicleStatus{false};
     bool sentClearRequest{};
     bool sentClearRequestForEV{};
-    bool sendSSM{false};
-    bool sendPriorityRequestList{false};
     string intersectionName{};
     string mapPayloadFileName{};
-    string optimizationMethod{};
+    bool sendSSM{false};
+    bool sendPriorityRequestList{false};
     ofstream logFile;
     /* plocAwareLib is a pointer that points to a variable of the type LocAware. This variable is be created in the constructor of this class, as it requires some other parameters that are available in the constructor.*/
     LocAware *plocAwareLib;
-    vector<ArrivalTable> ConnectedPassengerVehicleArrivalTable{};
-    vector<ArrivalTable> VehicleArrivalTable{};
 
 public:
     PriorityRequestServer();
@@ -127,14 +118,14 @@ public:
     void setRequestedSignalGroup(SignalRequest signalRequest);
     void setSrmMessageStatus(SignalRequest signalRequest);
     void setETAUpdateTime();
+    void setMinuteOfYear();
+    void setMsOfMinute();
     void readconfigFile();
     void loggingData(string logString);
     void displayConsoleData(string consoleString);
     void calculateETA(int ETA_Minute, int ETA_Second);
     int getMessageType(string jsonString);
     int getRequestTimedOutVehicleID();
-    int getMinuteOfYear();
-    int getMsOfMinute();
     int getPRSSequenceNumber();
     int getPRSUpdateCount();
     int getSplitPhase(int signalGroup);
@@ -150,10 +141,4 @@ public:
     bool findEVInList();
     bool findEVInRequest(SignalRequest signalRequest);
     bool sendSystemPerformanceDataLog();
-    void manageConnectedPassengerVehicleArrivalTable(string jsonString);
-    void manageVehicleArrivalTable(string jsonString);
-    void updateETAInArrivalTable();
-    string getVehicleArrivalTableJsonString();
-    bool checkArrivalTableSendingRequirement();
-    string getOptimizationMethod();
 };

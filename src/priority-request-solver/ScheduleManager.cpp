@@ -622,6 +622,7 @@ void ScheduleManager::createEventListForDP()
             schedule.commandPhase = optimalSignalTiming[i].signalGroup1InRing1;
             schedule.commandType = "hold";
             schedule.commandStartTime = 0.0 + trafficControllerStatus[0].initPhase1;
+            // schedule.commandEndTime = optimalSignalTiming[i].allocatedGreenTimeSignalGroup1Ring1 - 0.5;
             schedule.commandEndTime = optimalSignalTiming[i].allocatedGreenTimeSignalGroup1Ring1 + trafficControllerStatus[0].initPhase1 - 0.5;
             if (schedule.commandEndTime < 0.0)
                 schedule.commandEndTime = 0.0;
@@ -630,6 +631,8 @@ void ScheduleManager::createEventListForDP()
             schedule.reset();
             schedule.commandPhase = optimalSignalTiming[i].signalGroup1InRing1;
             schedule.commandType = "forceoff";
+            // schedule.commandStartTime = optimalSignalTiming[i].allocatedGreenTimeSignalGroup1Ring1;
+            // schedule.commandEndTime = optimalSignalTiming[i].allocatedGreenTimeSignalGroup1Ring1+ 3.0; //Econolite signal controller check for gateway every 2 second. It doesn't perform any operations that time. Force-OFF command may not execute if command end time is less than 2 seconds.
             schedule.commandStartTime = optimalSignalTiming[i].allocatedGreenTimeSignalGroup1Ring1 + trafficControllerStatus[0].initPhase1;
             schedule.commandEndTime = optimalSignalTiming[i].allocatedGreenTimeSignalGroup1Ring1 + trafficControllerStatus[0].initPhase1 + 3.0; //Econolite signal controller check for gateway every 2 second. It doesn't perform any operations that time. Force-OFF command may not execute if command end time is less than 2 seconds.
             completeSchedule.push_back(schedule);
@@ -640,6 +643,7 @@ void ScheduleManager::createEventListForDP()
             schedule.commandPhase = optimalSignalTiming[i].signalGroup1InRing2;
             schedule.commandType = "hold";
             schedule.commandStartTime = 0.0 + trafficControllerStatus[0].initPhase2;
+            // schedule.commandEndTime = optimalSignalTiming[i].allocatedGreenTimeSignalGroup1Ring2 - 0.5;
             schedule.commandEndTime = optimalSignalTiming[i].allocatedGreenTimeSignalGroup1Ring2 + trafficControllerStatus[0].initPhase2 - 0.5;
             if (schedule.commandEndTime < 0.0)
                 schedule.commandEndTime = 0.0;
@@ -648,6 +652,8 @@ void ScheduleManager::createEventListForDP()
             schedule.reset();
             schedule.commandPhase = optimalSignalTiming[i].signalGroup1InRing2;
             schedule.commandType = "forceoff";
+            // schedule.commandStartTime = optimalSignalTiming[i].allocatedGreenTimeSignalGroup1Ring2;
+            // schedule.commandEndTime = optimalSignalTiming[i].allocatedGreenTimeSignalGroup1Ring2 + 3.0;
             schedule.commandStartTime = optimalSignalTiming[i].allocatedGreenTimeSignalGroup1Ring2 + trafficControllerStatus[0].initPhase2;
             schedule.commandEndTime = optimalSignalTiming[i].allocatedGreenTimeSignalGroup1Ring2 + trafficControllerStatus[0].initPhase2 + 3.0;
             completeSchedule.push_back(schedule);

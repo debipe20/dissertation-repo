@@ -39,7 +39,7 @@ using namespace MsgEnum;
 PriorityRequestServer::PriorityRequestServer()
 {
 	bool singleFrame{false};
-	cellLength = StandardQueueLengthPerVehicle * FeetToMeterConversion;
+
 	readconfigFile();
 
 	LocAware *tempPlocAwareLib = new LocAware(mapPayloadFileName, singleFrame);
@@ -65,12 +65,6 @@ int PriorityRequestServer::getMessageType(string jsonString)
 
 		else if ((jsonObject["MsgType"]).asString() == "CoordinationRequest")
 			messageType = static_cast<int>(msgType::coordinationRequest);
-
-		else if ((jsonObject["MsgType"]).asString() == "ConnectedPassengerVehicleData")
-			messageType = static_cast<int>(msgType::connectedPassengerVehicleData);
-
-		else if ((jsonObject["MsgType"]).asString() == "EstimatedArrivalTable")
-			messageType = static_cast<int>(msgType::estimatedArrivalTable);
 
 		else
 		{
@@ -344,14 +338,7 @@ int PriorityRequestServer::getSplitPhase(int signalGroup)
 
 void PriorityRequestServer::calculateETA(int ETA_Minute, int ETA_Second)
 {
-	if (getMsOfMinute() > ETA_Second)
-		vehicleETA = (getMinuteOfYear() - ETA_Minute) * SECOND_MINTUTE_CONVERSION + ((getMsOfMinute() - ETA_Second) / SECOND_MILISECOND_CONVERSION) + SECOND_MINTUTE_CONVERSION;
-
-	else if (getMsOfMinute() < ETA_Second)
-		vehicleETA = (getMinuteOfYear() - ETA_Minute) * SECOND_MINTUTE_CONVERSION + (ETA_Second - getMsOfMinute()) / SECOND_MILISECOND_CONVERSION;
-
-	if (getMsOfMinute() == ETA_Second)
-		vehicleETA = (getMinuteOfYear() - ETA_Minute) * SECOND_MINTUTE_CONVERSION;
+	vehicleETA = ((ETA_Minute - currentMinuteOfYear) * SECOND_MINTUTE_CONVERSION) + ((ETA_Second - currentMsOfMinute) / SECOND_MILISECOND_CONVERSION);
 
 	if (vehicleETA < Minimum_ETA)
 		vehicleETA = Minimum_ETA;
@@ -379,6 +366,8 @@ void PriorityRequestServer::manageSignalRequestTable(SignalRequest signalRequest
 
 	if (acceptSignalRequest(signalRequest))
 	{
+		setMinuteOfYear();
+		setMsOfMinute();
 		calculateETA(signalRequest.getETA_Minute(), signalRequest.getETA_Second());
 		setRequestedSignalGroup(signalRequest);
 
@@ -394,8 +383,8 @@ void PriorityRequestServer::manageSignalRequestTable(SignalRequest signalRequest
 			activeRequest.basicVehicleRole = signalRequest.getBasicVehicleRole();
 			activeRequest.vehicleType = vehicleType;
 			activeRequest.vehicleLaneID = signalRequest.getInBoundLaneID();
-			activeRequest.minuteOfYear = getMinuteOfYear();
-			activeRequest.secondOfMinute = static_cast<int>(getMsOfMinute() / SECOND_MILISECOND_CONVERSION);
+			activeRequest.minuteOfYear = currentMsOfMinute;
+			activeRequest.secondOfMinute = static_cast<int>(currentMsOfMinute / SECOND_MILISECOND_CONVERSION);
 			activeRequest.signalGroup = vehicleRequestedSignalGroup;
 			activeRequest.vehicleETAMinute = signalRequest.getETA_Minute();
 			activeRequest.vehicleETASecond = signalRequest.getETA_Second();
@@ -419,8 +408,8 @@ void PriorityRequestServer::manageSignalRequestTable(SignalRequest signalRequest
 				activeRequest.basicVehicleRole = signalRequest.getBasicVehicleRole();
 				activeRequest.vehicleType = vehicleType;
 				activeRequest.vehicleLaneID = signalRequest.getInBoundLaneID();
-				activeRequest.minuteOfYear = getMinuteOfYear();
-				activeRequest.secondOfMinute = static_cast<int>(getMsOfMinute() / SECOND_MILISECOND_CONVERSION);
+				activeRequest.minuteOfYear = currentMinuteOfYear;
+				activeRequest.secondOfMinute = static_cast<int>(currentMsOfMinute / SECOND_MILISECOND_CONVERSION);
 				activeRequest.signalGroup = getSplitPhase(vehicleRequestedSignalGroup);
 				activeRequest.vehicleETAMinute = signalRequest.getETA_Minute();
 				activeRequest.vehicleETASecond = signalRequest.getETA_Second();
@@ -435,7 +424,6 @@ void PriorityRequestServer::manageSignalRequestTable(SignalRequest signalRequest
 				activeRequest.etaUpdateTime = currentTime;
 				ActiveRequestTable.push_back(activeRequest);
 			}
-			updateETAInActiveRequestTable();
 			sendPriorityRequestList = true;
 		}
 
@@ -462,8 +450,8 @@ void PriorityRequestServer::manageSignalRequestTable(SignalRequest signalRequest
 				activeRequest.basicVehicleRole = signalRequest.getBasicVehicleRole();
 				activeRequest.vehicleType = vehicleType;
 				activeRequest.vehicleLaneID = signalRequest.getInBoundLaneID();
-				activeRequest.minuteOfYear = getMinuteOfYear();
-				activeRequest.secondOfMinute = static_cast<int>(getMsOfMinute() / SECOND_MILISECOND_CONVERSION);
+				activeRequest.minuteOfYear = currentMinuteOfYear;
+				activeRequest.secondOfMinute = static_cast<int>(currentMsOfMinute / SECOND_MILISECOND_CONVERSION);
 				activeRequest.signalGroup = vehicleRequestedSignalGroup;
 				activeRequest.vehicleETAMinute = signalRequest.getETA_Minute();
 				activeRequest.vehicleETASecond = signalRequest.getETA_Second();
@@ -486,8 +474,8 @@ void PriorityRequestServer::manageSignalRequestTable(SignalRequest signalRequest
 					activeRequest.basicVehicleRole = signalRequest.getBasicVehicleRole();
 					activeRequest.vehicleType = vehicleType;
 					activeRequest.vehicleLaneID = signalRequest.getInBoundLaneID();
-					activeRequest.minuteOfYear = getMinuteOfYear();
-					activeRequest.secondOfMinute = static_cast<int>(getMsOfMinute() / SECOND_MILISECOND_CONVERSION);
+					activeRequest.minuteOfYear = currentMinuteOfYear;
+					activeRequest.secondOfMinute = static_cast<int>(currentMsOfMinute / SECOND_MILISECOND_CONVERSION);
 					activeRequest.signalGroup = getSplitPhase(vehicleRequestedSignalGroup);
 					activeRequest.vehicleETAMinute = signalRequest.getETA_Minute();
 					activeRequest.vehicleETASecond = signalRequest.getETA_Second();
@@ -515,8 +503,8 @@ void PriorityRequestServer::manageSignalRequestTable(SignalRequest signalRequest
 				findVehicleIDOnTable->msgCount = signalRequest.getMsgCount();
 				findVehicleIDOnTable->basicVehicleRole = signalRequest.getBasicVehicleRole();
 				findVehicleIDOnTable->vehicleLaneID = signalRequest.getInBoundLaneID();
-				findVehicleIDOnTable->minuteOfYear = getMinuteOfYear();
-				findVehicleIDOnTable->secondOfMinute = static_cast<int>(getMsOfMinute() / SECOND_MILISECOND_CONVERSION);
+				findVehicleIDOnTable->minuteOfYear = currentMinuteOfYear;
+				findVehicleIDOnTable->secondOfMinute = static_cast<int>(currentMsOfMinute / SECOND_MILISECOND_CONVERSION);
 				findVehicleIDOnTable->signalGroup = vehicleRequestedSignalGroup;
 				findVehicleIDOnTable->vehicleETAMinute = signalRequest.getETA_Minute();
 				findVehicleIDOnTable->vehicleETASecond = signalRequest.getETA_Second();
@@ -530,7 +518,6 @@ void PriorityRequestServer::manageSignalRequestTable(SignalRequest signalRequest
 				findVehicleIDOnTable->msgReceivedTime = currentTime;
 				findVehicleIDOnTable->etaUpdateTime = currentTime;
 			}
-			updateETAInActiveRequestTable();
 			sendPriorityRequestList = true;
 		}
 
@@ -569,10 +556,10 @@ void PriorityRequestServer::manageSignalRequestTable(SignalRequest signalRequest
 				if (findVehicleIDOnTable != ActiveRequestTable.end())
 					ActiveRequestTable.erase(findVehicleIDOnTable);
 			}
-			updateETAInActiveRequestTable();
 			sendPriorityRequestList = true;
 		}
 
+		updateETAInActiveRequestTable();
 		setPriorityRequestStatus();
 		setSrmMessageStatus(signalRequest);
 		sendSSM = true;
@@ -658,8 +645,8 @@ string PriorityRequestServer::createSSMJsonString(SignalStatus signalStatus)
 	string ssmJsonString{};
 	signalStatus.reset();
 
-	signalStatus.setMinuteOfYear(getMinuteOfYear());
-	signalStatus.setMsOfMinute(getMsOfMinute());
+	signalStatus.setMinuteOfYear(currentMinuteOfYear);
+	signalStatus.setMsOfMinute(currentMsOfMinute);
 	signalStatus.setSequenceNumber(getPRSSequenceNumber());
 	signalStatus.setUpdateCount(getPRSUpdateCount());
 	signalStatus.setRegionalID(regionalID);
@@ -687,7 +674,7 @@ string PriorityRequestServer::createJsonStringForPrioritySolver()
 
 	noOfRequest = static_cast<int>(ActiveRequestTable.size());
 
-	if ((sentClearRequestForEV || ActiveRequestTable.empty()) && getOptimizationMethod() == "MILP")
+	if (sentClearRequestForEV || ActiveRequestTable.empty())
 	{
 		jsonObject["MsgType"] = "ClearRequest";
 		sentClearRequest = true;
@@ -696,7 +683,7 @@ string PriorityRequestServer::createJsonStringForPrioritySolver()
 		loggingData("Clear Request Message will send to PRSolver");
 	}
 
-	else if (noOfRequest > 0 && getOptimizationMethod() == "MILP")
+	else if (noOfRequest > 0)
 	{
 		jsonObject["MsgType"] = "PriorityRequest";
 		jsonObject["PriorityRequestList"]["noOfRequest"] = noOfRequest;
@@ -710,7 +697,7 @@ string PriorityRequestServer::createJsonStringForPrioritySolver()
 			jsonObject["PriorityRequestList"]["requestorInfo"][i]["requestedSignalGroup"] = ActiveRequestTable[i].signalGroup;
 
 			if (ActiveRequestTable[i].vehicleETA <= 0)
-				jsonObject["PriorityRequestList"]["requestorInfo"][i]["ETA"] = Minimum_ETA;
+				jsonObject["PriorityRequestList"]["requestorInfo"][i]["ETA"] = 1.0;
 
 			else
 				jsonObject["PriorityRequestList"]["requestorInfo"][i]["ETA"] = ActiveRequestTable[i].vehicleETA;
@@ -756,7 +743,6 @@ bool PriorityRequestServer::getPriorityRequestListSendingRequirement()
 	- Checking whether PRS need to update the ETA in the ART.
 		- If there is no request in the list, no need to update the ETA
 		- If vehicle ETA is zero, no need to update.
-		- If there is no priority request, it is not required to send SSM. Thus, etaUpdateRequirement value is not updated for arrval table.
 */
 bool PriorityRequestServer::updateETA()
 {
@@ -769,9 +755,6 @@ bool PriorityRequestServer::updateETA()
 		updateETAInActiveRequestTable();
 	}
 
-	if (!VehicleArrivalTable.empty() && (currentTime - etaUpdateTime >= TIME_GAP_BETWEEN_ETA_Update))
-		updateETAInArrivalTable();
-
 	return etaUpdateRequirement;
 }
 
@@ -782,11 +765,8 @@ bool PriorityRequestServer::sendClearRequest()
 {
 	bool clearRequestStatus{false};
 
-	if (ActiveRequestTable.empty() && !sentClearRequest && (getOptimizationMethod() == "MILP"))
+	if (ActiveRequestTable.empty() && (sentClearRequest == false))
 		clearRequestStatus = true;
-
-	// else if (VehicleArrivalTable.empty() && !sentClearRequest && (getOptimizationMethod() == "DP"))
-	// 	clearRequestStatus = true;
 
 	return clearRequestStatus;
 }
@@ -799,22 +779,25 @@ void PriorityRequestServer::updateETAInActiveRequestTable()
 	double currentTime = getPosixTimestamp();
 	int relativeETAInMiliSecond{};
 
+	setMinuteOfYear();
+	setMsOfMinute();
+
 	if (!ActiveRequestTable.empty())
 	{
 		for (size_t i = 0; i < ActiveRequestTable.size(); i++)
 		{
 			ActiveRequestTable[i].vehicleETA = ActiveRequestTable[i].vehicleETA - (currentTime - ActiveRequestTable[i].etaUpdateTime);
 
-			if (ActiveRequestTable[i].vehicleETA <= 0)
+			if (ActiveRequestTable[i].basicVehicleRole == static_cast<int>(MsgEnum::basicRole::roadsideSource) && ActiveRequestTable[i].vehicleETA <= 0.0)
+				ActiveRequestTable[i].vehicleETADuration = static_cast<int>(ActiveRequestTable[i].vehicleETADuration - (currentTime - ActiveRequestTable[i].etaUpdateTime) * SECOND_MILISECOND_CONVERSION);
+
+			if (ActiveRequestTable[i].vehicleETA <= Minimum_ETA)
 				ActiveRequestTable[i].vehicleETA = Minimum_ETA;
 
-			relativeETAInMiliSecond = static_cast<int>(ActiveRequestTable[i].vehicleETA * SECOND_MILISECOND_CONVERSION + getMsOfMinute());
+			relativeETAInMiliSecond = static_cast<int>(ActiveRequestTable[i].vehicleETA * SECOND_MILISECOND_CONVERSION + currentMsOfMinute);
 
-			ActiveRequestTable[i].vehicleETAMinute = getMinuteOfYear() + (relativeETAInMiliSecond / static_cast<int>(SECOND_MINTUTE_CONVERSION * SECOND_MILISECOND_CONVERSION));
+			ActiveRequestTable[i].vehicleETAMinute = currentMinuteOfYear + (relativeETAInMiliSecond / static_cast<int>(SECOND_MINTUTE_CONVERSION * SECOND_MILISECOND_CONVERSION));
 			ActiveRequestTable[i].vehicleETASecond = relativeETAInMiliSecond % static_cast<int>(SECOND_MINTUTE_CONVERSION * SECOND_MILISECOND_CONVERSION);
-
-			if (ActiveRequestTable[i].basicVehicleRole == static_cast<int>(MsgEnum::basicRole::roadsideSource) && ActiveRequestTable[i].vehicleETA == Minimum_ETA)
-				ActiveRequestTable[i].vehicleETADuration = static_cast<int>(ActiveRequestTable[i].vehicleETADuration - (currentTime - ActiveRequestTable[i].etaUpdateTime) * SECOND_MILISECOND_CONVERSION);
 
 			ActiveRequestTable[i].etaUpdateTime = currentTime;
 		}
@@ -964,12 +947,10 @@ void PriorityRequestServer::setVehicleType(SignalRequest signalRequest)
 }
 
 /*
-	- Method for obtaining minute of a year based on GMT(UTC) time
+	- Method for setting current minute of a year based on GMT(UTC) time
 */
-int PriorityRequestServer::getMinuteOfYear()
+void PriorityRequestServer::setMinuteOfYear()
 {
-	int minuteOfYear{};
-
 	time_t curr_time;
 	curr_time = time(NULL);
 	tm *tm_gmt = gmtime(&curr_time);
@@ -978,27 +959,21 @@ int PriorityRequestServer::getMinuteOfYear()
 	int currentHour = tm_gmt->tm_hour;
 	int currentMinute = tm_gmt->tm_min;
 
-	minuteOfYear = dayOfYear * HOUR_DAY_CONVERSION * MINTUTE_HOUR_CONVERSION + currentHour * MINTUTE_HOUR_CONVERSION + currentMinute;
-
-	return minuteOfYear;
+	currentMinuteOfYear = dayOfYear * HOUR_DAY_CONVERSION * MINTUTE_HOUR_CONVERSION + currentHour * MINTUTE_HOUR_CONVERSION + currentMinute;
 }
 
 /*
-	- Method for obtaining millisecond of a minute based on GMT(UTC) time
+	- Method for setting current millisecond of a minute based on GMT(UTC) time
 */
-int PriorityRequestServer::getMsOfMinute()
+void PriorityRequestServer::setMsOfMinute()
 {
-	int msOfMinute{};
-
 	time_t curr_time;
 	curr_time = time(NULL);
 	tm *tm_gmt = gmtime(&curr_time);
 
 	int currentSecond = tm_gmt->tm_sec;
 
-	msOfMinute = currentSecond * static_cast<int>(SECOND_MILISECOND_CONVERSION);
-
-	return msOfMinute;
+	currentMsOfMinute = currentSecond * static_cast<int>(SECOND_MILISECOND_CONVERSION);
 }
 
 /*
@@ -1048,13 +1023,11 @@ void PriorityRequestServer::readconfigFile()
 	intersectionID = jsonObject["IntersectionID"].asInt();
 	regionalID = jsonObject["RegionalID"].asInt();
 	requestTimedOutValue = jsonObject["SRMTimedOutTime"].asDouble();
-	systemPerformanceSendingTimeInterval = jsonObject["SystemPerformanceTimeInterval"].asDouble();
+	timeInterval = jsonObject["SystemPerformanceTimeInterval"].asDouble();
 	logging = jsonObject["Logging"].asBool();
 	consoleOutput = jsonObject["ConsoleOutput"].asBool();
 	mapPayload = jsonObject["MapPayload"].asString();
 	intersectionName = jsonObject["IntersectionName"].asString();
-	optimizationMethod = jsonObject["PriorityParameter"]["OptimizationMethod"].asString();
-	optimizationProblemSolvingTimegap = jsonObject["PriorityParameter"]["OptimizationProblemSolvingTimegap"].asDouble();
 
 	mapPayloadFileName = "/nojournal/bin/" + intersectionName + ".map.payload";
 
@@ -1121,7 +1094,7 @@ bool PriorityRequestServer::sendSystemPerformanceDataLog()
 	bool sendData{false};
 	double currentTime = getPosixTimestamp();
 
-	if (currentTime - msgSentTime >= systemPerformanceSendingTimeInterval)
+	if (currentTime - msgSentTime >= timeInterval)
 		sendData = true;
 
 	return sendData;
@@ -1144,7 +1117,7 @@ string PriorityRequestServer::createJsonStringForSystemPerformanceDataLog()
 	jsonObject["MsgInformation"]["MsgCount"] = msgReceived;
 	jsonObject["MsgInformation"]["MsgServed"] = msgServed;
 	jsonObject["MsgInformation"]["MsgRejected"] = msgRejected;
-	jsonObject["MsgInformation"]["TimeInterval"] = systemPerformanceSendingTimeInterval;
+	jsonObject["MsgInformation"]["TimeInterval"] = timeInterval;
 	jsonObject["MsgInformation"]["Timestamp_posix"] = getPosixTimestamp();
 	jsonObject["MsgInformation"]["Timestamp_verbose"] = getVerboseTimestamp();
 
@@ -1173,10 +1146,15 @@ void PriorityRequestServer::manageCoordinationRequest(string jsonString)
 	Json::CharReaderBuilder builder;
 	Json::CharReader *reader = builder.newCharReader();
 	string errors{};
+
 	ActiveRequest activeRequest;
 	activeRequest.reset();
+
 	displayConsoleData("Received Coordination Request from Signal Coordination Request Generator");
 	loggingData("Received Coordination Request from Signal Coordination Request Generator");
+
+	setMinuteOfYear();
+	setMsOfMinute();
 	setETAUpdateTime();
 
 	reader->parse(jsonString.c_str(), jsonString.c_str() + jsonString.size(), &jsonObject, &errors);
@@ -1208,8 +1186,8 @@ void PriorityRequestServer::manageCoordinationRequest(string jsonString)
 			activeRequest.vehicleID = jsonObject["CoordinationRequestList"]["requestorInfo"][i]["vehicleID"].asInt();
 			activeRequest.vehicleType = jsonObject["CoordinationRequestList"]["requestorInfo"][i]["vehicleType"].asInt();
 			activeRequest.vehicleETA = jsonObject["CoordinationRequestList"]["requestorInfo"][i]["ETA"].asDouble();
-			activeRequest.vehicleETAMinute = getMinuteOfYear() + static_cast<int>(jsonObject["CoordinationRequestList"]["requestorInfo"][i]["ETA"].asDouble() / SECOND_MINTUTE_CONVERSION);
-			activeRequest.vehicleETASecond = static_cast<int>((fmod(jsonObject["CoordinationRequestList"]["requestorInfo"][i]["ETA"].asDouble(), SECOND_MINTUTE_CONVERSION)) * getMsOfMinute());
+			activeRequest.vehicleETAMinute = currentMinuteOfYear + static_cast<int>(jsonObject["CoordinationRequestList"]["requestorInfo"][i]["ETA"].asDouble() / SECOND_MINTUTE_CONVERSION);
+			activeRequest.vehicleETASecond = static_cast<int>((fmod(jsonObject["CoordinationRequestList"]["requestorInfo"][i]["ETA"].asDouble(), SECOND_MINTUTE_CONVERSION)) * currentMsOfMinute);
 			activeRequest.vehicleETADuration = jsonObject["CoordinationRequestList"]["requestorInfo"][i]["CoordinationSplit"].asInt();
 			activeRequest.vehicleLaneID = coordinationLaneID;
 			activeRequest.msgReceivedTime = currentTime;
@@ -1228,185 +1206,6 @@ void PriorityRequestServer::manageCoordinationRequest(string jsonString)
 		sendSSM = false;
 		sendPriorityRequestList = false;
 	}
-}
-
-/*
-	- The method stores non-priority eligible connected vehicle data in the ConnectedPassengerVehicleArrivalTable.
-*/
-void PriorityRequestServer::manageConnectedPassengerVehicleArrivalTable(string jsonString)
-{
-	Json::Value jsonObject;
-	Json::CharReaderBuilder builder;
-	Json::CharReader *reader = builder.newCharReader();
-	string errors{};
-	reader->parse(jsonString.c_str(), jsonString.c_str() + jsonString.size(), &jsonObject, &errors);
-	delete reader;
-
-	ConnectedPassengerVehicleArrivalTable.clear();
-	ArrivalTable connectedPassengerVehicleObject;
-
-	int noOfConnectedPassengerVehicle = jsonObject["NoOfConnectedPassengerVehicle"].asInt();
-
-	for (int i = 0; i < noOfConnectedPassengerVehicle; i++)
-	{
-		connectedPassengerVehicleObject.reset();
-		connectedPassengerVehicleObject.vehicleType = static_cast<int>(vehicleType::car);
-		connectedPassengerVehicleObject.vehicleSignalGroup = jsonObject["SignalGroup"][i].asInt();
-		connectedPassengerVehicleObject.vehicleETA = jsonObject["ETA"][i].asInt();
-		connectedPassengerVehicleObject.etaUpdateTime = getPosixTimestamp();
-
-		ConnectedPassengerVehicleArrivalTable.push_back(connectedPassengerVehicleObject);
-	}
-}
-
-void PriorityRequestServer::manageVehicleArrivalTable(string jsonString)
-{
-	double estimatedETA{};
-	Json::Value jsonObject;
-	Json::CharReaderBuilder builder;
-	Json::CharReader *reader = builder.newCharReader();
-	string errors{};
-	reader->parse(jsonString.c_str(), jsonString.c_str() + jsonString.size(), &jsonObject, &errors);
-	delete reader;
-
-	VehicleArrivalTable.clear();
-	ArrivalTable arrivalTableObject;
-	arrivalTableReceivedTime = getPosixTimestamp();
-
-	for (size_t i = 0; i < ActiveRequestTable.size(); i++)
-	{
-		arrivalTableObject.reset();
-		arrivalTableObject.vehicleType = ActiveRequestTable[i].vehicleType;
-		arrivalTableObject.vehicleSignalGroup = ActiveRequestTable[i].signalGroup;
-		arrivalTableObject.vehicleETA = ActiveRequestTable[i].vehicleETA;
-		VehicleArrivalTable.push_back(arrivalTableObject);
-	}
-
-	for (size_t i = 0; i < ConnectedPassengerVehicleArrivalTable.size(); i++)
-	{
-		arrivalTableObject.reset();
-		arrivalTableObject.vehicleType = ConnectedPassengerVehicleArrivalTable[i].vehicleType;
-		arrivalTableObject.vehicleSignalGroup = ConnectedPassengerVehicleArrivalTable[i].vehicleSignalGroup;
-		arrivalTableObject.vehicleETA = ConnectedPassengerVehicleArrivalTable[i].vehicleETA;
-		VehicleArrivalTable.push_back(arrivalTableObject);
-	}
-
-	int noOfEstimatedVehicle = jsonObject["noOfEstimatedVehicle"].asInt();
-
-	for (int i = 0; i < noOfEstimatedVehicle; i++)
-	{
-		arrivalTableObject.reset();
-		estimatedETA = (jsonObject["EstimatedVehicleDistanceToStopbar"][i].asDouble() / cellLength) * 2.0;
-
-		if (estimatedETA <= 0)
-			estimatedETA = 2.0;
-
-		arrivalTableObject.vehicleType = jsonObject["EstimatedVehicleType"][i].asInt();
-		arrivalTableObject.vehicleSignalGroup = jsonObject["EstimatedVehicleSignalGroup"][i].asInt();
-		arrivalTableObject.vehicleETA = estimatedETA;
-		arrivalTableObject.etaUpdateTime = getPosixTimestamp();
-
-		VehicleArrivalTable.push_back(arrivalTableObject);
-	}
-
-	displayConsoleData("Receive Arrival Table Data");
-}
-
-/*
-	- Method to update ETA in Arriaval Table and Connected Passenger Vehicle Arrival Table.
-	- If ETA becomes less than zero, the method sets ETA as Minimum_ETA value (e.g., 1.0)
-*/
-void PriorityRequestServer::updateETAInArrivalTable()
-{
-	double currentTime = getPosixTimestamp();
-
-	if (!VehicleArrivalTable.empty())
-	{
-		for (size_t i = 0; i < VehicleArrivalTable.size(); i++)
-		{
-			VehicleArrivalTable[i].vehicleETA = VehicleArrivalTable[i].vehicleETA - (currentTime - VehicleArrivalTable[i].etaUpdateTime);
-
-			if (VehicleArrivalTable[i].vehicleETA <= 0)
-				VehicleArrivalTable[i].vehicleETA = Minimum_ETA;
-
-			VehicleArrivalTable[i].etaUpdateTime = currentTime;
-		}
-
-		for (size_t i = 0; i < ConnectedPassengerVehicleArrivalTable.size(); i++)
-		{
-			ConnectedPassengerVehicleArrivalTable[i].vehicleETA = ConnectedPassengerVehicleArrivalTable[i].vehicleETA - (currentTime - ConnectedPassengerVehicleArrivalTable[i].etaUpdateTime);
-
-			if (ConnectedPassengerVehicleArrivalTable[i].vehicleETA <= 0)
-				ConnectedPassengerVehicleArrivalTable[i].vehicleETA = Minimum_ETA;
-
-			ConnectedPassengerVehicleArrivalTable[i].etaUpdateTime = currentTime;
-		}
-
-		etaUpdateTime = currentTime;
-	}
-}
-
-string PriorityRequestServer::getVehicleArrivalTableJsonString()
-{
-	string vehicleArrivalTableJsonString{};
-	double currentTime = getPosixTimestamp();
-
-	Json::Value jsonObject;
-	Json::StreamWriterBuilder builder;
-	builder["commentStyle"] = "None";
-	builder["indentation"] = "";
-
-	if (((currentTime - arrivalTableReceivedTime) >= SRM_TIME_GAP_VALUE) && !sentClearRequest && (getOptimizationMethod() == "DP"))
-	{
-		jsonObject["MsgType"] = "ClearRequest";
-		sentClearRequest = true;
-		VehicleArrivalTable.clear();
-		ConnectedPassengerVehicleArrivalTable.clear();
-		displayConsoleData("Clear Request Message will send to PRSolver");
-		loggingData("Clear Request Message will send to PRSolver");
-	}
-	
-
-	else if (!VehicleArrivalTable.empty() && getOptimizationMethod() == "DP")
-	{
-		jsonObject["MsgType"] = "ArrivalTableData";
-		jsonObject["ArrivalTable"]["NoOfVehicles"] = VehicleArrivalTable.size();
-
-		for (unsigned int i = 0; i < VehicleArrivalTable.size(); i++)
-		{
-			jsonObject["ArrivalTable"]["VehicleType"][i] = VehicleArrivalTable[i].vehicleType;
-			jsonObject["ArrivalTable"]["ETA"][i] = VehicleArrivalTable[i].vehicleETA;
-			jsonObject["ArrivalTable"]["SignalGroup"][i] = VehicleArrivalTable[i].vehicleSignalGroup;
-		}
-
-		sentClearRequest = false;
-		displayConsoleData("Arrival Table data will send to PRSolver");
-		loggingData("Arrival Table data  will send to PRSolver");
-	}
-
-	vehicleArrivalTableJsonString = Json::writeString(builder, jsonObject);
-	arrivalTableSendingTimeToSolver = getPosixTimestamp();
-
-	// displayConsoleData(vehicleArrivalTableJsonString);
-	// loggingData(vehicleArrivalTableJsonString);
-
-	return vehicleArrivalTableJsonString;
-}
-
-bool PriorityRequestServer::checkArrivalTableSendingRequirement()
-{
-	bool messageSendrequirement{false};
-	double currentTime = getPosixTimestamp();
-
-	if ((currentTime - arrivalTableSendingTimeToSolver) >= optimizationProblemSolvingTimegap && !VehicleArrivalTable.empty())
-		messageSendrequirement = true;
-
-	return messageSendrequirement;
-}
-
-string PriorityRequestServer::getOptimizationMethod()
-{
-	return optimizationMethod;
 }
 
 PriorityRequestServer::~PriorityRequestServer()

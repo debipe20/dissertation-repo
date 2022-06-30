@@ -64,12 +64,6 @@ int main()
             else if (msgType == static_cast<int>(msgType::coordinationRequest))
                 PRS.manageCoordinationRequest(receivedJsonString);
 
-            else if (msgType == static_cast<int>(msgType::connectedPassengerVehicleData))
-                PRS.manageConnectedPassengerVehicleArrivalTable(receivedJsonString);
-
-            else if (msgType == static_cast<int>(msgType::estimatedArrivalTable))
-                PRS.manageVehicleArrivalTable(receivedJsonString);
-
             //Storing the received message in the logfile, if logging is true in config file
             PRS.loggingData(receivedJsonString);
 
@@ -81,26 +75,17 @@ int main()
                 PRSSocket.sendData(messageDistributorIP, static_cast<short unsigned int>(messageDistributorPortNo), ssmJsonString);
                 PRSSocket.sendData(LOCALHOST, static_cast<short unsigned int>(dataCollectorPortNo), ssmJsonString);
             }
-
             //Creating JSON string for solver
-            if (PRS.getOptimizationMethod() == "MILP" && PRS.getPriorityRequestListSendingRequirement())
+            if (PRS.getPriorityRequestListSendingRequirement())
             {
                 solverJsonString = PRS.createJsonStringForPrioritySolver();
                 PRSSocket.sendData(LOCALHOST, static_cast<short unsigned int>(solverPortNo), solverJsonString);
-                // PRS.printActiveRequestTable();
+                PRS.printActiveRequestTable();
             }
-
-            
         }
 
         else
         {
-            if (PRS.getOptimizationMethod() == "DP" && PRS.checkArrivalTableSendingRequirement())
-            {
-                solverJsonString = PRS.getVehicleArrivalTableJsonString();
-                PRSSocket.sendData(LOCALHOST, static_cast<short unsigned int>(solverPortNo), solverJsonString);
-            }
-
             /* 
 	            - Delete vehicle info from Active Request Table if Infrustracture doesn't receive and SRM for predefined time
                 - After the request, if Active request table is empty then send clear request message to PRSolver
@@ -114,7 +99,7 @@ int main()
                 
                 solverJsonString = PRS.createJsonStringForPrioritySolver();
                 PRSSocket.sendData(LOCALHOST, static_cast<short unsigned int>(solverPortNo), solverJsonString);
-                // PRS.printActiveRequestTable();
+                PRS.printActiveRequestTable();
             }
             // Clear request will send to solver, if requires
             if (PRS.sendClearRequest())
@@ -132,7 +117,7 @@ int main()
             if (PRS.updateETA())
             {
                 ssmJsonString = PRS.createSSMJsonString(signalStatus);
-                // PRS.printActiveRequestTable();
+                PRS.printActiveRequestTable();
                 PRSSocket.sendData(LOCALHOST, static_cast<short unsigned int>(ssmReceiverPortNo), ssmJsonString);
                 PRSSocket.sendData(messageDistributorIP, static_cast<short unsigned int>(messageDistributorPortNo), ssmJsonString);
                 PRSSocket.sendData(LOCALHOST, static_cast<short unsigned int>(dataCollectorPortNo), ssmJsonString);

@@ -43,6 +43,7 @@ using namespace MsgEnum;
 #define NumberOfPhasePerRing 4
 #define NumberOfStartingPhase 2
 #define Initialize 0.0
+#define BigNumber 10000
 
 using std::cout;
 using std::endl;
@@ -57,31 +58,12 @@ using std::vector;
 class SignalControl
 {
 private:
-  int timeHorizon{};
-  int startingPhase1{};
-  int startingPhase2{};
+  int timeHorizon{120};
   int indexOfMinPerformanceMeasurement{};
-  int emergencyVehicle = static_cast<int>(MsgEnum::vehicleType::special);
-  int transit = static_cast<int>(MsgEnum::vehicleType::bus);
-  int truck = static_cast<int>(MsgEnum::vehicleType::axleCnt4);
-  int connectedPassengerVehicle = static_cast<int>(MsgEnum::vehicleType::carOther);
-  int nonConnectedVehicle = static_cast<int>(MsgEnum::vehicleType::car);
-  // double emergencyVehicleWeight{1.0};
-  // double transitWeight{1.0};
-  // double truckWeight{1.0};
-  // double connectedPassengerVehicleWeight{0.1};
-  // double nonConnectedVehicleWeight{0.1};
-  double activePhasesPerformanceMeasurementValue{};
-  double inactivePhasesPerformanceMeasurementValue{};
-
   int gminSignalGroup1InRing1{};
   int gminSignalGroup2InRing1{};
   int gminSignalGroup1InRing2{};
   int gminSignalGroup2InRing2{};
-  // int gmaxSignalGroup1InRing1{};
-  // int gmaxSignalGroup2InRing1{};
-  // int gmaxSignalGroup1InRing2{};
-  // int gmaxSignalGroup2InRing2{};
   int clearanceIntervalSignalGroup1InRing1{};
   int clearanceIntervalSignalGroup2InRing1{};
   int clearanceIntervalSignalGroup1InRing2{};
@@ -94,17 +76,10 @@ private:
   int allocatedGreenTimeToCurrentStageSignalGroup2InRing1{};
   int allocatedGreenTimeToCurrentStageSignalGroup1InRing2{};
   int allocatedGreenTimeToCurrentStageSignalGroup2InRing2{};
+  double activePhasesPerformanceMeasurementValue{};
+  double inactivePhasesPerformanceMeasurementValue{};
   string scheduleJsonString{};
-
-  vector<int> PhaseNumber{};
-  vector<double> PedWalk{};
-  vector<double> PedClear{};
-  vector<double> MinGreen{};
-  vector<double> Passage{};
-  vector<double> MaxGreen{};
-  vector<double> YellowChange{};
-  vector<double> RedClear{};
-  vector<int> PhaseRing{};
+  string objectiveFunction{};
   vector<int> previousStageSignalGroupList{};
   vector<int> previousStageMinimumTimeList{};
   vector<int> plannedSignalGroupInRing1{};
@@ -124,7 +99,6 @@ private:
   vector<int> pedCallList{};
   vector<int> phaseCallList{};
   vector<int> arrivalPhaseCallList{};
-
   vector<TrafficControllerData::TrafficSignalPlan> trafficSignalPlan{};
   vector<TrafficControllerData::TrafficConrtollerStatus> trafficControllerStatus{};
   vector<ArrivalTable> vehicleArrivalTable{};
@@ -135,7 +109,8 @@ private:
   vector<COP::OptimalPlan> optimalSignalTiming{};
 
 public:
-  SignalControl(vector<TrafficControllerData::TrafficSignalPlan> signalPlan, vector<TrafficControllerData::TrafficConrtollerStatus> signalStatus, vector<int> phase_Call_List,
+  SignalControl(string objective_Function, int time_Horizon,
+                vector<TrafficControllerData::TrafficSignalPlan> signalPlan, vector<TrafficControllerData::TrafficConrtollerStatus> signalStatus, vector<int> phase_Call_List,
                 vector<ArrivalTable> vehicle_Arrival_Table, vector<int> arrival_PhaseCall_List,
                 vector<int> P_11, vector<int> P_12, vector<int> P_13, vector<int> P_14,
                 vector<int> P_21, vector<int> P_22, vector<int> P_23, vector<int> P_24);
@@ -154,10 +129,6 @@ public:
   double getPerformaceMeasurementListForInactivePhasesInLaterStage(int stageIndex, int currentStageTimeStep, int allocatedTimeToPreviousStage, vector<int> inactiveSignalGroupIncurrentStage);
   double getCummulativeValueFunction(int currentStageNo, int allocatedTimeToPreviousStage);
   bool checkStoppingCrietria(double previousPerformanceMeasurement, double currentPerformanceMeasurement);
-  string getSignalTimingPlanRequestString();
-  string getArrivalTableDataRequestString();
-  string getTimePhaseDiagramMessageString();
-  string getScheduleforTCI();
   vector<int> getPreviousStageTimeStep(int currentStageTimeStep, int currentStageMinimumBarrierLength);
   vector<int> getAllocatedTimeStepListToSignalGroup1(int allocatedTotalTimeStep, int currentStageMinimumBarrierLength, int minimumGreenTimeSignalGroup2, int clearanceIntervalSignalGroup2);
   vector<COP::OptimalPlan> getOptimalSignalTiming();
