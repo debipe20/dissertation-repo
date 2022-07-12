@@ -2,7 +2,7 @@
     "FileName":"processed-results-gavilan-approach5-0.20.csv",
     "ApproachLength": 350,
     "LaneId": 17,
-    "EstimatedData": false,
+    "EstimatedData": true,
     "StartTimeOfDiagram": 1653093600,
 	"EndTimeOfDiagram": 1653093900
 }

@@ -149,15 +149,37 @@ def getTrajectoryPoint(dataFrame, startTime, endTime, approachLength, estimatedD
                 # if row['DistanceToStopBar'] > 100:
                 #     print(row['DistanceToStopBar'])
 
+            #DNN-TSE
+            # if row['ConnectedVehicleId'] == 0 and row['NonConnectedVehicleId'] > 0 and row['DistanceToStopBar'] >= 0.0 and row['DistanceToStopBar'] < 250.0 and \
+            #         row['PredictedCellStatus'] > 0.035 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
+            #     nonConnectedVehicleTimePoint.append(row['TimeStamp'] - startTime)
+            #     nonConnectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
 
-            if row['ConnectedVehicleId'] == 0 and row['NonConnectedVehicleId'] > 0 and row['DistanceToStopBar'] >= 0.0 and row['DistanceToStopBar'] < 250.0 and \
+
+            # if row['ConnectedVehicleId'] == 0 and row['NonConnectedVehicleId'] > 0 and row['DistanceToStopBar'] >250 and \
+            #         row['PredictedCellStatus'] > 0.042 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
+            #     nonConnectedVehicleTimePoint.append(row['TimeStamp'] - startTime)
+            #     nonConnectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
+            
+            # if row['ConnectedVehicleId'] == 0 and row['DistanceToStopBar'] >= 100.0 and row['DistanceToStopBar'] < 330.0 and \
+            #         row['PredictedCellStatus'] > 0.045 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
+            #     nonConnectedVehicleTimePoint.append(row['TimeStamp'] - startTime)
+            #     nonConnectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
+
+            #SVM
+            if row['ConnectedVehicleId'] == 0 and row['NonConnectedVehicleId'] > 0 and row['DistanceToStopBar'] >= 0.0 and row['DistanceToStopBar'] < 80.0 and \
                     row['PredictedCellStatus'] > 0.035 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
                 nonConnectedVehicleTimePoint.append(row['TimeStamp'] - startTime)
                 nonConnectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
 
 
-            if row['ConnectedVehicleId'] == 0 and row['NonConnectedVehicleId'] > 0 and row['DistanceToStopBar'] >250 and \
-                    row['PredictedCellStatus'] > 0.042 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
+            if row['ConnectedVehicleId'] == 0 and row['NonConnectedVehicleId'] > 0 and row['DistanceToStopBar'] >90 and \
+                    row['PredictedCellStatus'] > 0.8 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
+                nonConnectedVehicleTimePoint.append(row['TimeStamp'] - startTime)
+                nonConnectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
+            
+            if row['ConnectedVehicleId'] == 0 and row['DistanceToStopBar'] >= 20.0 and row['DistanceToStopBar'] <= 90.0 and \
+                    row['PredictedCellStatus'] > 0.2 and row['TimeStamp'] >= startTime and row['TimeStamp'] <= endTime:
                 nonConnectedVehicleTimePoint.append(row['TimeStamp'] - startTime)
                 nonConnectedVehicleDistancePoint.append(approachLength - row['DistanceToStopBar'])
 
