@@ -1,0 +1,38 @@
+{
+    "IntersectionName": "daisy-meridian",
+    "MaximumNoOfData": 50,
+    "DataLookBack": 25.0,
+    "NoOfApproach": 3,
+    "ApproachInformation": [
+        {
+            "ApproachNo": 1,
+            "ApproachId": 1,
+            "NoOfLanes": 4,
+            "CellsPerLane": 46,
+            "LaneId": [1,2,3,4],
+            "SignalGroup": [6,6,6,1],
+            "EstimationModel": "/nojournal/bin/trained-model/trained-model-approach1.h5",
+            "SampleY": "/nojournal/bin/trained-model/trainY-approach1.npy"
+        },
+        {
+            "ApproachNo": 2,
+            "ApproachId": 3,
+            "NoOfLanes": 3,
+            "CellsPerLane": 46,
+            "LaneId": [8,9,10],
+            "SignalGroup": [8,8,8],
+            "EstimationModel": "/nojournal/bin/trained-model/trained-model-approach3.h5",
+            "SampleY": "/nojournal/bin/trained-model/trainY-approach3.npy"
+        },
+        {
+            "ApproachNo": 3,
+            "ApproachId": 5,
+            "NoOfLanes": 3,
+            "CellsPerLane": 46,
+            "LaneId": [13,14,15],
+            "SignalGroup": [2,2,2],
+            "EstimationModel": "/nojournal/bin/trained-model/trained-model-approach5.h5",
+            "SampleY": "/nojournal/bin/trained-model/trainY-approach5.npy"
+        }
+    ]
+}

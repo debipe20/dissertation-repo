@@ -1,8 +1,0 @@
-{
-    "IntersectionName" : "daisy-gavilan",
-    "ConnectedVehiclePenetrationRate": 0.7,
-    "FrequencyOfRequest": 0.5,
-    "ApproachId": 3,
-    "NoOfLanes":4,
-    "LaneId":[9,10,11,12]
-}

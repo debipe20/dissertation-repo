@@ -1,0 +1,29 @@
+{
+    "currentPhases": [
+        {
+            "Phase": 2,
+            "State": "yellow",
+            "ElapsedTime": 38,
+            "ElapsedTimeInGMax": null,
+            "RemainingGMax": null,
+            "PedState": "do_not_walk"
+        },
+        {
+            "Phase": 6,
+            "State": "yellow",
+            "ElapsedTime": 38,
+            "ElapsedTimeInGMax": null,
+            "RemainingGMax": null,
+            "PedState": "do_not_walk"
+        }
+    ],
+    "MsgType": "CurrNextPhaseStatus",
+    "nextPhases": [
+        3,
+        7
+    ],
+    "vehicleCalls": [],
+    "totalVehicleCalls": 0,
+    "pedestrianCalls": [],
+    "totalPedestrianCalls": 0
+}

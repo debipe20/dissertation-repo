@@ -1,0 +1,20 @@
+{
+    "IntersectionName" : "daisy-memorial",
+    "TrainingData": true,
+    "CoonectedVehiclePenetrationRate": 1.0,
+    "ApproachLength": 352.0,
+    "NoOfApproach": 4,
+    "ApproachId":[1,3,5,7],
+    "Approach1NoOfLanes": 4,
+    "Approach2NoOfLanes": 2,
+    "Approach3NoOfLanes": 4,
+    "Approach4NoOfLanes": 2,    
+    "Approach1LaneId":[1,2,3,4],
+    "Approach2LaneId":[8,9],
+    "Approach3LaneId":[11,12,13,14],
+    "Approach4LaneId":[18,19],
+    "Approach1SignalGroup":[2,2,2,5],
+    "Approach2SignalGroup":[4,4],
+    "Approach3SignalGroup":[6,6,6,1],
+    "Approach4SignalGroup":[8,8]
+}

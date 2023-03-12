@@ -58,11 +58,6 @@ void VehicleStatusManager::readConfigFile()
 	{
 		penetrationRate = jsonObject["ConnectedVehiclePenetrationRate"].asDouble();
 		msgSendingFrequency = jsonObject["FrequencyOfRequest"].asDouble();
-		approachId = jsonObject["ApproachId"].asInt();
-		noOfLanes = jsonObject["NoOfLanes"].asInt();
-
-		for (int i = 0; i < noOfLanes; i++)
-			lanesId.push_back(jsonObject["LaneId"][i].asInt());
 	}
 }
 
@@ -111,6 +106,7 @@ void VehicleStatusManager::getVehicleInformationFromMAP(BasicVehicle basicVehicl
 	int vehicleId{};
 	// double currentTime{};
 	bool onMap{false};
+	int vehicleLocationOnMap{};
 	vehicleId = basicVehicle.getTemporaryID();
 
 	vector<VehicleStatus>::iterator findVehicleIdInVehicleStatusList = std::find_if(std::begin(VehicleStatusList), std::end(VehicleStatusList),
@@ -143,8 +139,9 @@ void VehicleStatusManager::getVehicleInformationFromMAP(BasicVehicle basicVehicl
 	struct connectedVehicle_t connectedVehicle_t_1 = {0, 0, 0, geoPoint_t_1, motion_t_1, vehicleTracking_t_1, locationAware_t_1, signalAware_t_1};
 
 	onMap = plocAwareLib->locateVehicleInMap(connectedVehicle_t_1, vehicleTracking_t_1);
+	vehicleLocationOnMap = unsigned(vehicleTracking_t_1.intsectionTrackingState.vehicleIntersectionStatus);
 
-	if (onMap)
+	if (onMap && (vehicleLocationOnMap == static_cast<int>(mapLocType::onInbound)))
 	{
 		plocAwareLib->getPtDist2D(vehicleTracking_t_1, point2D_t_2);
 		double vehicleDistanceFromStopBar = unsigned(point2D_t_1.distance2pt(point2D_t_2)) / 100; //unit of meters
@@ -153,39 +150,21 @@ void VehicleStatusManager::getVehicleInformationFromMAP(BasicVehicle basicVehicl
 															 unsigned(vehicleTracking_t_1.intsectionTrackingState.approachIndex),
 															 unsigned(vehicleTracking_t_1.intsectionTrackingState.laneIndex));
 
-		// int vehicleApproachId = plocAwareLib->getApproachIdByLaneId(regionalId, intersectionId, (unsigned char)((unsigned)vehicleLaneId));
+		int vehicleApproachId = plocAwareLib->getApproachIdByLaneId(regionalId, intersectionId, (unsigned char)((unsigned)vehicleLaneId));
 
 		// int vehicleSignalGroup = unsigned(plocAwareLib->getControlPhaseByIds(static_cast<uint16_t>(regionalId), static_cast<uint16_t>(intersectionId),
 		// 																	 static_cast<uint8_t>(vehicleApproachId), static_cast<uint8_t>(vehicleLaneId)));
 
 		findVehicleIdInVehicleStatusList->vehicleDistanceFromStopBar = vehicleDistanceFromStopBar;
 		findVehicleIdInVehicleStatusList->vehicleLaneId = vehicleLaneId;
-		// findVehicleIdInVehicleStatusList->vehicleApproachId = vehicleApproachId;
+		findVehicleIdInVehicleStatusList->vehicleApproachId = vehicleApproachId;
 		// findVehicleIdInVehicleStatusList->vehicleSignalGroup = vehicleSignalGroup;
 		findVehicleIdInVehicleStatusList->vehicleLocationOnMap = unsigned(vehicleTracking_t_1.intsectionTrackingState.vehicleIntersectionStatus);
 		findVehicleIdInVehicleStatusList->updateTime = getPosixTimestamp();
-
-		// currentTime = getPosixTimestamp();
-
-		// if (vehicle_Speed <= 2.0)
-		// {
-		// 	double vehicleStoppedDelay = findVehicleIdInVehicleStatusList->vehicleStoppedDelay + currentTime - findVehicleIdInVehicleStatusList->updateTime;
-		// 	findVehicleIdInVehicleStatusList->vehicleStoppedDelay = vehicleStoppedDelay;
-		// 	findVehicleIdInVehicleStatusList->updateTime = currentTime;
-		// }
-
-		// else
-		// {
-		// 	findVehicleIdInVehicleStatusList->updateTime = currentTime;
-		// 	findVehicleIdInVehicleStatusList->vehicleStoppedDelay = 0;
-		// }
 	}
 
 	else
 	{
-		// if (findVehicleIdInVehicleStatusList->connected)
-		// 	noOfConnectedVehiclesInList--;
-
 		VehicleStatusList.erase(findVehicleIdInVehicleStatusList);
 	}
 }
@@ -222,7 +201,7 @@ void VehicleStatusManager::manageVehicleStatusList(BasicVehicle basicVehicle)
 		vehicleStatus.vehicleType = vehicleType;
 		vehicleStatus.vehicleSpeed_MeterPerSecond = basicVehicle.getSpeed_MeterPerSecond();
 		// vehicleStatus.vehicleHeading_Degree = basicVehicle.getHeading_Degree();
-		vehicleStatus.updateTime = getPosixTimestamp();
+		// vehicleStatus.updateTime = getPosixTimestamp();
 
 		VehicleStatusList.push_back(vehicleStatus);
 
@@ -239,7 +218,7 @@ void VehicleStatusManager::manageVehicleStatusList(BasicVehicle basicVehicle)
 
 		findVehicleIdInVehicleStatusList->vehicleSpeed_MeterPerSecond = basicVehicle.getSpeed_MeterPerSecond();
 		// findVehicleIdInVehicleStatusList->vehicleHeading_Degree = basicVehicle.getHeading_Degree();
-		findVehicleIdInVehicleStatusList->updateTime = getPosixTimestamp();
+		// findVehicleIdInVehicleStatusList->updateTime = getPosixTimestamp();
 	}
 
 	getVehicleInformationFromMAP(basicVehicle);
@@ -255,28 +234,6 @@ void VehicleStatusManager::setConnectedVehicleStatus(int vehicleId)
 																					[&](VehicleStatus const &p)
 																					{ return p.vehicleId == vehicleId; });
 	findVehicleIdInVehicleStatusList->connected = connectedVehicleStatus;
-
-	// int noOfVehiclesInList = static_cast<int>(VehicleStatusList.size());
-	// int allowedConnectedVehicle = static_cast<int>(noOfVehiclesInList * penetrationRate);
-
-	// vector<VehicleStatus>::iterator findVehicleIdInVehicleStatusList = std::find_if(std::begin(VehicleStatusList), std::end(VehicleStatusList),
-	// 																					[&](VehicleStatus const &p)
-	// 																					{ return p.vehicleId == vehicleId; });
-
-	// if (noOfVehiclesInList == 1)
-	// {
-	// 	findVehicleIdInVehicleStatusList->connected = true;
-	// 	noOfConnectedVehiclesInList++;
-	// }
-
-	// else if (noOfConnectedVehiclesInList <= allowedConnectedVehicle)
-	// {
-	// 	findVehicleIdInVehicleStatusList->connected = true;
-	// 	noOfConnectedVehiclesInList++;
-	// }
-
-	// else
-	// 	findVehicleIdInVehicleStatusList->connected = false;
 }
 
 /*
@@ -399,7 +356,7 @@ string VehicleStatusManager::getVehicleStatusList()
 			jsonObject["VehicleStatusList"][i]["speed_MeterPerSecond"] = VehicleStatusList[i].vehicleSpeed_MeterPerSecond;
 			// jsonObject["VehicleStatusList"][i]["heading_Degree"] = VehicleStatusList[i].vehicleHeading_Degree;
 			jsonObject["VehicleStatusList"][i]["inBoundLaneId"] = VehicleStatusList[i].vehicleLaneId;
-			// jsonObject["VehicleStatusList"][i]["inBoundApproachId"] = VehicleStatusList[i].vehicleApproachId;
+			jsonObject["VehicleStatusList"][i]["inBoundApproachId"] = VehicleStatusList[i].vehicleApproachId;
 			// jsonObject["VehicleStatusList"][i]["signalGroup"] = VehicleStatusList[i].vehicleSignalGroup;
 			jsonObject["VehicleStatusList"][i]["distanceFromStopBar"] = VehicleStatusList[i].vehicleDistanceFromStopBar;
 			// jsonObject["VehicleStatusList"][i]["locationOnMap"] = VehicleStatusList[i].vehicleLocationOnMap;
@@ -410,6 +367,7 @@ string VehicleStatusManager::getVehicleStatusList()
 	jsonObject["NoOfVehicle"] = noOfVehicle;
 	vehicleStatusListJsonString = Json::writeString(builder, jsonObject);
 	msgSendingTime = getPosixTimestamp();
+	// cout << "Sent following Vehicle Status Data:\n" << vehicleStatusListJsonString << endl;
 
 	return vehicleStatusListJsonString;
 }
@@ -419,7 +377,6 @@ bool VehicleStatusManager::checkMsgSendingRequirement()
 	bool messageSendrequirement{false};
 	double currentTime = getPosixTimestamp();
 
-	// if (((currentTime - msgSendingTime) >= msgSendingFrequency) && VehicleStatusList.size() > 0)
 	if ((currentTime - msgSendingTime) >= msgSendingFrequency)
 		messageSendrequirement = true;
 

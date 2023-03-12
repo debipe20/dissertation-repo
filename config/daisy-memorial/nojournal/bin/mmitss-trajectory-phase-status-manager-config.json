@@ -1,0 +1,18 @@
+{
+    "IntersectionName" : "daisy-memorial",
+    "ConnectedVehiclePenetrationRate": 1.0,
+    "TrajectoryUpdateTimeGap": 0.5,
+    "MessageSendingTimeGap": 5.0,
+    "MaximumNoOfData": 50,
+    "DataLookBack": 25.0,
+    "NoOfApproach": 4,
+    "ApproachId": [1,3,5,7],
+    "NoOfSignalGroupInApproach1":2,
+    "NoOfSignalGroupInApproach2":1,
+    "NoOfSignalGroupInApproach3":2,
+    "NoOfSignalGroupInApproach4":1,
+    "SignalGroupInApproach1": [1,6],
+    "SignalGroupInApproach2": [8],
+    "SignalGroupInApproach3": [2,5],
+    "SignalGroupInApproach4": [4]
+}

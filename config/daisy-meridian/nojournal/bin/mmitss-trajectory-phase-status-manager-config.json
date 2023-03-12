@@ -1,0 +1,18 @@
+{
+    "IntersectionName" : "daisy-meridian",
+    "ConnectedVehiclePenetrationRate": 1.0,
+    "TrajectoryUpdateTimeGap": 0.5,
+    "MessageSendingTimeGap": 5.0,
+    "MaximumNoOfData": 50,
+    "DataLookBack": 25.0,
+    "NoOfApproach": 3,
+    "ApproachId": [1,3,5],
+    "NoOfSignalGroupInApproach1":2,
+    "NoOfSignalGroupInApproach2":1,
+    "NoOfSignalGroupInApproach3":1,
+    "NoOfSignalGroupInApproach4":0,
+    "SignalGroupInApproach1": [1,6],
+    "SignalGroupInApproach2": [8],
+    "SignalGroupInApproach3": [2],
+    "SignalGroupInApproach4": []
+}
